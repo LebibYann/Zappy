@@ -1,0 +1,21 @@
+# General excludes
+.vscode/
+*.o
+*.a
+*.so
+*~
+a.out
+vgcore*
+*.gcno
+*.gcda
+*.gcov
+coding-style*
+*.zip
+
+# Specific excludes
+zappy_ai
+zappy_gui
+zappy_server
+test_zappy_ai
+test_zappy_gui
+test_zappy_server
