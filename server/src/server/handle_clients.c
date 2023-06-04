@@ -16,8 +16,9 @@ static void client_interact(server_t *server, int current_fd)
             exit(84);
         FD_SET(client_socket, &server->read_sockets);
         FD_SET(client_socket, &server->write_sockets);
-    } else
-        handle_command(server, current_fd);
+    } else {
+        // handle_command(server, current_fd);
+    }
 }
 
 bool handle_client(server_t *server)

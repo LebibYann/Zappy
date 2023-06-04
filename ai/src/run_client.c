@@ -16,6 +16,10 @@ void run_client(client_t *client)
     if (select(FD_SETSIZE, &client->read_sockets,
     &client->write_sockets, NULL, NULL) < 0)
         exit(84);
-    if (FD_ISSET(client->server_fd, &client->write_sockets));
-    if (FD_ISSET(client->server_fd, &client->read_sockets));
+    if (FD_ISSET(client->server_fd, &client->write_sockets)) {
+
+    }
+    if (FD_ISSET(client->server_fd, &client->read_sockets)) {
+        
+    }
 }
