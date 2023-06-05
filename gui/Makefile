@@ -191,7 +191,7 @@ fclean: clean_test_file clean
 		-or -name "*.so" -delete  \
 		-or -name "vgcore*" -delete
 	@$(ECHO) $(GREEN) "All temporal file deleted!" $(DEFLT)
-	@find -maxdepth 1 -name $(NAME) -delete
+	@find -maxdepth 1 -name $(OUT)$(NAME) -delete
 	@$(ECHO) $(GREEN) "Executable deleted!" $(DEFLT)
 
 
