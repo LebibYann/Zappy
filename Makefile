@@ -54,6 +54,7 @@ fclean:
 	@make fclean -C $(GUI_SRC) --no-print-directory; \
 	make fclean -C $(SERVER_SRC) --no-print-directory; \
 	make fclean -C $(AI_SRC) --no-print-directory;
+	@find ./lib/ -maxdepth 1 -name "*.a" -delete
 	@$(ECHO) $(BLINK) "[FCLEAN DONE]" $(DEFLT)
 
 lib: FORCE
