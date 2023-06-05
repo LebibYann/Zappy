@@ -7,12 +7,12 @@
 ##
 
 NAME = libzappy_protocol
-CC = gcc
+CC = g++
 CC_A = ar
-CC_SO = gcc
+CC_SO = g++
 ROOT =
 OUTPUT =
-SRC_FILE_EXT = .c
+SRC_FILE_EXT = .cpp
 
 #SRC
 SRC_DIRS_REC = src/
