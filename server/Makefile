@@ -22,7 +22,7 @@ INCLUDE_DIRS_REC = include/
 INCLUDE_DIRS =
 
 #FLAGS
-FLAGS = -g -g3 -Wextra -Wall -W -Werror
+FLAGS = -g -g3 -Wextra -Wall -W -Werror -lstr_split
 
 #LIB
 LIB_DIRS = ../lib/
