@@ -64,3 +64,12 @@ t_custom_fd *new_custom_fd(void);
  ** @return t_custom_fd*
  */
 void delete_custom_fd(t_custom_fd *c_fd);
+
+/**
+ ** @brief Works as a getline return NULL even if there's content,
+ ** this function only returns something if it can find a \\n or a \\0.
+ **
+ ** @param c_fd
+ ** @return char*
+ */
+char *getline_in_custom_fd(t_custom_fd *c_fd);

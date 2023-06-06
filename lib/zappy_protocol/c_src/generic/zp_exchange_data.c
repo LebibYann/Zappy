@@ -53,7 +53,6 @@ fd_set rd_socket, fd_set wr_socket, bool *something_to_read)
 ssize_t zp_exchange_data(t_zp_pending_data *zp_pending_d,
 fd_set rd_socket, fd_set wr_socket)
 {
-    int select_code = 0;
     bool can_read = true;
     fd_set tmp_rd_sock;
     fd_set tmp_wr_sock;

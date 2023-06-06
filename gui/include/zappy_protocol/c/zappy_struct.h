@@ -35,6 +35,7 @@ typedef enum e_zp_command {
     ZP_INCANTATION,
 
     // GUI
+    ZP_GRAPHIC,
     ZP_MSZ,
     ZP_BCT,
     ZP_MCT,
