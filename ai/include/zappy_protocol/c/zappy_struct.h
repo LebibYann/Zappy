@@ -7,7 +7,16 @@
 
 #pragma once
 
-#define BUF_SIZE 8192
+#include "custom_fd.h"
+
+#define BUFSIZE 8192
+
+typedef struct s_zp_pending_data {
+    int fd;
+    bool disconnected;
+    t_custom_fd c_rfd;
+    t_custom_fd c_wfd;
+} t_zp_pending_data;
 
 typedef enum e_zp_command {
     // AI

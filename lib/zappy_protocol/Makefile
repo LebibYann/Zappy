@@ -12,10 +12,10 @@ CC_A = ar
 CC_SO = g++
 ROOT =
 OUTPUT =
-SRC_FILE_EXT = .cpp
+SRC_FILE_EXT = .c*
 
 #SRC
-SRC_DIRS_REC = src/
+SRC_DIRS_REC = c_src/ cpp_src
 SRC_DIRS =
 SRC_FILES =
 
@@ -126,7 +126,8 @@ _SRC_DIRS_FILES_REC = $(foreach dir, $(SRC_DIRS_REC), \
 _SRC = $(SRC_FILES) $(_SRC_DIRS_FILES) $(_SRC_DIRS_FILES_REC)
 
 # Obj
-_OBJ = $(_SRC:$(SRC_FILE_EXT)=.o)
+_TMP = $(_SRC:.cpp=.o)
+_OBJ = $(_TMP:.c=.o)
 
 # ---------------------- ################################ ----------------------
 # ---------------------- ################################ ----------------------
@@ -136,23 +137,10 @@ _OBJ = $(_SRC:$(SRC_FILE_EXT)=.o)
 
 all:
 	@$(ECHO) $(BLINK)$(PURPLE)"[COMPILING: $(NAME)]"$(DEFLT)
-	@make object --no-print-directory && \
+	@make -C ./c_src/ --no-print-directory && \
+	make -C ./cpp_src/ --no-print-directory && \
 	make build_a --no-print-directory; \
 	make build_so --no-print-directory
-
-
-
-object:$(NAME)
-%.o : %$(SRC_FILE_EXT)
-	@if [ -f $@ ]; then rm $@; fi
-	@echo -ne "\r"
-	@$(CC) -o $@ -c $< $(_INCLUDE_GCC) $(_LIB_GCC) $(LIB_FLAGS) $(FLAGS)  && \
-	($(CLS_LINE) ; $(ECHO) -n $(BLINK)" [OK]"$(DEFLT) $<) || \
-	($(ECHO) $(RED)"==================================== [KO] "$(TEAL)\
-	"$<"$(DEFLT)" \n\n")
-
-$(NAME):$(_OBJ)
-	@($(CLS_LINE) ; $(ECHO) $(BLUE)" [OBJECT COMPILATION FINISHED]"$(DEFLT))
 
 
 
@@ -163,7 +151,8 @@ build_a:
 	$(ECHO) $(RED) "[KO]"$(DEFLT) $(NAME).a;
 
 build_so:
-	@$(CC_SO) $(FLAGS) $(FLAGS_SO) -o $(ROOT)$(NAME).so $(_OBJ) && \
+	@$(CC_SO) $(FLAGS) $(FLAGS_SO) -o $(ROOT)$(NAME).so\
+	 $(_OBJ) $(_INCLUDE_GCC) && \
 	($(CLS_LINE) ; $(ECHO) $(BLINK)" [OK]"$(DEFLT) $(NAME).so) || \
 	$(ECHO) $(RED) "[KO]"$(DEFLT) $(NAME).so;
 
@@ -177,19 +166,16 @@ so: object build_so
 
 
 
-compil:
-	$(CC) $(_SRC) -o $(NAME) $(_INCLUDE_GCC) $(_LIB_GCC) $(LIB_FLAGS) $(FLAGS)
-
-
-
 clean:
-	@find . -name "*.o" $(_FIND_LIB_EXCL_DIRS) -delete \
-		-or -name "*~" -delete && \
+	@make clean -C ./c_src/ --no-print-directory
+	@make clean -C ./cpp_src/ --no-print-directory
 	$(ECHO) $(BLINK) "[CLEAN DONE]" $(DEFLT)
 
 
 
 fclean: clean_test_file clean
+	@make fclean -C ./c_src/ --no-print-directory
+	@make fclean -C ./cpp_src/ --no-print-directory
 	@find .	-name "*.a" $(_FIND_LIB_EXCL_DIRS) -delete \
 		-or -name "*.exe" -delete \
 		-or -name "a.out" -delete \
@@ -202,18 +188,6 @@ fclean: clean_test_file clean
 
 
 re: fclean all
-
-
-
-install: all
-	@sudo mv $(NAME) /usr/bin/
-	@$(ECHO) $(GREEN) "Program installed!" $(DEFLT)
-
-
-
-uninstall:
-	@sudo rm -i /usr/bin/$(NAME)
-	@$(ECHO) $(GREEN) "Program deleted!" $(DEFLT)
 
 
 
