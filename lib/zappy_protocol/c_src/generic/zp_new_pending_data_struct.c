@@ -11,5 +11,5 @@ t_zp_pending_data *zp_new_pending_data_struct(int fd)
 {
     t_zp_pending_data *zp_pdata = malloc(sizeof(*zp_pdata));
 
-    
+    return (zp_init_pending_data_struct(zp_pdata, fd));
 }
