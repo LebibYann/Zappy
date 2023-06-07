@@ -62,3 +62,15 @@ typedef enum e_zp_command {
     ZP_SBP,
     ZP_TOTAL_CMD
 } t_zp_command;
+
+typedef struct s_zp_ai_to_serv_data {
+    enum e_zp_command cmd_type;
+    char *msg;
+} t_zp_ai_to_serv_data;
+
+typedef struct s_zp_gui_protocol {
+    enum e_zp_command cmd_type;
+    int nbr_args;
+    int *args;
+    char *msg;
+} t_zp_gui_protocol;

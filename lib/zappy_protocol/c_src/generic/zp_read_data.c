@@ -9,5 +9,5 @@
 
 size_t zp_read_data(t_zp_pending_data *zp_pending_d, void *data, size_t size)
 {
-    return (read_in_custom_fd(&(zp_pending_d->c_wfd), data, size));
+    return (read_in_custom_fd(&(zp_pending_d->c_rfd), data, size));
 }
