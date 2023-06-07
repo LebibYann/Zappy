@@ -14,6 +14,7 @@
 #include <stdlib.h>
 
 #include "zappy_struct.h"
+#include "c_zappy_protocol_gui.h"
 
 /**
  ** @brief Fills c_rfd member of t_zp_pending_data
@@ -56,3 +57,5 @@ size_t zp_read_data(t_zp_pending_data *zp_pending_d, void *data, size_t size);
 void zp_init_pending_data_struct(t_zp_pending_data *zp_pending_d, int fd);
 
 void zp_clear_pending_data_struct(t_zp_pending_data *zp_pending_d);
+
+char *zp_getline_pending_data(t_zp_pending_data *zp_pending_d);

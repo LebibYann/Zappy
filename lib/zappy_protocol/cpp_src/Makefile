@@ -22,7 +22,7 @@ INCLUDE_DIRS_REC = ../include/
 INCLUDE_DIRS =
 
 #FLAGS
-FLAGS = -g -g3 -Wextra -Wall -Werror -W
+FLAGS = -g -g3 -Wextra -Wall -Werror -W -shared -fPIC
 
 #EXCLUDED
 GLOB_EXCL_DIRS = ./bonus/
@@ -158,7 +158,7 @@ compil:
 clean:
 	@find . -name "*.o" $(_FIND_LIB_EXCL_DIRS) -delete \
 		-or -name "*~" -delete && \
-	@$(ECHO) $(BLINK) "[CLEAN DONE]" $(DEFLT)
+	$(ECHO) $(BLINK) "[CLEAN DONE]" $(DEFLT)
 
 
 
