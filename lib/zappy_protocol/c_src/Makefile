@@ -22,7 +22,7 @@ INCLUDE_DIRS_REC = ../include/c/
 INCLUDE_DIRS =
 
 #FLAGS
-FLAGS = -g -g3 -Wextra -Wall -Werror -W
+FLAGS = -g -g3 -Wextra -Wall -Werror -W -shared -fPIC
 
 #EXCLUDED
 GLOB_EXCL_DIRS = ./bonus/

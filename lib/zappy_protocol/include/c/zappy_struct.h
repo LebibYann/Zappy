@@ -19,6 +19,7 @@ typedef struct s_zp_pending_data {
 } t_zp_pending_data;
 
 typedef enum e_zp_command {
+    ZP_END = -1,
     // AI
     ZP_FORWARD,
     ZP_RIGHT,
@@ -40,6 +41,7 @@ typedef enum e_zp_command {
     ZP_BCT,
     ZP_MCT,
     ZP_TNA,
+    ZP_PNW,
     ZP_PPO,
     ZP_PLV,
     ZP_PIN,
@@ -65,12 +67,12 @@ typedef enum e_zp_command {
 
 typedef struct s_zp_ai_to_serv_data {
     enum e_zp_command cmd_type;
-    char *msg;
+    char *str;
 } t_zp_ai_to_serv_data;
 
 typedef struct s_zp_gui_protocol {
     enum e_zp_command cmd_type;
     int nbr_args;
     int *args;
-    char *msg;
+    char *str;
 } t_zp_gui_protocol;
