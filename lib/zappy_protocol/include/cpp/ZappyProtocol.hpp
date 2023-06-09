@@ -7,11 +7,18 @@
 
 #pragma once
 
+#include <string>
+
+#include "c_zappy_protocol_gui.h"
+
 class ZappyProtocol {
 public:
-    ZappyProtocol();
+    ZappyProtocol(int fd);
     ~ZappyProtocol();
 
-protected:
+    void writeData(void *data, size_t size);
+    void readData(void *data, size_t size);
+    std::string getLine();
 private:
+    t_zp_pending_data _data;
 };
