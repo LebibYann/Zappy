@@ -9,7 +9,7 @@
 
 #include <string>
 
-#include "c_zappy_protocol_gui.h"
+#include "c_zappy_protocol.h"
 
 class ZappyProtocol {
 public:
@@ -32,6 +32,7 @@ public:
     void readData(void *data, size_t size);
     std::string getLine();
     int getFd(void) const;
-private:
+
+protected:
     t_zp_pending_data _data;
 };

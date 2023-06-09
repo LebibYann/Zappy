@@ -31,10 +31,46 @@ typedef struct s_zp_gui_pair {
 
 extern const t_zp_gui_pair GUI_PAIR[];
 
-
+/**
+ ** @brief You should call zp_exchange_data() after using this function.
+ ** Transform the cmd_type and ... (command arguments)
+ ** into a correctly formed command ready to be sent.
+ ** (use zp_exchange_data() to send it)
+ **
+ ** @param pdata
+ ** @param sender From where you send it.
+ ** @param cmd_type
+ ** @param ... The arguments of the command
+ ** @return true on sucess false if the cmd_type is invalid.
+ */
 bool zp_gui_send_package(t_zp_pending_data *pdata, enum e_sender sender,
 enum e_zp_command cmd_type, ...);
 
+/**
+ ** @brief You should call zp_exchange_data() after using this function.
+ ** Transform the cmd_type and args
+ ** into a correctly formed command ready to be sent.
+ ** (use zp_exchange_data() to send it)
+ **
+ ** @param pdata
+ ** @param sender From where you send it.
+ ** @param cmd_type
+ ** @param ... The arguments of the command
+ ** @return true on sucess false if the cmd_type is invalid.
+ */
+bool zp_gui_send_package_varg(t_zp_pending_data *pdata, enum e_sender sender,
+enum e_zp_command cmd_type, va_list *args);
+
+/**
+ ** @brief You should call zp_exchange_data() before using this function.
+ ** Parse the data of the received command if there's one.
+ **
+ ** @param pdata
+ ** @param pkg
+ ** @param expected_sender Who must have sent it to you.
+ ** @return int 0 on success, -1 if no data has been received,
+ ** -2 if the command receive is unknown, -3 if parameters are invalid.
+ */
 int zp_gui_receive_package(t_zp_pending_data *pdata, t_zp_gui_protocol *pkg,
 enum e_sender expected_sender);
 
