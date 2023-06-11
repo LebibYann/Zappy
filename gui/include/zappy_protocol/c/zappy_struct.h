@@ -76,3 +76,29 @@ typedef struct s_zp_gui_protocol {
     int *args;
     char *str;
 } t_zp_gui_protocol;
+
+#define TOTAL_ELEVATION 8
+
+typedef enum e_elemOnTile {
+    ELEM_PLAYER,
+    ELEM_FOOD,
+    ELEM_LINEMATE,
+    ELEM_DERAUMERE,
+    ELEM_SIBUR,
+    ELEM_MENDIANE,
+    ELEM_PHIRAS,
+    ELEM_THYSTAME,
+    TOTAL_ELEM_ON_TILE
+} t_elemOnTile;
+
+static const int
+ELEVATION_REQUIREMENT[TOTAL_ELEVATION][TOTAL_ELEM_ON_TILE] = {
+    {0, 0, 0, 0, 0, 0, 0, 0},
+    {1, 0, 1, 0, 0, 0, 0, 0},
+    {2, 0, 1, 1, 1, 0, 0, 0},
+    {2, 0, 2, 0, 1, 0, 2, 0},
+    {4, 0, 1, 1, 2, 0, 1, 0},
+    {4, 0, 1, 2, 1, 3, 0, 0},
+    {6, 0, 1, 2, 3, 0, 1, 0},
+    {6, 0, 2, 2, 2, 2, 2, 4}
+};
