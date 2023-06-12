@@ -7,7 +7,7 @@
 
 #include "ZappyAIParam.hpp"
 
-int paramHelp(const std::vector<std::string> &argvList, int argPos, ZappyAI &targetClass)
+int paramHelp(const std::vector<std::string> &argvList, std::size_t &argPos, ZappyAI &targetClass)
 {
     (void)argvList;
     (void)argPos;

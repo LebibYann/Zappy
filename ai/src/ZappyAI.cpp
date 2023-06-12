@@ -17,8 +17,39 @@ ZappyAI::~ZappyAI()
 
 int ZappyAI::init(const std::vector<std::string> &argvList)
 {
-    for (size_t i = 0; i < argvList.size(); ++i) {
-        std::cout << argvList[i] << std::endl;
+    bool portSet = false;
+    bool nameSet = false;
+    bool argRecognized = false;
+    int out = INIT_OK;
+
+    for (size_t i = 1; i < argvList.size(); ++i) {
+        argRecognized = false;
+        for (size_t k = 0; k < PARAM_FUNC_NBR; ++k) {
+            if (argvList[i].compare(PARAMETER_FUNC[k].paramStr) == 0) {
+                argRecognized = true;
+                if (argvList[i].compare(PARAMETER_FUNC[AIFLAG_PORT].paramStr) == 0)
+                    portSet = true;
+                if (argvList[i].compare(PARAMETER_FUNC[AIFLAG_NAME].paramStr) == 0)
+                    nameSet = true;
+                out = PARAMETER_FUNC[k].paramFunc(argvList, i, *this);
+                if (out != INIT_OK)
+                    return (out);
+            }
+        }
+        if (!argRecognized) {
+            std::cerr << "Unknown argument " << i << ": \"" << argvList[i] << "\"\n";
+            return (INIT_KO);
+        }
+    }
+    if (!portSet) {
+        std::cerr << "Port is not set. (" <<
+        PARAMETER_FUNC[AIFLAG_PORT].paramStr << ")" << std::endl;
+        return (INIT_KO);
+    }
+    if (!nameSet) {
+        std::cerr << "Team name is not set. (" <<
+        PARAMETER_FUNC[AIFLAG_NAME].paramStr << ")" << std::endl;
+        return (INIT_KO);
     }
     return (INIT_OK);
 }
@@ -54,8 +85,21 @@ std::string ZappyAI::getMachine(void) const
     return (this->_machine);
 }
 
+void ZappyAI::displayParameters(void)
+{
+    std::cout << std::endl;
+    std::cout << "---------- Connection informations ----------" << std::endl;
+    std::cout << "\tMachine   : " << this->_machine << std::endl;
+    std::cout << "\tPort      : " << this->_port << std::endl;
+    std::cout << "\tTeam name : " << this->_name << std::endl;
+    std::cout << "---------------------------------------------" << std::endl;
+    std::cout << std::endl;
+}
+
+
 bool ZappyAI::connectToServer(void)
 {
+    std::cout << "Attempting connect to: " << this->_machine << ":" << this->_port << std::endl;
     return (true);
 }
 

@@ -22,5 +22,13 @@ int main(int argc, char **argv)
     std::vector<std::string> argvList = generateStrVector(argc, argv);
     ZappyAI zai;
 
+    switch (zai.init(argvList)) {
+        case INIT_KO:
+            return (84);
+        case INIT_HELP:
+            return (0);
+    }
+    zai.displayParameters();
+    zai.connectToServer();
     return (0);
 }
