@@ -43,6 +43,7 @@ class ZappyAI {
         void setMachine(const std::string &machine);
         std::string getMachine(void) const;
 
+        void displayParameters(void);
         bool connectToServer(void);
         void generateCipherList(void);
 
@@ -52,7 +53,7 @@ class ZappyAI {
         bool charExist(char charToCheck);
 
         std::string _name;
-        std::string _machine;
+        std::string _machine = "localhost";
         uint32_t _port;
 
         int _playerId = -1;
