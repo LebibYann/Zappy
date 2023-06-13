@@ -26,5 +26,5 @@ typedef struct client_s{
 } client_t;
 
 int handle_connexion(char *addr, int port);
-int create_client(char *ip_adress, int port);
+int create_client(const char *ip_adress, int port);
 void run_client(client_t *client);

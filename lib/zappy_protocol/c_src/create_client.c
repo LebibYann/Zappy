@@ -7,7 +7,7 @@
 
 #include "client.h"
 
-int create_client(char *ip_adress, int port)
+int create_client(const char *ip_adress, int port)
 {
     int client_socket;
     struct sockaddr_in server_addr;
