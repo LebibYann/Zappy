@@ -42,7 +42,8 @@ fd_set rd_socket, fd_set wr_socket);
  ** @return size_t The size written
  */
 extern "C"
-size_t zp_write_data(t_zp_pending_data *zp_pending_d, void *data, size_t size);
+size_t zp_write_data(
+    t_zp_pending_data *zp_pending_d, const void *data, size_t size);
 
 /**
  ** @brief Reads in c_rfd member of t_zp_pending_data.

@@ -9,10 +9,13 @@
 
 ZappyAI::ZappyAI()
 {
+    FD_ZERO(&(this->_read_socket));
+    FD_ZERO(&(this->_write_socket));
 }
 
 ZappyAI::~ZappyAI()
 {
+    this->removeFdInFdset(this->_communication.getFd());
     this->_connection.Disconnect();
 }
 
@@ -86,6 +89,31 @@ std::string ZappyAI::getMachine(void) const
     return (this->_machine);
 }
 
+
+void ZappyAI::addFdInFdset(int fd)
+{
+    FD_SET(fd, &(this->_read_socket));
+    FD_SET(fd, &(this->_write_socket));
+}
+
+void ZappyAI::removeFdInFdset(int fd)
+{
+    FD_CLR(fd, &(this->_read_socket));
+    FD_CLR(fd, &(this->_write_socket));
+}
+
+bool ZappyAI::timedGetline(std::string &str, unsigned int timeout)
+{
+    this->_communication.refresh(this->_read_socket, this->_write_socket);
+    if(!this->_communication.getLine(str)) {
+        sleep(timeout);
+        this->_communication.refresh(this->_read_socket, this->_write_socket);
+        if(!this->_communication.getLine(str))
+            return (false);
+    }
+    return (true);
+}
+
 void ZappyAI::displayParameters(void)
 {
     std::cout << std::endl;
@@ -97,15 +125,91 @@ void ZappyAI::displayParameters(void)
     std::cout << std::endl;
 }
 
+bool ZappyAI::checkServerPackage(void)
+{
+    std::string data;
+
+    std::cout << "Checking server..." << std::endl;
+    if (!this->timedGetline(data))
+        return (false);
+    if (data.compare(SERVER_EXPECTED_PACKAGE) != 0) {
+        std::cerr << "Wrong package received, expecting \"WELCOME\\n\"." << std::endl;
+        return (false);
+    }
+    std::cout << "[OK]" << std::endl;
+    return (true);
+}
+
+bool ZappyAI::joinTeam(void)
+{
+    std::string data;
+
+    std::cout << "Joining \"" << this->_name << "\" team..." << std::endl;
+    this->_communication.writeData(this->_name + "\n", this->_name.length() + 1);
+    this->_communication.refresh(this->_read_socket, this->_write_socket);
+    this->_communication.refresh(this->_read_socket, this->_write_socket);
+    if (!this->timedGetline(data))
+        return (false);
+    data[data.length() - 1] = '\0';
+    if (!strIsDigit(data) || atoi(data.c_str()) < 0) {
+        std::cerr << "Invalid player ID: " << data << !strIsDigit(data) << (atoi(data.c_str()) < 0) << std::endl;
+        return (false);
+    }
+    this->_playerId = atoi(data.c_str());
+    std::cout << "[OK]" << std::endl;
+    return (true);
+}
+
+bool ZappyAI::initMap(void)
+{
+    std::string data;
+    std::stringstream line;
+    int mapX;
+    int mapY;
+
+    std::cout << "Getting map size..." << std::endl;
+    if (!this->timedGetline(data))
+        return (false);
+    line.str(data);
+    getline(line, data, ' ');
+    if (!strIsDigit(data) || atoi(data.c_str()) < 0) {
+        std::cerr << "Invalid X map size: " << data << std::endl;
+        return (false);
+    }
+    mapX = atoi(data.c_str());
+    getline(line, data, '\n');
+    if (!strIsDigit(data) || atoi(data.c_str()) < 0) {
+        std::cerr << "Invalid Y map size: " << data << std::endl;
+        return (false);
+    }
+    mapY = atoi(data.c_str());
+    this->_map.resize(mapY);
+    for (int i = 0; i < mapY; ++i) {
+        this->_map[i].resize(mapX);
+        for (int k = 0; k < mapX; ++k)
+            this->_map[i].resize(TOTAL_ELEM_ON_TILE);
+    }
+    std::cout << "[OK]" << std::endl;
+    return (true);
+}
 
 bool ZappyAI::connectToServer(void)
 {
     std::cout << "Attempting connect to: " << this->_machine << ":" << this->_port << std::endl;
-    if (!this->_connection.Connect(this->_machine, this->_port))
+    if (!this->_connection.Connect(this->_machine, this->_port)) {
         std::cerr << "Connection failed" << std::endl;
+        return (false);
+    }
+    std::cout << "[OK]" << std::endl;
     std::cout << "Initializing protocol..." << std::endl;
     this->_communication.setFd(this->_connection.FD());
-    // this->_communication.receivePackage()
+    this->addFdInFdset(this->_connection.FD());
+    if (!this->checkServerPackage())
+        return (false);
+    if (!this->joinTeam())
+        return (false);
+    if (!this->initMap())
+        return (false);
     return (true);
 }
 

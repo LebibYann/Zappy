@@ -29,9 +29,9 @@ public:
      ** @return ssize_t
      */
     ssize_t refresh(fd_set read_socket, fd_set write_socket);
-    void writeData(void *data, size_t size);
-    void readData(void *data, size_t size);
-    std::string getLine();
+    void writeData(const std::string &data, size_t size);
+    void readData(std::string &data, size_t size);
+    bool getLine(std::string &output);
     int getFd(void) const;
     void setFd(int fd);
 

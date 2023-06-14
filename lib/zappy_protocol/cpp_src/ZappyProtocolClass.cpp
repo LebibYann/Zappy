@@ -27,19 +27,29 @@ ssize_t ZappyProtocol::refresh(fd_set read_socket, fd_set write_socket)
     return (zp_exchange_data(&(this->_data), read_socket, write_socket));
 }
 
-void ZappyProtocol::readData(void *data, size_t size)
+void ZappyProtocol::readData(std::string &data, size_t size)
 {
-    zp_read_data(&(this->_data), data, size);
+    char *tmpData = new char(size);
+
+    zp_read_data(&(this->_data), tmpData, size);
+    data = tmpData;
+    delete tmpData;
 }
 
-void ZappyProtocol::writeData(void *data, size_t size)
+void ZappyProtocol::writeData(const std::string &data, size_t size)
 {
-    zp_write_data(&(this->_data), data, size);
+    zp_write_data(&(this->_data), data.c_str(), size);
 }
 
-std::string ZappyProtocol::getLine()
+bool ZappyProtocol::getLine(std::string &output)
 {
-    return (std::string(zp_getline_pending_data(&(this->_data))));
+    char *str = zp_getline_pending_data(&(this->_data));
+
+    if (str == nullptr)
+        return (false);
+    output = str;
+    free(str);
+    return (true);
 }
 
 int ZappyProtocol::getFd(void) const

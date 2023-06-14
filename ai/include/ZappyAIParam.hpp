@@ -10,6 +10,7 @@
 #include <iostream>
 
 #include "ZappyAI.hpp"
+#include "CheckFunction.hpp"
 
 class ZappyAI;
 
