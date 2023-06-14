@@ -41,7 +41,7 @@ void clear_custom_fd(t_custom_fd *c_fd);
  ** @param size
  */
 extern "C"
-void write_in_custom_fd(t_custom_fd *c_fd, void *buf, size_t size);
+void write_in_custom_fd(t_custom_fd *c_fd, const void *buf, size_t size);
 
 /**
  ** @brief Works as the syscall read works,

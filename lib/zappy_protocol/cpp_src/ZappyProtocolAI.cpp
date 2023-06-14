@@ -56,6 +56,10 @@ int ZappyProtocolAI::receivePackage()
 {
     if (_pkg.cmd_type == ZP_END)
         return (-1);
-    _pkg.str = const_cast<char *>(this->getLine().c_str());
+    std::string str;
+    if (this->getLine(str))
+        _pkg.str = strdup(str.c_str());
+    else
+        _pkg.str = nullptr;
     return (0);
 }

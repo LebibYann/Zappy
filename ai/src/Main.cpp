@@ -29,6 +29,7 @@ int main(int argc, char **argv)
             return (0);
     }
     zai.displayParameters();
-    zai.connectToServer();
+    if (!zai.connectToServer())
+        return (84);
     return (0);
 }
