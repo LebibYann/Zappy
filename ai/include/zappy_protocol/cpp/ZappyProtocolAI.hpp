@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "ZappyProtocol.hpp"
+#include "ZappyProtocolClass.hpp"
 
 typedef struct aiCommand_s
 {
@@ -15,8 +15,9 @@ typedef struct aiCommand_s
     std::string name;
 } aiCommand_t;
 
-class ZappyProtocolAI : public ZappyProtocol{
+class ZappyProtocolAI : public ZappyProtocol {
     public:
+        ZappyProtocolAI();
         ZappyProtocolAI(int fd);
         ~ZappyProtocolAI();
 
@@ -43,7 +44,7 @@ class ZappyProtocolAI : public ZappyProtocol{
          ** -2 if the command receive is unknown, -3 if parameters are invalid.
          */
         int receivePackage();
-    
+
     private:
         t_zp_ai_to_serv_data _pkg;
 };

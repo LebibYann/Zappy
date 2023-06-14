@@ -9,7 +9,7 @@
 
 void write_in_custom_fd(t_custom_fd *c_fd, void *buf, size_t size)
 {
-    c_fd->buf = realloc(c_fd->buf, c_fd->size + size);
+    c_fd->buf = (char*) realloc(c_fd->buf, c_fd->size + size);
     memcpy(&c_fd->buf[c_fd->size], buf, size);
     c_fd->size += size;
 }

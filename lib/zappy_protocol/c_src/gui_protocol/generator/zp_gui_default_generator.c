@@ -16,14 +16,14 @@ va_list *args, enum e_sender sender)
 
     for (int i = 0; i < pair->nbr_param[sender]; ++i) {
         full_size = strlen(buf) + 17;
-        buf = realloc(buf, full_size);
-        buf2 = malloc(full_size);
+        buf = (char*) realloc(buf, full_size);
+        buf2 = (char*) malloc(full_size);
         strcat(buf, " %d");
         sprintf(buf2, buf, va_arg(*args, int));
         strcpy(buf, buf2);
         free(buf2);
     }
-    buf = realloc(buf, strlen(buf) + 2);
+    buf = (char*) realloc(buf, strlen(buf) + 2);
     strcat(buf, "\n");
     return (buf);
 }

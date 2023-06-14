@@ -5,11 +5,16 @@
 ** ZappyProtocol
 */
 
-#include "ZappyProtocol.hpp"
+#include "ZappyProtocolClass.hpp"
 
 ZappyProtocol::ZappyProtocol(int fd)
 {
     zp_init_pending_data_struct(&(this->_data), fd);
+}
+
+ZappyProtocol::ZappyProtocol()
+{
+    zp_init_pending_data_struct(&(this->_data), -1);
 }
 
 ZappyProtocol::~ZappyProtocol()
@@ -40,4 +45,10 @@ std::string ZappyProtocol::getLine()
 int ZappyProtocol::getFd(void) const
 {
     return (this->_data.fd);
+}
+
+void ZappyProtocol::setFd(int fd)
+{
+    zp_clear_pending_data_struct(&(this->_data));
+    zp_init_pending_data_struct(&(this->_data), fd);
 }

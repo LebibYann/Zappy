@@ -13,6 +13,7 @@
 
 class Client {
     public:
+        Client();
         Client(std::string adress, int port);
         ~Client();
 
@@ -25,7 +26,7 @@ class Client {
         bool Connected() const;
     private:
         int _fd;
-        std::string _adress;
+        std::string _adress = "";
         int _port;
-        bool _connected;
+        bool _connected = false;
 };

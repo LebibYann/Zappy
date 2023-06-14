@@ -9,7 +9,7 @@
 
 static char *append_end_str(char *buf, char *str)
 {
-    buf = realloc(buf, strlen(buf) + strlen(str) + 2);
+    buf = (char*) realloc(buf, strlen(buf) + strlen(str) + 2);
     strcat(buf, str);
     strcat(buf, "\n");
     return (buf);
@@ -24,8 +24,8 @@ va_list *args, enum e_sender sender)
 
     for (int i = 0; i < pair->nbr_param[sender]; ++i) {
         full_size = strlen(buf) + 17;
-        buf = realloc(buf, full_size);
-        buf2 = malloc(full_size);
+        buf = (char*) realloc(buf, full_size);
+        buf2 = (char*) malloc(full_size);
         strcat(buf, " %d");
         sprintf(buf2, buf, va_arg(*args, int));
         strcpy(buf, buf2);
