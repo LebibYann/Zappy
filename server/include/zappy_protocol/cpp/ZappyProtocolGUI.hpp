@@ -11,7 +11,6 @@
 #include <vector>
 
 #include "c_zappy_protocol_gui.h"
-
 #include "ZappyProtocol.hpp"
 
 typedef struct s_zp_guiProtocol {

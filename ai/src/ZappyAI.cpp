@@ -13,6 +13,7 @@ ZappyAI::ZappyAI()
 
 ZappyAI::~ZappyAI()
 {
+    this->_connection.Disconnect();
 }
 
 int ZappyAI::init(const std::vector<std::string> &argvList)
@@ -100,6 +101,11 @@ void ZappyAI::displayParameters(void)
 bool ZappyAI::connectToServer(void)
 {
     std::cout << "Attempting connect to: " << this->_machine << ":" << this->_port << std::endl;
+    if (!this->_connection.Connect(this->_machine, this->_port))
+        std::cerr << "Connection failed" << std::endl;
+    std::cout << "Initializing protocol..." << std::endl;
+    this->_communication.setFd(this->_connection.FD());
+    // this->_communication.receivePackage()
     return (true);
 }
 

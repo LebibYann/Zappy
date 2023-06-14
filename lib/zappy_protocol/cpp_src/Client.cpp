@@ -7,10 +7,15 @@
 
 #include "Client.hpp"
 
-Client::Client(std::string adress, int port) : _fd(-1), _adress(NULL), _port(-1), _connected(false)
+Client::Client() : _fd(-1), _port(-1), _connected(false)
+{
+}
+
+Client::Client(std::string adress, int port) : Client::Client()
 {
     Connect(adress, port);
 }
+
 
 Client::~Client()
 {
@@ -35,7 +40,7 @@ void Client::Disconnect()
         return;
     close(_fd);
     _fd = -1;
-    _adress = nullptr;
+    _adress.clear();
     _port = -1;
     _connected = false;
 }

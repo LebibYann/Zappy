@@ -15,7 +15,7 @@ OUTPUT =
 SRC_FILE_EXT = .c*
 
 #SRC
-SRC_DIRS_REC = c_src/ cpp_src
+SRC_DIRS_REC = c_src/ cpp_src/
 SRC_DIRS =
 SRC_FILES =
 
@@ -139,8 +139,8 @@ all:
 	@$(ECHO) $(BLINK)$(PURPLE)"[COMPILING: $(NAME)]"$(DEFLT)
 	@make -C ./c_src/ --no-print-directory && \
 	make -C ./cpp_src/ --no-print-directory && \
-	make build_a --no-print-directory;
-	@# make build_so --no-print-directory
+	make build_a --no-print-directory; \
+	make build_so --no-print-directory
 
 
 

@@ -20,9 +20,6 @@
 #include "ZappyProtocol.hpp"
 #include "ZappyAIParam.hpp"
 
-
-
-
 typedef enum e_initStatus {
     INIT_OK,
     INIT_KO,
@@ -52,9 +49,12 @@ class ZappyAI {
     private:
         bool charExist(char charToCheck);
 
+        ZappyProtocolAI _communication;
+
         std::string _name;
         std::string _machine = "localhost";
         uint32_t _port;
+        Client _connection;
 
         int _playerId = -1;
         int _posX = 0;

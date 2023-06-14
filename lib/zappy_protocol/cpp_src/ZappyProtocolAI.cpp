@@ -7,7 +7,7 @@
 
 #include "ZappyProtocolAI.hpp"
 
-const aiCommand_t COMMANDS[13] = 
+const aiCommand_t COMMANDS[13] =
 {
     {ZP_FORWARD, "Forward"},
     {ZP_RIGHT, "Right"},
@@ -23,6 +23,12 @@ const aiCommand_t COMMANDS[13] =
     {ZP_SET_OBJ, "Set object"},
     {ZP_INCANTATION, "Incantation"}
 };
+
+ZappyProtocolAI::ZappyProtocolAI() : ZappyProtocol()
+{
+    _pkg.cmd_type = ZP_END;
+    _pkg.str = NULL;
+}
 
 ZappyProtocolAI::ZappyProtocolAI(int fd) : ZappyProtocol(fd)
 {
