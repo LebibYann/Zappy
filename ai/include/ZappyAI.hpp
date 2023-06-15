@@ -54,11 +54,13 @@ class ZappyAI {
         bool initMap(void);
         void generateCipherList(void);
 
-        void run();
+        void run(void);
+        void updateInventory(void);
 
     private:
         bool charExist(char charToCheck);
 
+        bool _alive = true;
         ZappyProtocolAI _communication;
 
         std::string _name;
@@ -71,7 +73,8 @@ class ZappyAI {
         int _playerId = -1;
         int _posX = 0;
         int _posY = 0;
-        int _rot = 0;
+        int _direction = 0;
+        int _inventory[TOTAL_ELEM_ON_TILE];
         std::vector<std::vector<std::vector<int>>> _map;
         char _cipherList[127];
 

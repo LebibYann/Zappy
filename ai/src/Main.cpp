@@ -31,5 +31,6 @@ int main(int argc, char **argv)
     zai.displayParameters();
     if (!zai.connectToServer())
         return (84);
+    zai.run();
     return (0);
 }

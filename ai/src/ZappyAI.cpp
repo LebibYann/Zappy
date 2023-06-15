@@ -11,6 +11,7 @@ ZappyAI::ZappyAI()
 {
     FD_ZERO(&(this->_read_socket));
     FD_ZERO(&(this->_write_socket));
+    memset(this->_inventory, 0, TOTAL_ELEM_ON_TILE * sizeof(*(this->_inventory)));
 }
 
 ZappyAI::~ZappyAI()
@@ -102,18 +103,6 @@ void ZappyAI::removeFdInFdset(int fd)
     FD_CLR(fd, &(this->_write_socket));
 }
 
-bool ZappyAI::timedGetline(std::string &str, unsigned int timeout)
-{
-    this->_communication.refresh();
-    if(!this->_communication.getLine(str)) {
-        sleep(timeout);
-        this->_communication.refresh();
-        if(!this->_communication.getLine(str))
-            return (false);
-    }
-    return (true);
-}
-
 void ZappyAI::displayParameters(void)
 {
     std::cout << std::endl;
@@ -130,7 +119,7 @@ bool ZappyAI::checkServerPackage(void)
     std::string data;
 
     std::cout << "Checking server..." << std::endl;
-    if (!this->_communication.getLineTimeout(data, 1))
+    if (this->_communication.getlineTimeout(data, 1) != 0)
         return (false);
     if (data.compare(SERVER_EXPECTED_PACKAGE) != 0) {
         std::cerr << "Wrong package received, expecting \"WELCOME\\n\"." << std::endl;
@@ -148,7 +137,7 @@ bool ZappyAI::joinTeam(void)
     this->_communication.writeData(this->_name + "\n", this->_name.length() + 1);
     this->_communication.refresh();
     this->_communication.refresh();
-    if (!this->_communication.getLineTimeout(data, 1))
+    if (this->_communication.getlineTimeout(data, 1) != 0)
         return (false);
     data[data.length() - 1] = '\0';
     if (!strIsDigit(data) || atoi(data.c_str()) < 0) {
@@ -168,7 +157,7 @@ bool ZappyAI::initMap(void)
     int mapY;
 
     std::cout << "Getting map size..." << std::endl;
-    if (!this->_communication.getLineTimeout(data, 1))
+    if (this->_communication.getlineTimeout(data, 1) != 0)
         return (false);
     line.str(data);
     getline(line, data, ' ');
@@ -256,4 +245,58 @@ void ZappyAI::generateCipherList(void)
         }
         this->_cipherList[i] = cipherStep;
     }
+}
+
+
+
+void ZappyAI::run(void)
+{
+    while (this->_alive) {
+        this->updateInventory();
+        if (this->_inventory[ELEM_FOOD] < 5) {
+
+        }
+    }
+    std::cout << "dead" << std::endl;
+}
+
+void ZappyAI::updateInventory(void)
+{
+    int out;
+    std::string str;
+    std::string itemStr;
+    std::string itemName;
+    std::string itemStrQuantity;
+    std::stringstream stream;
+    std::stringstream itemStream;
+
+    this->_communication.sendPackage(ZP_INVENTORY);
+    out = this->_communication.receivePackage(str);
+    if (out == RESPONSE_DISCONNECTION || out == RESPONSE_DEAD) {
+        this->_alive = false;
+        return;
+    }
+    str[0] = ' ';
+    str[str.length() - 2] = ' ';
+    stream.str(str);
+    while (getline(stream, itemStr, ',')) {
+        itemStream.clear();
+        itemStream.str(itemStr);
+        itemName = "";
+        while (itemName.compare("") == 0)
+            getline(itemStream, itemName, ' ');
+        itemStrQuantity = "";
+        while (itemStrQuantity.compare("") == 0)
+            getline(itemStream, itemStrQuantity, ' ');
+        for (size_t i = 0; i < TOTAL_ELEM_ON_TILE; ++i) {
+            if (itemName.compare(INVENTORY_PAIR[i].item_name) == 0) {
+                this->_inventory[INVENTORY_PAIR[i].item_type] = atoi(itemStrQuantity.c_str());
+                break;
+            }
+        }
+    }
+    // for (size_t i = 0; i < TOTAL_ELEM_ON_TILE; ++i) {
+    //     std::cout << this->_inventory[INVENTORY_PAIR[i].item_type] << " ";
+    // }
+    // std::cout << std::endl;
 }

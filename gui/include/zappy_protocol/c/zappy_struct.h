@@ -102,3 +102,22 @@ ELEVATION_REQUIREMENT[TOTAL_ELEVATION][TOTAL_ELEM_ON_TILE] = {
     {6, 0, 1, 2, 3, 0, 1, 0},
     {6, 0, 2, 2, 2, 2, 2, 4}
 };
+
+typedef struct s_inventoryPair {
+    const char *item_name;
+    enum e_elemOnTile item_type;
+} t_inventoryPair;
+
+/* The player doesn't exist in the inventory,
+it's here only to avoid potential bug */
+static const t_inventoryPair
+INVENTORY_PAIR[TOTAL_ELEM_ON_TILE] = {
+    {"player", ELEM_PLAYER},
+    {"food", ELEM_FOOD},
+    {"linemate", ELEM_LINEMATE},
+    {"deraumere", ELEM_DERAUMERE},
+    {"sibur", ELEM_SIBUR},
+    {"mendiane", ELEM_MENDIANE},
+    {"phiras", ELEM_PHIRAS},
+    {"thystame", ELEM_THYSTAME},
+};
