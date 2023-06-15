@@ -104,10 +104,10 @@ void ZappyAI::removeFdInFdset(int fd)
 
 bool ZappyAI::timedGetline(std::string &str, unsigned int timeout)
 {
-    this->_communication.refresh(this->_read_socket, this->_write_socket);
+    this->_communication.refresh();
     if(!this->_communication.getLine(str)) {
         sleep(timeout);
-        this->_communication.refresh(this->_read_socket, this->_write_socket);
+        this->_communication.refresh();
         if(!this->_communication.getLine(str))
             return (false);
     }
@@ -130,7 +130,7 @@ bool ZappyAI::checkServerPackage(void)
     std::string data;
 
     std::cout << "Checking server..." << std::endl;
-    if (!this->timedGetline(data))
+    if (!this->_communication.getLineTimeout(data, 1))
         return (false);
     if (data.compare(SERVER_EXPECTED_PACKAGE) != 0) {
         std::cerr << "Wrong package received, expecting \"WELCOME\\n\"." << std::endl;
@@ -146,9 +146,9 @@ bool ZappyAI::joinTeam(void)
 
     std::cout << "Joining \"" << this->_name << "\" team..." << std::endl;
     this->_communication.writeData(this->_name + "\n", this->_name.length() + 1);
-    this->_communication.refresh(this->_read_socket, this->_write_socket);
-    this->_communication.refresh(this->_read_socket, this->_write_socket);
-    if (!this->timedGetline(data))
+    this->_communication.refresh();
+    this->_communication.refresh();
+    if (!this->_communication.getLineTimeout(data, 1))
         return (false);
     data[data.length() - 1] = '\0';
     if (!strIsDigit(data) || atoi(data.c_str()) < 0) {
@@ -168,7 +168,7 @@ bool ZappyAI::initMap(void)
     int mapY;
 
     std::cout << "Getting map size..." << std::endl;
-    if (!this->timedGetline(data))
+    if (!this->_communication.getLineTimeout(data, 1))
         return (false);
     line.str(data);
     getline(line, data, ' ');

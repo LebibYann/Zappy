@@ -28,13 +28,18 @@ public:
      ** @param write_socket
      ** @return ssize_t
      */
-    ssize_t refresh(fd_set read_socket, fd_set write_socket);
+    ssize_t refresh(void);
+    ssize_t receive(void);
+    ssize_t send(void);
     void writeData(const std::string &data, size_t size);
     void readData(std::string &data, size_t size);
     bool getLine(std::string &output);
+    bool getLineTimeout(std::string &output, int timeout);
     int getFd(void) const;
     void setFd(int fd);
 
 protected:
     t_zp_pending_data _data;
+    fd_set _readSocket;
+    fd_set _writeSocket;
 };

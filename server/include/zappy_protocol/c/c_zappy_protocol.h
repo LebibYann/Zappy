@@ -7,6 +7,9 @@
 
 #pragma once
 
+#include <time.h>
+#include <sys/time.h>
+#include <poll.h>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/select.h>
@@ -23,14 +26,14 @@
  ** to in the fd.
  **
  ** @param zp_pending_d
- ** @param rd_socket
- ** @param wr_socket
+ ** @param rd_socket An fd_set or NULL to disable read at this call.
+ ** @param wr_socket An fd_set or NULL to disable write at this call.
  ** @return ssize_t 0 on success,
  ** 1 if a disconnection is detected and -1 if it fails.
  */
 extern "C"
 ssize_t zp_exchange_data(t_zp_pending_data *zp_pending_d,
-fd_set rd_socket, fd_set wr_socket);
+const fd_set *rd_socket, const fd_set *wr_socket);
 
 /**
  ** @brief Writes in c_wfd member of t_zp_pending_data.
@@ -72,3 +75,7 @@ void zp_delete_pending_data_struct(t_zp_pending_data *zp_pdata);
 
 extern "C"
 char *zp_getline_pending_data(t_zp_pending_data *zp_pending_d);
+
+extern "C"
+char *zp_getline_timeout_pending_data(t_zp_pending_data *zp_pending_d,
+int timeout_ms, fd_set rd_socket);

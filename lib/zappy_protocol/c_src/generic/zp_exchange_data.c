@@ -32,9 +32,10 @@ static ssize_t write_action(t_zp_pending_data *zp_pending_d)
 }
 
 static ssize_t rw_action(t_zp_pending_data *zp_pending_d,
-fd_set rd_socket, fd_set wr_socket, bool *something_to_read)
+bool *something_to_read, fd_set *rd_socket, fd_set *wr_socket)
 {
-    if (FD_ISSET(zp_pending_d->fd, &rd_socket)) {
+    (*something_to_read) = false;
+    if (rd_socket != NULL && FD_ISSET(zp_pending_d->fd, rd_socket)) {
         (*something_to_read) = true;
         switch (read_action(zp_pending_d)) {
             case -1:
@@ -43,28 +44,49 @@ fd_set rd_socket, fd_set wr_socket, bool *something_to_read)
                 return (1);
         }
     }
-    if (FD_ISSET(zp_pending_d->fd, &wr_socket)) {
+    if (wr_socket != NULL && FD_ISSET(zp_pending_d->fd, wr_socket)) {
         if (write_action(zp_pending_d))
             return (-1);
     }
     return (0);
 }
 
+static int pick_select(const fd_set *rd_socket, const fd_set *wr_socket,
+fd_set *tmp_rd_sock, fd_set *tmp_wr_sock)
+{
+    if (rd_socket != NULL) {
+        *tmp_rd_sock = *rd_socket;
+        if (wr_socket != NULL)
+            *tmp_wr_sock = *wr_socket;
+        else
+            *tmp_wr_sock = *rd_socket;
+    }
+    if (wr_socket != NULL) {
+        *tmp_wr_sock = *wr_socket;
+        if (rd_socket != NULL)
+            *tmp_rd_sock = *rd_socket;
+        else
+            *tmp_rd_sock = *wr_socket;
+    }
+    return (select(FD_SETSIZE, tmp_rd_sock, tmp_wr_sock, NULL, NULL));
+}
+
 ssize_t zp_exchange_data(t_zp_pending_data *zp_pending_d,
-fd_set rd_socket, fd_set wr_socket)
+const fd_set *rd_socket, const fd_set *wr_socket)
 {
     bool can_read = true;
     fd_set tmp_rd_sock;
     fd_set tmp_wr_sock;
 
-    while (!zp_pending_d->disconnected &&
-    (zp_pending_d->c_wfd.size > 0 || can_read)) {
-        can_read = false;
-        tmp_rd_sock = rd_socket;
-        tmp_wr_sock = wr_socket;
-        if (select(FD_SETSIZE, &tmp_rd_sock, &tmp_wr_sock, NULL, NULL) < 0)
+    if (rd_socket == NULL && wr_socket == NULL)
+        return (0);
+    while (!zp_pending_d->disconnected && (can_read ||
+    (zp_pending_d->c_wfd.size > 0 && wr_socket != NULL))) {
+        if (pick_select(rd_socket, wr_socket, &tmp_rd_sock, &tmp_wr_sock) < 0)
             return (-1);
-        switch (rw_action(zp_pending_d, tmp_rd_sock, tmp_wr_sock, &can_read)) {
+        switch (rw_action(zp_pending_d, &can_read,
+        ((rd_socket == NULL) ? NULL : &tmp_rd_sock),
+        ((wr_socket == NULL) ? NULL : &tmp_wr_sock))) {
             case -1:
                 return (-1);
             case 1:
