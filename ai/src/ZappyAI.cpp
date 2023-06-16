@@ -260,6 +260,7 @@ void ZappyAI::run(void)
         this->look();
         this->forward();
         this->take(ELEM_FOOD);
+        this->set(ELEM_FOOD);
         if (this->_inventory[ELEM_FOOD] < 5) {
 
         }
@@ -360,7 +361,7 @@ bool ZappyAI::look(void)
         this->_alive = false;
         return (false);
     }
-    // std::cout << str << std::endl;
+    std::cout << str << std::endl;
     str[0] = ' ';
     str[str.length() - 2] = ' ';
     this->_lookResult.clear();
@@ -465,5 +466,29 @@ bool ZappyAI::take(enum e_elemOnTile elem)
         return (false);
     }
     ++(this->_inventory[elem]);
+    return (true);
+}
+
+bool ZappyAI::set(enum e_elemOnTile elem)
+{
+    int elemIndex = -1;
+    int out;
+
+    for (int i = 0; i < TOTAL_ELEM_ON_TILE; ++i) {
+        if (INVENTORY_PAIR[i].item_type == elem) {
+            elemIndex = i;
+            break;
+        }
+    }
+    if (elemIndex == -1 && this->_inventory[elem] <= 0)
+        return (false);
+    this->_communication.sendPackage(ZP_SET_OBJ, INVENTORY_PAIR[elemIndex].item_name);
+    out = this->_communication.receivePackage();
+    if (out != RESPONSE_OK) {
+        if (out == RESPONSE_DISCONNECTION || out == RESPONSE_DEAD)
+            this->_alive = false;
+        return (false);
+    }
+    --(this->_inventory[elem]);
     return (true);
 }

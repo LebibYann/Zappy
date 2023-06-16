@@ -69,6 +69,7 @@ class ZappyAI {
         bool right(void);
         bool left(void);
         bool take(enum e_elemOnTile elem);
+        bool set(enum e_elemOnTile elem);
 
     private:
         bool charExist(char charToCheck);
