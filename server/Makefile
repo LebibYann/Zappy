@@ -22,7 +22,7 @@ INCLUDE_DIRS_REC = include/
 INCLUDE_DIRS =
 
 #FLAGS
-FLAGS = -g -g3 -Wextra -Wall -W -Werror
+FLAGS = -g -g3 -Wextra -Wall -W -Werror -lstr_split
 
 #LIB
 LIB_DIRS = ../lib/
@@ -142,7 +142,7 @@ _OBJ = $(_SRC:$(SRC_FILE_EXT)=.o)
 
 
 
-all: lib
+all: lib_cpy
 	@$(ECHO) $(BLINK)$(PURPLE)"[COMPILING: $(NAME)]"$(DEFLT)
 	@make object --no-print-directory && \
 	make build --no-print-directory
@@ -191,7 +191,7 @@ fclean: clean_test_file clean
 		-or -name "*.so" -delete  \
 		-or -name "vgcore*" -delete
 	@$(ECHO) $(GREEN) "All temporal file deleted!" $(DEFLT)
-	@find -maxdepth 1 -name $(NAME) -delete
+	@find $(OUTPUT) -maxdepth 1 -name $(NAME) -delete
 	@$(ECHO) $(GREEN) "Executable deleted!" $(DEFLT)
 
 
@@ -225,7 +225,27 @@ lib: FORCE
 			cp $$lib_path/*.a $$lib_dir; \
 		done \
 	done
+	@make lib_cpy --no-print-directory
 
+lib_cpy: lib_cpy_header lib_cpy_bin
+
+lib_cpy_header: FORCE
+	@for lib_dir in $(LIB_DIRS); do \
+		dirs=$$(find $$lib_dir -maxdepth 1 -mindepth 1 -type d 2>/dev/null); \
+		for lib_path in $$dirs; do \
+			lib_name=$$(basename $$lib_path); \
+			mkdir -p $(LIB_INCL_PATH)$$lib_name; \
+			cp -r $$lib_path/include/* $(LIB_INCL_PATH)$$lib_name; \
+		done \
+	done
+
+lib_cpy_bin: FORCE
+	@for lib_dir in $(LIB_DIRS); do \
+		dirs=$$(find $$lib_dir -maxdepth 1 -mindepth 1 -type d 2>/dev/null); \
+		for lib_path in $$dirs; do \
+			cp $$lib_path/*.a $$lib_dir; \
+		done \
+	done
 
 
 lib_clean:

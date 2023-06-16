@@ -9,5 +9,15 @@
 
 int main(int ac, char **av)
 {
-    return 0;
+    server_t server;
+
+    init_server(&server);
+    if (read_parameters(&server, ac, av) == -1)
+        return (84);
+    if ((server.fd = open_server(server.port, 5)) < 0)
+        return (84);
+    // FD_SET(server.fd, &server.current_sockets);
+    while (handle_client(&server));
+    close(server.fd);
+    return (0);
 }
