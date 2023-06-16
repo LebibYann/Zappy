@@ -76,6 +76,7 @@ class ZappyAI {
         bool set(enum e_elemOnTile elem);
         bool broadcast(const std::string &msg, bool cipher);
         int connectNbr(void);
+        bool fork(void);
 
     private:
         bool charExist(char charToCheck);

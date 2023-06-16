@@ -536,3 +536,9 @@ int ZappyAI::connectNbr(void)
         return (-1);
     return (atoi(str.c_str()));
 }
+
+bool ZappyAI::fork(void)
+{
+    this->_communication.sendPackage(ZP_FORK);
+    return (this->handlePackageReception(RESPONSE_OK));
+}
