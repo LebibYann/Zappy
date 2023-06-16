@@ -60,6 +60,8 @@ class ZappyAI {
         bool joinTeam(void);
         bool initMap(void);
         void generateCipherList(void);
+        void cipherStr(std::string &str);
+        void uncipherStr(std::string &str);
 
         void run(void);
         bool inventory(void);
@@ -70,6 +72,7 @@ class ZappyAI {
         bool left(void);
         bool take(enum e_elemOnTile elem);
         bool set(enum e_elemOnTile elem);
+        bool broadcast(const std::string &msg, bool cipher);
 
     private:
         bool charExist(char charToCheck);

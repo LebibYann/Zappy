@@ -221,7 +221,8 @@ void ZappyAI::generateCipherList(void)
     int cipherStep = 0;
     int nameLen = this->_name.length();
 
-    memset(this->_cipherList, 0, 127);
+    for (size_t i = 0; i < 127; ++i)
+        this->_cipherList[i] = i;
     for (int i = ' '; i <= '~'; ++i) {
         cipherStep = i;
         for (size_t k = 0; k < 20 && (charExist(cipherStep) || k == 0); ++k) {
@@ -249,6 +250,29 @@ void ZappyAI::generateCipherList(void)
     }
 }
 
+void ZappyAI::cipherStr(std::string &str)
+{
+    size_t strLen = str.length();
+
+    for (size_t i = 0; i < strLen; ++i) {
+        if (str[i] >= '\0')
+            str[i] = this->_cipherList[static_cast<int>(str[i])];
+    }
+}
+
+void ZappyAI::uncipherStr(std::string &str)
+{
+    size_t strLen = str.length();
+
+    for (size_t i = 0; i < strLen; ++i) {
+        for (size_t k = 0; k < '~'; ++k) {
+            if (str[i] == this->_cipherList[k]) {
+                str[i] = k;
+                break;
+            }
+        }
+    }
+}
 
 
 void ZappyAI::run(void)
@@ -261,6 +285,7 @@ void ZappyAI::run(void)
         this->forward();
         this->take(ELEM_FOOD);
         this->set(ELEM_FOOD);
+        this->broadcast("prout", false);
         if (this->_inventory[ELEM_FOOD] < 5) {
 
         }
@@ -490,5 +515,22 @@ bool ZappyAI::set(enum e_elemOnTile elem)
         return (false);
     }
     --(this->_inventory[elem]);
+    return (true);
+}
+
+bool ZappyAI::broadcast(const std::string &msg, bool cipher)
+{
+    int out;
+    std::string tmpStr = msg;
+
+    if (cipher)
+        this->cipherStr(tmpStr);
+    this->_communication.sendPackage(ZP_BROADCAST, tmpStr);
+    out = this->_communication.receivePackage();
+    if (out != RESPONSE_OK) {
+        if (out == RESPONSE_DISCONNECTION || out == RESPONSE_DEAD)
+            this->_alive = false;
+        return (false);
+    }
     return (true);
 }
