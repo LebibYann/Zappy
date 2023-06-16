@@ -63,9 +63,7 @@ bool ZappyProtocolAI::sendPackage(enum e_zp_command cmd_type, const std::string 
             this->writeData(str, str.size());
             this->writeData("\n", 1);
             _pkg.cmd_type = cmd_type;
-            std::cout << "hey" << std::endl;
             this->send();
-            std::cout << "hey" << std::endl;
             return (true);
         }
     }
@@ -88,4 +86,11 @@ int ZappyProtocolAI::receivePackage(std::string &str)
     if (str.compare("dead\n") == 0)
         return (RESPONSE_DEAD);
     return (RESPONSE_OTHER);
+}
+
+int ZappyProtocolAI::receivePackage(void)
+{
+    std::string str;
+
+    return (this->receivePackage(str));
 }

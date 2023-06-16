@@ -18,6 +18,12 @@ typedef struct s_zp_pending_data {
     t_custom_fd c_wfd;
 } t_zp_pending_data;
 
+typedef struct s_coords {
+    int x;
+    int y;
+    int l;
+} t_coords;
+
 typedef enum e_zp_command {
     ZP_END = -1,
     // AI

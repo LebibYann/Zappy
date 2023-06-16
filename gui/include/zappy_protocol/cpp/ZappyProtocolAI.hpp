@@ -68,6 +68,7 @@ class ZappyProtocolAI : public ZappyProtocol {
          ** -2 if the command receive is unknown, -3 if parameters are invalid.
          */
         int receivePackage(std::string &str);
+        int receivePackage(void);
 
     private:
         t_zp_ai_to_serv_data _pkg;

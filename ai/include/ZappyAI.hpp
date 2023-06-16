@@ -31,6 +31,14 @@ typedef enum e_initStatus {
     TOTAL_INIT
 } t_initStatus;
 
+typedef enum e_playerDirection {
+    DIR_NORTH,
+    DIR_EAST,
+    DIR_SOUTH,
+    DIR_WEST,
+    TOTAL_DIRECTION
+} t_playerDirection;
+
 class ZappyAI {
     public:
         ZappyAI();
@@ -46,7 +54,6 @@ class ZappyAI {
         void addFdInFdset(int fd);
         void removeFdInFdset(int fd);
 
-        bool timedGetline(std::string &str, unsigned int timeout = 1);
         void displayParameters(void);
         bool connectToServer(void);
         bool checkServerPackage(void);
@@ -55,7 +62,13 @@ class ZappyAI {
         void generateCipherList(void);
 
         void run(void);
-        void updateInventory(void);
+        bool inventory(void);
+        int lookFor(enum e_elemOnTile seekedElem, t_coords &relativeCoords);
+        bool look(void);
+        bool forward(void);
+        bool right(void);
+        bool left(void);
+        bool take(enum e_elemOnTile elem);
 
     private:
         bool charExist(char charToCheck);
@@ -71,6 +84,9 @@ class ZappyAI {
         fd_set _write_socket;
 
         int _playerId = -1;
+        std::vector<std::vector<int>> _lookResult;
+        bool _lookDone = false;
+        t_coords _targetPos;
         int _posX = 0;
         int _posY = 0;
         int _direction = 0;
