@@ -70,10 +70,21 @@ bool ZappyProtocolAI::sendPackage(enum e_zp_command cmd_type, const std::string 
     return (false);
 }
 
+// static bool strIsDigit(const std::string &str)
+// {
+//     for (size_t i = 0; i < str.length() && str[i] != '\n'; ++i) {
+//         if (str[i] < '0' || str[i] > '9')
+//             return (false);
+//     }
+//     return (true);
+// }
+
 int ZappyProtocolAI::receivePackage(std::string &str)
 {
-    int out = this->getlineTimeout(str);
-    switch (out) {
+    std::string tmpStr;
+    std::stringstream stream;
+
+    switch (this->getlineTimeout(str)) {
         case -1:
             return (RESPONSE_DISCONNECTION);
         case 1:
@@ -85,6 +96,12 @@ int ZappyProtocolAI::receivePackage(std::string &str)
         return (RESPONSE_KO);
     if (str.compare("dead\n") == 0)
         return (RESPONSE_DEAD);
+    stream.str(str);
+    getline(stream, tmpStr, ' ');
+    if (tmpStr.compare("message") == 0)
+        return (RESPONSE_MESSAGE);
+    if (tmpStr.compare("eject") == 0)
+        return (RESPONSE_EJECT);
     return (RESPONSE_OTHER);
 }
 

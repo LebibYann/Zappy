@@ -62,6 +62,8 @@ class ZappyAI {
         void generateCipherList(void);
         void cipherStr(std::string &str);
         void uncipherStr(std::string &str);
+        bool handlePackageReception(enum e_AIResponse expectedResponse);
+        bool handlePackageReception(enum e_AIResponse expectedResponse, std::string &str);
 
         void run(void);
         bool inventory(void);
@@ -73,6 +75,7 @@ class ZappyAI {
         bool take(enum e_elemOnTile elem);
         bool set(enum e_elemOnTile elem);
         bool broadcast(const std::string &msg, bool cipher);
+        int connectNbr(void);
 
     private:
         bool charExist(char charToCheck);

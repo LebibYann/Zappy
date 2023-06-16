@@ -274,6 +274,38 @@ void ZappyAI::uncipherStr(std::string &str)
     }
 }
 
+bool ZappyAI::handlePackageReception(enum e_AIResponse expectedResponse, std::string &str)
+{
+    int out;
+
+    while (true) {
+        out = this->_communication.receivePackage(str);
+        switch (out) {
+            case RESPONSE_EJECT:
+                std::cout << "Eject" << std::endl;
+                break;
+            case RESPONSE_MESSAGE:
+                std::cout << "Message" << std::endl;
+                break;
+            default:
+                if (out != expectedResponse) {
+                    if (out == RESPONSE_DISCONNECTION || out == RESPONSE_DEAD)
+                        this->_alive = false;
+                    return (false);
+                }
+                return (true);
+        }
+
+    }
+    return (false);
+}
+
+bool ZappyAI::handlePackageReception(enum e_AIResponse expectedResponse)
+{
+    std::string str;
+
+    return (this->handlePackageReception(expectedResponse, str));
+}
 
 void ZappyAI::run(void)
 {
@@ -295,7 +327,6 @@ void ZappyAI::run(void)
 
 bool ZappyAI::inventory(void)
 {
-    int out;
     std::string str;
     std::string itemStr;
     std::string itemName;
@@ -304,11 +335,8 @@ bool ZappyAI::inventory(void)
     std::stringstream itemStream;
 
     this->_communication.sendPackage(ZP_INVENTORY);
-    out = this->_communication.receivePackage(str);
-    if (out == RESPONSE_DISCONNECTION || out == RESPONSE_DEAD) {
-        this->_alive = false;
+    if (!this->handlePackageReception(RESPONSE_OTHER, str))
         return (false);
-    }
     str[0] = ' ';
     str[str.length() - 2] = ' ';
     stream.str(str);
@@ -372,7 +400,6 @@ int ZappyAI::lookFor(enum e_elemOnTile seekedElem, t_coords &relativeCoords)
 
 bool ZappyAI::look(void)
 {
-    int out;
     std::string str;
     std::string strTile;
     std::string strElem;
@@ -381,11 +408,8 @@ bool ZappyAI::look(void)
     std::stringstream streamTile;
 
     this->_communication.sendPackage(ZP_LOOK);
-    out = this->_communication.receivePackage(str);
-    if (out == RESPONSE_DISCONNECTION || out == RESPONSE_DEAD) {
-        this->_alive = false;
+    if (!this->handlePackageReception(RESPONSE_OTHER, str))
         return (false);
-    }
     std::cout << str << std::endl;
     str[0] = ' ';
     str[str.length() - 2] = ' ';
@@ -411,15 +435,9 @@ bool ZappyAI::look(void)
 
 bool ZappyAI::forward(void)
 {
-    int out;
-
     this->_communication.sendPackage(ZP_FORWARD);
-    out = this->_communication.receivePackage();
-    if (out != RESPONSE_OK) {
-        if (out == RESPONSE_DISCONNECTION || out == RESPONSE_DEAD)
-            this->_alive = false;
+    if (!this->handlePackageReception(RESPONSE_OK))
         return (false);
-    }
     switch (this->_direction) {
         case DIR_NORTH:
             --(this->_targetPos.y);
@@ -440,15 +458,9 @@ bool ZappyAI::forward(void)
 
 bool ZappyAI::right(void)
 {
-    int out;
-
     this->_communication.sendPackage(ZP_LEFT);
-    out = this->_communication.receivePackage();
-    if (out != RESPONSE_OK) {
-        if (out == RESPONSE_DISCONNECTION || out == RESPONSE_DEAD)
-            this->_alive = false;
+    if (!this->handlePackageReception(RESPONSE_OK))
         return (false);
-    }
     this->_direction = (this->_direction + 1) % TOTAL_DIRECTION;
     this->_lookDone = false;
     return (true);
@@ -456,15 +468,9 @@ bool ZappyAI::right(void)
 
 bool ZappyAI::left(void)
 {
-    int out;
-
     this->_communication.sendPackage(ZP_RIGHT);
-    out = this->_communication.receivePackage();
-    if (out != RESPONSE_OK) {
-        if (out == RESPONSE_DISCONNECTION || out == RESPONSE_DEAD)
-            this->_alive = false;
+    if (!this->handlePackageReception(RESPONSE_OK))
         return (false);
-    }
     this->_direction = (this->_direction + TOTAL_DIRECTION - 1) % TOTAL_DIRECTION;
     this->_lookDone = false;
     return (true);
@@ -473,7 +479,6 @@ bool ZappyAI::left(void)
 bool ZappyAI::take(enum e_elemOnTile elem)
 {
     int elemIndex = -1;
-    int out;
 
     for (int i = 0; i < TOTAL_ELEM_ON_TILE; ++i) {
         if (INVENTORY_PAIR[i].item_type == elem) {
@@ -484,12 +489,8 @@ bool ZappyAI::take(enum e_elemOnTile elem)
     if (elemIndex == -1)
         return (false);
     this->_communication.sendPackage(ZP_TAKE_OBJ, INVENTORY_PAIR[elemIndex].item_name);
-    out = this->_communication.receivePackage();
-    if (out != RESPONSE_OK) {
-        if (out == RESPONSE_DISCONNECTION || out == RESPONSE_DEAD)
-            this->_alive = false;
+    if (!this->handlePackageReception(RESPONSE_OK))
         return (false);
-    }
     ++(this->_inventory[elem]);
     return (true);
 }
@@ -497,7 +498,6 @@ bool ZappyAI::take(enum e_elemOnTile elem)
 bool ZappyAI::set(enum e_elemOnTile elem)
 {
     int elemIndex = -1;
-    int out;
 
     for (int i = 0; i < TOTAL_ELEM_ON_TILE; ++i) {
         if (INVENTORY_PAIR[i].item_type == elem) {
@@ -508,29 +508,31 @@ bool ZappyAI::set(enum e_elemOnTile elem)
     if (elemIndex == -1 && this->_inventory[elem] <= 0)
         return (false);
     this->_communication.sendPackage(ZP_SET_OBJ, INVENTORY_PAIR[elemIndex].item_name);
-    out = this->_communication.receivePackage();
-    if (out != RESPONSE_OK) {
-        if (out == RESPONSE_DISCONNECTION || out == RESPONSE_DEAD)
-            this->_alive = false;
+    if (!this->handlePackageReception(RESPONSE_OK))
         return (false);
-    }
     --(this->_inventory[elem]);
     return (true);
 }
 
 bool ZappyAI::broadcast(const std::string &msg, bool cipher)
 {
-    int out;
     std::string tmpStr = msg;
 
     if (cipher)
         this->cipherStr(tmpStr);
     this->_communication.sendPackage(ZP_BROADCAST, tmpStr);
-    out = this->_communication.receivePackage();
-    if (out != RESPONSE_OK) {
-        if (out == RESPONSE_DISCONNECTION || out == RESPONSE_DEAD)
-            this->_alive = false;
+    if (!this->handlePackageReception(RESPONSE_OK))
         return (false);
-    }
     return (true);
+}
+
+int ZappyAI::connectNbr(void)
+{
+    std::string str;
+
+    this->_communication.sendPackage(ZP_CONNECT_NBR);
+    if (!this->handlePackageReception(RESPONSE_OTHER, str) &&
+    !strIsDigit(str))
+        return (-1);
+    return (atoi(str.c_str()));
 }
