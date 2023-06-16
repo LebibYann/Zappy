@@ -542,3 +542,9 @@ bool ZappyAI::fork(void)
     this->_communication.sendPackage(ZP_FORK);
     return (this->handlePackageReception(RESPONSE_OK));
 }
+
+bool ZappyAI::eject(void)
+{
+    this->_communication.sendPackage(ZP_EJECT);
+    return (this->handlePackageReception(RESPONSE_OK));
+}

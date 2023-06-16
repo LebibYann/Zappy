@@ -77,6 +77,7 @@ class ZappyAI {
         bool broadcast(const std::string &msg, bool cipher);
         int connectNbr(void);
         bool fork(void);
+        bool eject(void);
 
     private:
         bool charExist(char charToCheck);
