@@ -22,7 +22,10 @@
 #include "ZappyProtocol.hpp"
 #include "ZappyAIParam.hpp"
 
+#define PRINT_ACTION true
 #define SERVER_EXPECTED_PACKAGE "WELCOME\n"
+#define ON_RELATIVE_TILE(coord) ((coord).x == 0 && (coord).y == 0)
+#define MAX_ACTION_AT_ONCE 10
 
 typedef enum e_initStatus {
     INIT_OK,
@@ -32,6 +35,7 @@ typedef enum e_initStatus {
 } t_initStatus;
 
 typedef enum e_playerDirection {
+    DIR_UNDEF = -1,
     DIR_NORTH,
     DIR_EAST,
     DIR_SOUTH,
@@ -65,42 +69,61 @@ class ZappyAI {
         bool handlePackageReception(enum e_AIResponse expectedResponse);
         bool handlePackageReception(enum e_AIResponse expectedResponse, std::string &str);
 
+        void surviveBehaviour(void);
         void run(void);
+
         bool inventory(void);
-        int lookFor(enum e_elemOnTile seekedElem, t_coords &relativeCoords);
         bool look(void);
         bool forward(void);
+        bool forward(t_coords &relativeCoord);
         bool right(void);
         bool left(void);
         bool take(enum e_elemOnTile elem);
         bool set(enum e_elemOnTile elem);
-        bool broadcast(const std::string &msg, bool cipher);
+        bool broadcast(const std::string &msg, bool cipher = true);
         int connectNbr(void);
         bool fork(void);
         bool eject(void);
+        bool elevation(void);
+
+        void turn180(void);
+        void turnTo(enum e_playerDirection direction);
+
+        bool moveTowardRelativeCoord(t_coords &relativeCoord);
+        void moveRandom(void);
+        void moveRandom(t_coords &relativeCoord);
+
+        void lookItemList(std::vector<int> &itemList);
+        int lookFor(enum e_elemOnTile seekedElem, t_coords &relativeCoord);
+
+        int takeAll(enum e_elemOnTile elem);
+
+        int tryElevate(void);
 
     private:
         bool charExist(char charToCheck);
 
-        bool _alive = true;
-        ZappyProtocolAI _communication;
-
         std::string _name;
-        std::string _machine = "localhost";
+        std::string _machine = "127.0.0.1";
         uint32_t _port;
-        Client _connection;
         fd_set _read_socket;
         fd_set _write_socket;
+        Client _connection;
+        ZappyProtocolAI _communication;
 
-        int _playerId = -1;
-        std::vector<std::vector<int>> _lookResult;
-        bool _lookDone = false;
-        t_coords _targetPos;
-        int _posX = 0;
-        int _posY = 0;
+        bool _alive = true;
+        int _playerId = 0;
+        int _playerLevel = 1;
         int _direction = 0;
         int _inventory[TOTAL_ELEM_ON_TILE];
-        std::vector<std::vector<std::vector<int>>> _map;
+
+        // Look data
+        bool _lookDone = false;
+        std::vector<std::vector<int>> _lookResult;
+
+        t_coords _targetPos = {0, 0, 0};
+
         char _cipherList[127];
+        // std::vector<std::vector<std::vector<int>>> _map;
 
 };

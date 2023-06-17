@@ -174,13 +174,13 @@ bool ZappyAI::initMap(void)
         return (false);
     }
     mapY = atoi(data.c_str());
-    this->_map.resize(mapY);
-    for (int i = 0; i < mapY; ++i) {
-        this->_map[i].resize(mapX);
-        for (int k = 0; k < mapX; ++k)
-            this->_map[i].resize(TOTAL_ELEM_ON_TILE);
-    }
-    std::cout << "[OK]" << std::endl;
+    // this->_map.resize(mapY);
+    // for (int i = 0; i < mapY; ++i) {
+    //     this->_map[i].resize(mapX);
+    //     for (int k = 0; k < mapX; ++k)
+    //         this->_map[i].resize(TOTAL_ELEM_ON_TILE);
+    // }
+    std::cout << "[OK] {" << mapX << ", " << mapY << "}" << std::endl;
     return (true);
 }
 
@@ -307,20 +307,34 @@ bool ZappyAI::handlePackageReception(enum e_AIResponse expectedResponse)
     return (this->handlePackageReception(expectedResponse, str));
 }
 
+void ZappyAI::surviveBehaviour(void)
+{
+    t_coords relPos;
+
+    while (this->_inventory[ELEM_FOOD] < 10 && this->_alive) {
+        if (this->lookFor(ELEM_FOOD, relPos) > 0) {
+            this->takeAll(ELEM_FOOD);
+            while (!ON_RELATIVE_TILE(relPos) && this->_alive) {
+                // std::cout << relPos.x << " " << relPos.y << " " << this->_direction << std::endl;
+                this->moveTowardRelativeCoord(relPos);
+                this->takeAll(ELEM_FOOD);
+            }
+        } else {
+            this->moveRandom(this->_targetPos);
+        }
+        this->inventory();
+    }
+}
+
 void ZappyAI::run(void)
 {
-    // t_coords relPos;
-
     while (this->_alive) {
         this->inventory();
-        this->look();
-        this->forward();
-        this->take(ELEM_FOOD);
-        this->set(ELEM_FOOD);
-        this->broadcast("prout", false);
-        if (this->_inventory[ELEM_FOOD] < 5) {
-
-        }
+        if (this->_inventory[ELEM_FOOD] < 4)
+            this->surviveBehaviour();
+        if (this->_inventory[ELEM_FOOD] < 30)
+            this->takeAll(ELEM_FOOD);
+        this->moveRandom();
     }
     std::cout << "dead" << std::endl;
 }
@@ -337,6 +351,8 @@ bool ZappyAI::inventory(void)
     this->_communication.sendPackage(ZP_INVENTORY);
     if (!this->handlePackageReception(RESPONSE_OTHER, str))
         return (false);
+    if (PRINT_ACTION)
+        std::cout << "Inventory: " << str << std::endl;
     str[0] = ' ';
     str[str.length() - 2] = ' ';
     stream.str(str);
@@ -363,41 +379,6 @@ bool ZappyAI::inventory(void)
     return (true);
 }
 
-int ZappyAI::lookFor(enum e_elemOnTile seekedElem, t_coords &relativeCoords)
-{
-    int elemCount = 0;
-    int tmp;
-    int width;
-
-    if ((!this->_lookDone && !this->look()) ||
-    this->_lookResult.size() <= 0)
-        return (0);
-    if (this->_lookResult[0][seekedElem] > 0)
-        return (this->_lookResult[0][seekedElem]);
-    relativeCoords.y = 1;
-    width = 3;
-    relativeCoords.x = -width / 2;
-    for (size_t i = 1; i < this->_lookResult.size(); ++i) {
-        if (relativeCoords.x >= width / 2) {
-            width += 2;
-            relativeCoords.x = -width / 2;
-            ++(relativeCoords.y);
-        }
-        if (this->_lookResult[i][seekedElem] > 0) {
-            relativeCoords.l = i;
-            elemCount = this->_lookResult[i][seekedElem];
-            break;
-        }
-        ++(relativeCoords.x);
-    }
-    for (int i = 0; i < this->_direction; ++i) {
-        tmp = relativeCoords.y;
-        relativeCoords.y = -relativeCoords.x;
-        relativeCoords.x = tmp;
-    }
-    return (elemCount);
-}
-
 bool ZappyAI::look(void)
 {
     std::string str;
@@ -410,7 +391,8 @@ bool ZappyAI::look(void)
     this->_communication.sendPackage(ZP_LOOK);
     if (!this->handlePackageReception(RESPONSE_OTHER, str))
         return (false);
-    std::cout << str << std::endl;
+    if (PRINT_ACTION)
+        std::cout << "Look: " << str << std::endl;
     str[0] = ' ';
     str[str.length() - 2] = ' ';
     this->_lookResult.clear();
@@ -435,29 +417,40 @@ bool ZappyAI::look(void)
 
 bool ZappyAI::forward(void)
 {
+    if (PRINT_ACTION)
+        std::cout << "Forward: " << this->_direction << std::endl;
     this->_communication.sendPackage(ZP_FORWARD);
     if (!this->handlePackageReception(RESPONSE_OK))
         return (false);
+    this->_lookDone = false;
+    return (true);
+}
+
+bool ZappyAI::forward(t_coords &relativeCoord)
+{
+    if (!this->forward())
+        return (false);
     switch (this->_direction) {
         case DIR_NORTH:
-            --(this->_targetPos.y);
+            --(relativeCoord.y);
             break;
         case DIR_SOUTH:
-            ++(this->_targetPos.y);
+            ++(relativeCoord.y);
             break;
         case DIR_EAST:
-            --(this->_targetPos.x);
+            --(relativeCoord.x);
             break;
         case DIR_WEST:
-            ++(this->_targetPos.x);
+            ++(relativeCoord.x);
             break;
     }
-    this->_lookDone = false;
     return (true);
 }
 
 bool ZappyAI::right(void)
 {
+    if (PRINT_ACTION)
+        std::cout << "Right: " << std::endl;
     this->_communication.sendPackage(ZP_LEFT);
     if (!this->handlePackageReception(RESPONSE_OK))
         return (false);
@@ -468,6 +461,8 @@ bool ZappyAI::right(void)
 
 bool ZappyAI::left(void)
 {
+    if (PRINT_ACTION)
+        std::cout << "Left: " << std::endl;
     this->_communication.sendPackage(ZP_RIGHT);
     if (!this->handlePackageReception(RESPONSE_OK))
         return (false);
@@ -480,6 +475,8 @@ bool ZappyAI::take(enum e_elemOnTile elem)
 {
     int elemIndex = -1;
 
+    if (PRINT_ACTION)
+        std::cout << "Take: " << elem << std::endl;
     for (int i = 0; i < TOTAL_ELEM_ON_TILE; ++i) {
         if (INVENTORY_PAIR[i].item_type == elem) {
             elemIndex = i;
@@ -499,6 +496,8 @@ bool ZappyAI::set(enum e_elemOnTile elem)
 {
     int elemIndex = -1;
 
+    if (PRINT_ACTION)
+        std::cout << "Set: " << elem << std::endl;
     for (int i = 0; i < TOTAL_ELEM_ON_TILE; ++i) {
         if (INVENTORY_PAIR[i].item_type == elem) {
             elemIndex = i;
@@ -547,4 +546,201 @@ bool ZappyAI::eject(void)
 {
     this->_communication.sendPackage(ZP_EJECT);
     return (this->handlePackageReception(RESPONSE_OK));
+}
+
+bool ZappyAI::elevation(void)
+{
+    std::string str;
+
+    this->_communication.sendPackage(ZP_EJECT);
+    if (!this->handlePackageReception(RESPONSE_OTHER, str))
+        return (false);
+    if (str.compare("Elevation underway\n") != 0)
+        return (false);
+    if (!this->handlePackageReception(RESPONSE_OTHER, str))
+        return (false);
+    ++(this->_playerLevel);
+    return (true);
+}
+
+
+void ZappyAI::turn180(void)
+{
+    this->left();
+    this->left();
+}
+
+void ZappyAI::turnTo(enum e_playerDirection direction)
+{
+    if (direction == this->_direction)
+        return;
+    if ((this->_direction + 1) % TOTAL_DIRECTION == direction) {
+        this->right();
+    } else if (direction % 2 == 1) {
+        this->left();
+    } else if (direction != DIR_UNDEF) {
+        this->turn180();
+    }
+    this->_direction = direction;
+}
+
+bool ZappyAI::moveTowardRelativeCoord(t_coords &relativeCoord)
+{
+    bool xOk = (relativeCoord.x == 0);
+    bool yOk = (relativeCoord.y == 0);
+    enum e_playerDirection finalDirection = DIR_UNDEF;
+
+    if (xOk && yOk)
+        return (true);
+    if (!yOk)
+        finalDirection = (relativeCoord.y < 0) ? DIR_SOUTH : DIR_NORTH;
+    if (!xOk && finalDirection != this->_direction)
+        finalDirection = (relativeCoord.x < 0) ? DIR_WEST : DIR_EAST;
+    this->turnTo(finalDirection);
+    return (this->forward(relativeCoord));
+}
+
+
+void ZappyAI::moveRandom(void)
+{
+    int randTurn = rand() % 3;
+
+    switch (randTurn) {
+        case 0:
+            this->left();
+            break;
+        case 1:
+            this->right();
+            break;
+    }
+    this->forward();
+}
+
+void ZappyAI::moveRandom(t_coords &relativeCoord)
+{
+    int randTurn = rand() % 3;
+
+    switch (randTurn) {
+        case 0:
+            this->left();
+            break;
+        case 1:
+            this->right();
+            break;
+    }
+    this->forward(relativeCoord);
+}
+
+
+void ZappyAI::lookItemList(std::vector<int> &itemList)
+{
+    itemList.resize(TOTAL_ELEM_ON_TILE);
+    std::fill(itemList.begin(), itemList.end(), 0);
+    if (!this->_lookDone && !this->look())
+        return;
+    for (size_t i = 0; i < this->_lookResult.size(); ++i) {
+        for (size_t k = 0; k < itemList.size(); ++k)
+            itemList[k] += this->_lookResult[i][k];
+    }
+}
+
+int ZappyAI::lookFor(enum e_elemOnTile seekedElem, t_coords &relativeCoord)
+{
+    int elemCount = 0;
+    int tmp;
+    int width;
+
+    if (PRINT_ACTION)
+        std::cout << "Look for:" << std::endl;
+    if ((!this->_lookDone && !this->look()) ||
+    this->_lookResult.size() <= 0)
+        return (0);
+    if (this->_lookResult[0][seekedElem] > 0) {
+        relativeCoord.x = 0;
+        relativeCoord.y = 0;
+        return (this->_lookResult[0][seekedElem]);
+    }
+    relativeCoord.y = 1;
+    width = 3;
+    relativeCoord.x = -width / 2;
+    for (size_t i = 1; i < this->_lookResult.size(); ++i) {
+        if (relativeCoord.x >= width / 2) {
+            width += 2;
+            relativeCoord.x = -width / 2;
+            ++(relativeCoord.y);
+        }
+        if (this->_lookResult[i][seekedElem] > 0) {
+            relativeCoord.l = i;
+            elemCount = this->_lookResult[i][seekedElem];
+            break;
+        }
+        ++(relativeCoord.x);
+    }
+    for (int i = 0; i < this->_direction; ++i) {
+        tmp = relativeCoord.y;
+        relativeCoord.y = -relativeCoord.x;
+        relativeCoord.x = tmp;
+    }
+    return (elemCount);
+}
+
+int ZappyAI::tryElevate(void)
+{
+    for (size_t i = 0; i < TOTAL_ELEM_ON_TILE; ++i) {
+        if (this->_inventory[i] < ELEVATION_REQUIREMENT[this->_playerLevel][i])
+            return (i);
+    }
+    if (this->_inventory[ELEM_FOOD] < 5)
+        return (ELEM_FOOD);
+    this->elevation();
+    return (TOTAL_ELEM_ON_TILE);
+}
+
+int ZappyAI::takeAll(enum e_elemOnTile elem)
+{
+    int out;
+    int sentRequest = 0;
+    t_coords coords;
+    int elemIndex = -1;
+    int elemToTake = this->lookFor(elem, coords);
+    int elemTaken = 0;
+
+
+    if (PRINT_ACTION)
+        std::cout << "Take all: " << elem << std::endl;
+    if (elemToTake <= 0 || !ON_RELATIVE_TILE(coords))
+        return (elemTaken);
+    for (int i = 0; i < TOTAL_ELEM_ON_TILE; ++i) {
+        if (INVENTORY_PAIR[i].item_type == elem) {
+            elemIndex = i;
+            break;
+        }
+    }
+    if (elemIndex == -1)
+        return (elemTaken);
+    for (int i = 0; i < elemToTake; ++i) {
+        if (sentRequest < MAX_ACTION_AT_ONCE) {
+            this->_communication.sendPackage(ZP_TAKE_OBJ, INVENTORY_PAIR[elemIndex].item_name);
+            ++sentRequest;
+        } else {
+            out = this->_communication.receivePackage();
+            if (out == RESPONSE_DISCONNECTION || out == RESPONSE_DEAD) {
+                this->_alive = false;
+                return (elemTaken);
+            }
+            elemTaken += (out == RESPONSE_OK);
+            --sentRequest;
+        }
+    }
+    while (sentRequest > 0) {
+        out = this->_communication.receivePackage();
+        if (out == RESPONSE_DISCONNECTION || out == RESPONSE_DEAD) {
+            this->_alive = false;
+            return (elemTaken);
+        }
+        elemTaken += (out == RESPONSE_OK);
+        --sentRequest;
+    }
+    this->_inventory[elem] += elemTaken;
+    return (elemTaken);
 }
