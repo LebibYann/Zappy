@@ -300,6 +300,17 @@ bool ZappyAI::handlePackageReception(enum e_AIResponse expectedResponse, std::st
     return (false);
 }
 
+void ZappyAI::setRessourceToHave(void)
+{
+    memset(this->_ressourceToHave, 0, TOTAL_ELEM_ON_TILE * sizeof(*(this->_ressourceToHave)));
+
+    for (size_t i = this->_playerLevel; i < TOTAL_ELEVATION; ++i) {
+        for (size_t k = 0; k < TOTAL_ELEM_ON_TILE; ++k) {
+            this->_ressourceToHave[k] += ELEVATION_REQUIREMENT[i][k] * 2;
+        }
+    }
+}
+
 bool ZappyAI::handlePackageReception(enum e_AIResponse expectedResponse)
 {
     std::string str;
@@ -426,10 +437,8 @@ bool ZappyAI::forward(void)
     return (true);
 }
 
-bool ZappyAI::forward(t_coords &relativeCoord)
+void ZappyAI::updateRelativeCoord(t_coords &relativeCoord)
 {
-    if (!this->forward())
-        return (false);
     switch (this->_direction) {
         case DIR_NORTH:
             --(relativeCoord.y);
@@ -444,6 +453,13 @@ bool ZappyAI::forward(t_coords &relativeCoord)
             ++(relativeCoord.x);
             break;
     }
+}
+
+bool ZappyAI::forward(t_coords &relativeCoord)
+{
+    if (!this->forward())
+        return (false);
+    this->updateRelativeCoord(relativeCoord);
     return (true);
 }
 
@@ -644,6 +660,18 @@ void ZappyAI::lookItemList(std::vector<int> &itemList)
     }
 }
 
+void ZappyAI::lookResourceOnTile(std::vector<int> &itemList)
+{
+    itemList.resize(TOTAL_ELEM_ON_TILE);
+    std::fill(itemList.begin(), itemList.end(), 0);
+    if (!this->_lookDone && !this->look())
+        return;
+    if (this->_lookResult.size() <= 0)
+        return;
+    itemList = this->_lookResult[0];
+}
+
+
 int ZappyAI::lookFor(enum e_elemOnTile seekedElem, t_coords &relativeCoord)
 {
     int elemCount = 0;
@@ -664,7 +692,7 @@ int ZappyAI::lookFor(enum e_elemOnTile seekedElem, t_coords &relativeCoord)
     width = 3;
     relativeCoord.x = -width / 2;
     for (size_t i = 1; i < this->_lookResult.size(); ++i) {
-        if (relativeCoord.x >= width / 2) {
+        if (relativeCoord.x > width / 2) {
             width += 2;
             relativeCoord.x = -width / 2;
             ++(relativeCoord.y);
@@ -682,18 +710,6 @@ int ZappyAI::lookFor(enum e_elemOnTile seekedElem, t_coords &relativeCoord)
         relativeCoord.x = tmp;
     }
     return (elemCount);
-}
-
-int ZappyAI::tryElevate(void)
-{
-    for (size_t i = 0; i < TOTAL_ELEM_ON_TILE; ++i) {
-        if (this->_inventory[i] < ELEVATION_REQUIREMENT[this->_playerLevel][i])
-            return (i);
-    }
-    if (this->_inventory[ELEM_FOOD] < 5)
-        return (ELEM_FOOD);
-    this->elevation();
-    return (TOTAL_ELEM_ON_TILE);
 }
 
 int ZappyAI::takeAll(enum e_elemOnTile elem)
@@ -743,4 +759,25 @@ int ZappyAI::takeAll(enum e_elemOnTile elem)
     }
     this->_inventory[elem] += elemTaken;
     return (elemTaken);
+}
+
+void ZappyAI::takeUsefulResource(const std::vector<int> &itemList)
+{
+    for (size_t i = 0; i < TOTAL_ELEM_ON_TILE; ++i) {
+        if (this->_inventory[i] < this->_ressourceToHave[i] && itemList[i] > 0)
+            takeAll(static_cast<enum e_elemOnTile>(i));
+    }
+    this->look();
+}
+
+int ZappyAI::tryElevate(void)
+{
+    for (size_t i = 0; i < TOTAL_ELEM_ON_TILE; ++i) {
+        if (this->_inventory[i] < ELEVATION_REQUIREMENT[this->_playerLevel][i])
+            return (i);
+    }
+    if (this->_inventory[ELEM_FOOD] < 5)
+        return (ELEM_FOOD);
+    this->elevation();
+    return (TOTAL_ELEM_ON_TILE);
 }

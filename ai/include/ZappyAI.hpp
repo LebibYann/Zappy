@@ -69,6 +69,8 @@ class ZappyAI {
         bool handlePackageReception(enum e_AIResponse expectedResponse);
         bool handlePackageReception(enum e_AIResponse expectedResponse, std::string &str);
 
+        void setRessourceToHave(void);
+
         void surviveBehaviour(void);
         void run(void);
 
@@ -89,14 +91,17 @@ class ZappyAI {
         void turn180(void);
         void turnTo(enum e_playerDirection direction);
 
+        void updateRelativeCoord(t_coords &relativeCoord);
         bool moveTowardRelativeCoord(t_coords &relativeCoord);
         void moveRandom(void);
         void moveRandom(t_coords &relativeCoord);
 
         void lookItemList(std::vector<int> &itemList);
+        void lookResourceOnTile(std::vector<int> &itemList);
         int lookFor(enum e_elemOnTile seekedElem, t_coords &relativeCoord);
 
         int takeAll(enum e_elemOnTile elem);
+        void takeUsefulResource(const std::vector<int> &itemList);
 
         int tryElevate(void);
 
@@ -116,11 +121,13 @@ class ZappyAI {
         int _playerLevel = 1;
         int _direction = 0;
         int _inventory[TOTAL_ELEM_ON_TILE];
+        int _ressourceToHave[TOTAL_ELEM_ON_TILE];
 
         // Look data
         bool _lookDone = false;
         std::vector<std::vector<int>> _lookResult;
 
+        t_coords _map = {0, 0, 0};
         t_coords _targetPos = {0, 0, 0};
 
         char _cipherList[127];
