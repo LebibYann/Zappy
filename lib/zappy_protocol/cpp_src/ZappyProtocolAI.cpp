@@ -62,6 +62,8 @@ bool ZappyProtocolAI::sendPackage(enum e_zp_command cmd_type, const std::string 
             this->writeData(" ", 1);
             this->writeData(str, str.size());
             this->writeData("\n", 1);
+            write(STDOUT_FILENO, "COMMAND: ", 9);
+            write(STDOUT_FILENO, this->_data.c_wfd.buf, this->_data.c_wfd.size);
             _pkg.cmd_type = cmd_type;
             this->send();
             return (true);

@@ -11,9 +11,10 @@ ZappyAI::ZappyAI()
 {
     FD_ZERO(&(this->_read_socket));
     FD_ZERO(&(this->_write_socket));
-    memset(this->_inventory, 0, TOTAL_ELEM_ON_TILE * sizeof(*(this->_inventory)));
+    memset(this->_inventory, 0, TOTAL_INVENTORY * sizeof(int));
     this->_targetPos.x = 0;
     this->_targetPos.y = 0;
+    this->setRessourceToHave();
 }
 
 ZappyAI::~ZappyAI()
@@ -302,10 +303,10 @@ bool ZappyAI::handlePackageReception(enum e_AIResponse expectedResponse, std::st
 
 void ZappyAI::setRessourceToHave(void)
 {
-    memset(this->_ressourceToHave, 0, TOTAL_ELEM_ON_TILE * sizeof(*(this->_ressourceToHave)));
+    memset(this->_ressourceToHave, 0, TOTAL_INVENTORY * sizeof(int));
 
     for (size_t i = this->_playerLevel; i < TOTAL_ELEVATION; ++i) {
-        for (size_t k = 0; k < TOTAL_ELEM_ON_TILE; ++k) {
+        for (size_t k = 0; k < TOTAL_INVENTORY; ++k) {
             this->_ressourceToHave[k] += ELEVATION_REQUIREMENT[i][k] * 2;
         }
     }
@@ -322,6 +323,8 @@ void ZappyAI::surviveBehaviour(void)
 {
     t_coords relPos;
 
+    if (PRINT_ACTION)
+        std::cout << "SURVIVE BEHAVIOUR" << std::endl;
     while (this->_inventory[ELEM_FOOD] < 10 && this->_alive) {
         if (this->lookFor(ELEM_FOOD, relPos) > 0) {
             this->takeAll(ELEM_FOOD);
@@ -337,15 +340,41 @@ void ZappyAI::surviveBehaviour(void)
     }
 }
 
+void ZappyAI::elevationBehaviour(enum e_elemOnTile seekedItem)
+{
+    t_coords relPos;
+    std::vector<int> itemList;
+
+    if (PRINT_ACTION)
+        std::cout << "ELEVATION BEHAVIOUR " << seekedItem << std::endl;
+    if (seekedItem != TOTAL_INVENTORY && seekedItem >= 0 &&
+    this->lookFor(seekedItem, relPos) > 0) {
+        std::cout << relPos.x << " " << relPos.y << " " << this->_direction << std::endl;
+        this->moveTowardRelativeCoord(relPos);
+        this->takeAll(ELEM_FOOD);
+        this->takeAll(seekedItem);
+        this->lookResourceOnTile(itemList);
+        this->takeUsefulResource(itemList);
+    } else {
+        this->moveRandom(this->_targetPos);
+    }
+}
+
 void ZappyAI::run(void)
 {
+    int seekedItem;
+    (void)seekedItem;
+
     while (this->_alive) {
+        if (PRINT_ACTION)
+            std::cout << "LOOP START" << std::endl;
         this->inventory();
         if (this->_inventory[ELEM_FOOD] < 4)
             this->surviveBehaviour();
         if (this->_inventory[ELEM_FOOD] < 30)
             this->takeAll(ELEM_FOOD);
-        this->moveRandom();
+        seekedItem = tryElevate();
+        this->elevationBehaviour(static_cast<enum e_elemOnTile>(seekedItem));
     }
     std::cout << "dead" << std::endl;
 }
@@ -371,12 +400,16 @@ bool ZappyAI::inventory(void)
         itemStream.clear();
         itemStream.str(itemStr);
         itemName = "";
-        while (itemName.compare("") == 0)
-            getline(itemStream, itemName, ' ');
+        while (getline(itemStream, itemName, ' ') &&
+        itemName.compare("") == 0);
+        if (itemName.compare("") == 0)
+            return (false);
         itemStrQuantity = "";
-        while (itemStrQuantity.compare("") == 0)
-            getline(itemStream, itemStrQuantity, ' ');
-        for (size_t i = 0; i < TOTAL_ELEM_ON_TILE; ++i) {
+        while (getline(itemStream, itemStrQuantity, ' ') &&
+        itemStrQuantity.compare("") == 0);
+        if (itemStrQuantity.compare("") == 0)
+            return (false);
+        for (size_t i = 0; i < TOTAL_INVENTORY; ++i) {
             if (itemName.compare(INVENTORY_PAIR[i].item_name) == 0) {
                 this->_inventory[INVENTORY_PAIR[i].item_type] = atoi(itemStrQuantity.c_str());
                 break;
@@ -493,7 +526,7 @@ bool ZappyAI::take(enum e_elemOnTile elem)
 
     if (PRINT_ACTION)
         std::cout << "Take: " << elem << std::endl;
-    for (int i = 0; i < TOTAL_ELEM_ON_TILE; ++i) {
+    for (int i = 0; i < TOTAL_INVENTORY; ++i) {
         if (INVENTORY_PAIR[i].item_type == elem) {
             elemIndex = i;
             break;
@@ -508,25 +541,47 @@ bool ZappyAI::take(enum e_elemOnTile elem)
     return (true);
 }
 
-bool ZappyAI::set(enum e_elemOnTile elem)
+bool ZappyAI::set(enum e_elemOnTile elem, int count)
 {
+    int elemSet = 0;
+    int out = 0;
     int elemIndex = -1;
+    int sentRequest = 0;
 
     if (PRINT_ACTION)
-        std::cout << "Set: " << elem << std::endl;
-    for (int i = 0; i < TOTAL_ELEM_ON_TILE; ++i) {
+        std::cout << "Set: " << elem << " x" << count << std::endl;
+    for (int i = 0; i < TOTAL_INVENTORY; ++i) {
         if (INVENTORY_PAIR[i].item_type == elem) {
             elemIndex = i;
             break;
         }
     }
-    if (elemIndex == -1 && this->_inventory[elem] <= 0)
-        return (false);
-    this->_communication.sendPackage(ZP_SET_OBJ, INVENTORY_PAIR[elemIndex].item_name);
-    if (!this->handlePackageReception(RESPONSE_OK))
-        return (false);
-    --(this->_inventory[elem]);
-    return (true);
+    for (int i = 0; elemIndex != -1 && i < count && this->_inventory[elem] > 0; ++i) {
+        if (sentRequest < MAX_ACTION_AT_ONCE) {
+            this->_communication.sendPackage(ZP_SET_OBJ, INVENTORY_PAIR[elemIndex].item_name);
+            ++sentRequest;
+        } else {
+            out = this->_communication.receivePackage();
+            if (out == RESPONSE_DISCONNECTION || out == RESPONSE_DEAD) {
+                this->_alive = false;
+                return (elemSet);
+            }
+            elemSet += (out == RESPONSE_OK);
+            --(this->_inventory[elem]);
+            --sentRequest;
+        }
+    }
+    while (sentRequest > 0) {
+        out = this->_communication.receivePackage();
+        if (out == RESPONSE_DISCONNECTION || out == RESPONSE_DEAD) {
+            this->_alive = false;
+            return (elemSet);
+        }
+        elemSet += (out == RESPONSE_OK);
+        --(this->_inventory[elem]);
+        --sentRequest;
+    }
+    return (elemSet);
 }
 
 bool ZappyAI::broadcast(const std::string &msg, bool cipher)
@@ -568,7 +623,7 @@ bool ZappyAI::elevation(void)
 {
     std::string str;
 
-    this->_communication.sendPackage(ZP_EJECT);
+    this->_communication.sendPackage(ZP_INCANTATION);
     if (!this->handlePackageReception(RESPONSE_OTHER, str))
         return (false);
     if (str.compare("Elevation underway\n") != 0)
@@ -576,6 +631,8 @@ bool ZappyAI::elevation(void)
     if (!this->handlePackageReception(RESPONSE_OTHER, str))
         return (false);
     ++(this->_playerLevel);
+    if (PRINT_ACTION)
+        std::cout << "Elevation success: " << this->_playerLevel << std::endl;
     return (true);
 }
 
@@ -726,7 +783,7 @@ int ZappyAI::takeAll(enum e_elemOnTile elem)
         std::cout << "Take all: " << elem << std::endl;
     if (elemToTake <= 0 || !ON_RELATIVE_TILE(coords))
         return (elemTaken);
-    for (int i = 0; i < TOTAL_ELEM_ON_TILE; ++i) {
+    for (int i = 0; i < TOTAL_INVENTORY; ++i) {
         if (INVENTORY_PAIR[i].item_type == elem) {
             elemIndex = i;
             break;
@@ -758,26 +815,49 @@ int ZappyAI::takeAll(enum e_elemOnTile elem)
         --sentRequest;
     }
     this->_inventory[elem] += elemTaken;
+    this->_lookDone = false;
     return (elemTaken);
 }
 
 void ZappyAI::takeUsefulResource(const std::vector<int> &itemList)
 {
-    for (size_t i = 0; i < TOTAL_ELEM_ON_TILE; ++i) {
-        if (this->_inventory[i] < this->_ressourceToHave[i] && itemList[i] > 0)
+    for (size_t i = 0; i < TOTAL_INVENTORY; ++i) {
+        if (this->_inventory[i] <
+        this->_ressourceToHave[i] &&
+        itemList[i] > 0)
             takeAll(static_cast<enum e_elemOnTile>(i));
     }
-    this->look();
+    this->_lookDone = false;
+}
+
+bool ZappyAI::setObjectForElevation(int level)
+{
+    for (size_t i = 0; i < TOTAL_INVENTORY; ++i) {
+        // std::cout << i << " " << this->_inventory[i] << " " <<
+        // ELEVATION_REQUIREMENT[level][i] << " " <<
+        // (this->_inventory[i] < ELEVATION_REQUIREMENT[level][i]) << std::endl;
+        if (this->_inventory[i] < ELEVATION_REQUIREMENT[level][i])
+            return (false);
+    }
+    for (size_t i = 0; i <  TOTAL_INVENTORY; ++i)
+        this->set(static_cast<enum e_elemOnTile>(i), ELEVATION_REQUIREMENT[level][i]);
+    return (true);
 }
 
 int ZappyAI::tryElevate(void)
 {
-    for (size_t i = 0; i < TOTAL_ELEM_ON_TILE; ++i) {
+    if (PRINT_ACTION)
+        std::cout << "Try elevate" << std::endl;
+    this->inventory();
+    for (size_t i = 0; i < TOTAL_INVENTORY; ++i) {
         if (this->_inventory[i] < ELEVATION_REQUIREMENT[this->_playerLevel][i])
             return (i);
     }
     if (this->_inventory[ELEM_FOOD] < 5)
         return (ELEM_FOOD);
-    this->elevation();
-    return (TOTAL_ELEM_ON_TILE);
+    if (!this->setObjectForElevation(this->_playerLevel))
+        return (-1);
+    if (!this->elevation())
+        return (-2);
+    return (TOTAL_INVENTORY);
 }

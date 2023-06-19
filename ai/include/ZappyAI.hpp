@@ -72,6 +72,7 @@ class ZappyAI {
         void setRessourceToHave(void);
 
         void surviveBehaviour(void);
+        void elevationBehaviour(enum e_elemOnTile seekedItem);
         void run(void);
 
         bool inventory(void);
@@ -81,7 +82,7 @@ class ZappyAI {
         bool right(void);
         bool left(void);
         bool take(enum e_elemOnTile elem);
-        bool set(enum e_elemOnTile elem);
+        bool set(enum e_elemOnTile elem, int count = 1);
         bool broadcast(const std::string &msg, bool cipher = true);
         int connectNbr(void);
         bool fork(void);
@@ -103,6 +104,8 @@ class ZappyAI {
         int takeAll(enum e_elemOnTile elem);
         void takeUsefulResource(const std::vector<int> &itemList);
 
+        bool setObjectForElevation(int level);
+
         int tryElevate(void);
 
     private:
@@ -120,8 +123,8 @@ class ZappyAI {
         int _playerId = 0;
         int _playerLevel = 1;
         int _direction = 0;
-        int _inventory[TOTAL_ELEM_ON_TILE];
-        int _ressourceToHave[TOTAL_ELEM_ON_TILE];
+        int _inventory[TOTAL_INVENTORY];
+        int _ressourceToHave[TOTAL_INVENTORY];
 
         // Look data
         bool _lookDone = false;
