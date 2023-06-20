@@ -66,8 +66,8 @@ class ZappyAI {
         void generateCipherList(void);
         void cipherStr(std::string &str);
         void uncipherStr(std::string &str);
-        bool handlePackageReception(enum e_AIResponse expectedResponse);
-        bool handlePackageReception(enum e_AIResponse expectedResponse, std::string &str);
+        int handlePackageReception(enum e_AIResponse expectedResponse);
+        int handlePackageReception(enum e_AIResponse expectedResponse, std::string &str);
 
         void setRessourceToHave(void);
 
@@ -81,8 +81,15 @@ class ZappyAI {
         bool forward(t_coords &relativeCoord);
         bool right(void);
         bool left(void);
-        bool take(enum e_elemOnTile elem);
-        bool set(enum e_elemOnTile elem, int count = 1);
+        /**
+         ** @brief Do the take command
+         **
+         ** @param elem
+         ** @param count
+         ** @return int returns the number of item taken
+         */
+        int take(enum e_elemOnTile elem, int count = 1);
+        int set(enum e_elemOnTile elem, int count = 1);
         bool broadcast(const std::string &msg, bool cipher = true);
         int connectNbr(void);
         bool fork(void);
