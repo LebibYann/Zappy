@@ -57,7 +57,7 @@ void ZappyProtocol::writeData(const std::string &data, size_t size)
     zp_write_data(&(this->_data), data.c_str(), size);
 }
 
-bool ZappyProtocol::getline(std::string &output)
+bool ZappyProtocol::zpGetline(std::string &output)
 {
     char *str = zp_getline_pending_data(&(this->_data));
 
@@ -72,8 +72,11 @@ int ZappyProtocol::getlineTimeout(std::string &output, int timeout)
 {
     char *str = zp_getline_timeout_pending_data(&(this->_data), timeout, this->_readSocket);
 
-    if (this->_data.disconnected)
+    if (this->_data.disconnected) {
+        if (str != nullptr)
+            free(str);
         return (-1);
+    }
     if (str == nullptr)
         return (1);
     output = str;
