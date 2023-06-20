@@ -41,7 +41,7 @@ public:
      ** @param output
      ** @return true if there's a line to get or false if there's no line to get.
      */
-    bool getline(std::string &output);
+    bool zpGetline(std::string &output);
     /**
      ** @brief Fills output parameter if a line can be recovered.
      ** The main difference with the getline() method is that

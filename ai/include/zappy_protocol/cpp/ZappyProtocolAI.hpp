@@ -8,6 +8,8 @@
 #pragma once
 
 #include <iostream>
+#include <string>
+#include <sstream>
 
 #include "ZappyProtocolClass.hpp"
 
@@ -22,6 +24,8 @@ typedef enum e_AIResponse {
     RESPONSE_OK,
     RESPONSE_KO,
     RESPONSE_DEAD,
+    RESPONSE_MESSAGE,
+    RESPONSE_EJECT,
     RESPONSE_OTHER,
     RESPONSE_TOTAL
 } t_AIResponse;
