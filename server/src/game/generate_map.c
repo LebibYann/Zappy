@@ -9,10 +9,10 @@
 
 tile_t **generate_map(int width, int height)
 {
-    tile_t **map = malloc(sizeof(tile_t *) * (height + 1));
+    tile_t **map = malloc(sizeof(tile_t *) * height);
 
     for (int i = 0; i < height; i++) {
-        map[i] = malloc(sizeof(tile_t) * (width + 1));
+        map[i] = malloc(sizeof(tile_t) * width);
         for (int j = 0; j < width; j++) {
             map[i][j].food = rand() % 10;
             map[i][j].linemate = rand() % 10;
