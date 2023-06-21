@@ -22,6 +22,7 @@
 
 #include "str_split.h"
 #include "zappy_resources.h"
+#include "clock.h"
 
 typedef struct parameter_s
 {
