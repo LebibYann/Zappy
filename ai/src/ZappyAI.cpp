@@ -275,7 +275,7 @@ void ZappyAI::uncipherStr(std::string &str)
     }
 }
 
-bool ZappyAI::handlePackageReception(enum e_AIResponse expectedResponse, std::string &str)
+int ZappyAI::handlePackageReception(enum e_AIResponse expectedResponse, std::string &str)
 {
     int out;
 
@@ -290,15 +290,17 @@ bool ZappyAI::handlePackageReception(enum e_AIResponse expectedResponse, std::st
                 break;
             default:
                 if (out != expectedResponse) {
-                    if (out == RESPONSE_DISCONNECTION || out == RESPONSE_DEAD)
+                    if (out == RESPONSE_DISCONNECTION || out == RESPONSE_DEAD) {
                         this->_alive = false;
-                    return (false);
+                        return (-1);
+                    }
+                    return (0);
                 }
-                return (true);
+                return (1);
         }
 
     }
-    return (false);
+    return (0);
 }
 
 void ZappyAI::setRessourceToHave(void)
@@ -312,7 +314,7 @@ void ZappyAI::setRessourceToHave(void)
     }
 }
 
-bool ZappyAI::handlePackageReception(enum e_AIResponse expectedResponse)
+int ZappyAI::handlePackageReception(enum e_AIResponse expectedResponse)
 {
     std::string str;
 
@@ -389,7 +391,7 @@ bool ZappyAI::inventory(void)
     std::stringstream itemStream;
 
     this->_communication.sendPackage(ZP_INVENTORY);
-    if (!this->handlePackageReception(RESPONSE_OTHER, str))
+    if (this->handlePackageReception(RESPONSE_OTHER, str) != 1)
         return (false);
     if (PRINT_ACTION)
         std::cout << "Inventory: " << str << std::endl;
@@ -433,7 +435,7 @@ bool ZappyAI::look(void)
     std::stringstream streamTile;
 
     this->_communication.sendPackage(ZP_LOOK);
-    if (!this->handlePackageReception(RESPONSE_OTHER, str))
+    if (this->handlePackageReception(RESPONSE_OTHER, str) != 1)
         return (false);
     if (PRINT_ACTION)
         std::cout << "Look: " << str << std::endl;
@@ -464,7 +466,7 @@ bool ZappyAI::forward(void)
     if (PRINT_ACTION)
         std::cout << "Forward: " << this->_direction << std::endl;
     this->_communication.sendPackage(ZP_FORWARD);
-    if (!this->handlePackageReception(RESPONSE_OK))
+    if (this->handlePackageReception(RESPONSE_OK) != 1)
         return (false);
     this->_lookDone = false;
     return (true);
@@ -501,7 +503,7 @@ bool ZappyAI::right(void)
     if (PRINT_ACTION)
         std::cout << "Right: " << std::endl;
     this->_communication.sendPackage(ZP_LEFT);
-    if (!this->handlePackageReception(RESPONSE_OK))
+    if (this->handlePackageReception(RESPONSE_OK) != 1)
         return (false);
     this->_direction = (this->_direction + 1) % TOTAL_DIRECTION;
     this->_lookDone = false;
@@ -513,15 +515,17 @@ bool ZappyAI::left(void)
     if (PRINT_ACTION)
         std::cout << "Left: " << std::endl;
     this->_communication.sendPackage(ZP_RIGHT);
-    if (!this->handlePackageReception(RESPONSE_OK))
+    if (this->handlePackageReception(RESPONSE_OK) != 1)
         return (false);
     this->_direction = (this->_direction + TOTAL_DIRECTION - 1) % TOTAL_DIRECTION;
     this->_lookDone = false;
     return (true);
 }
 
-bool ZappyAI::take(enum e_elemOnTile elem)
+int ZappyAI::take(enum e_elemOnTile elem, int count)
 {
+    int out;
+    int elemSet = 0;
     int elemIndex = -1;
 
     if (PRINT_ACTION)
@@ -533,20 +537,23 @@ bool ZappyAI::take(enum e_elemOnTile elem)
         }
     }
     if (elemIndex == -1)
-        return (false);
-    this->_communication.sendPackage(ZP_TAKE_OBJ, INVENTORY_PAIR[elemIndex].item_name);
-    if (!this->handlePackageReception(RESPONSE_OK))
-        return (false);
-    ++(this->_inventory[elem]);
+        return (elemSet);
+    for (int i = 0; elemIndex != -1 && i < count; ++i) {
+        this->_communication.sendPackage(ZP_TAKE_OBJ, INVENTORY_PAIR[elemIndex].item_name);
+        out = this->handlePackageReception(RESPONSE_OK);
+        if (out < 0)
+            return (elemSet);
+        elemSet += (out == 1);
+        this->_inventory[elem] += (out == 1);
+    }
     return (true);
 }
 
-bool ZappyAI::set(enum e_elemOnTile elem, int count)
+int ZappyAI::set(enum e_elemOnTile elem, int count)
 {
+    int out;
     int elemSet = 0;
-    int out = 0;
     int elemIndex = -1;
-    int sentRequest = 0;
 
     if (PRINT_ACTION)
         std::cout << "Set: " << elem << " x" << count << std::endl;
@@ -557,29 +564,12 @@ bool ZappyAI::set(enum e_elemOnTile elem, int count)
         }
     }
     for (int i = 0; elemIndex != -1 && i < count && this->_inventory[elem] > 0; ++i) {
-        if (sentRequest < MAX_ACTION_AT_ONCE) {
-            this->_communication.sendPackage(ZP_SET_OBJ, INVENTORY_PAIR[elemIndex].item_name);
-            ++sentRequest;
-        } else {
-            out = this->_communication.receivePackage();
-            if (out == RESPONSE_DISCONNECTION || out == RESPONSE_DEAD) {
-                this->_alive = false;
-                return (elemSet);
-            }
-            elemSet += (out == RESPONSE_OK);
-            --(this->_inventory[elem]);
-            --sentRequest;
-        }
-    }
-    while (sentRequest > 0) {
-        out = this->_communication.receivePackage();
-        if (out == RESPONSE_DISCONNECTION || out == RESPONSE_DEAD) {
-            this->_alive = false;
+        this->_communication.sendPackage(ZP_SET_OBJ, INVENTORY_PAIR[elemIndex].item_name);
+        out = this->handlePackageReception(RESPONSE_OK);
+        if (out < 0)
             return (elemSet);
-        }
-        elemSet += (out == RESPONSE_OK);
-        --(this->_inventory[elem]);
-        --sentRequest;
+        elemSet += (out == 1);
+        this->_inventory[elem] -= (out == 1);
     }
     return (elemSet);
 }
@@ -591,7 +581,7 @@ bool ZappyAI::broadcast(const std::string &msg, bool cipher)
     if (cipher)
         this->cipherStr(tmpStr);
     this->_communication.sendPackage(ZP_BROADCAST, tmpStr);
-    if (!this->handlePackageReception(RESPONSE_OK))
+    if (this->handlePackageReception(RESPONSE_OK) != 1)
         return (false);
     return (true);
 }
@@ -601,7 +591,7 @@ int ZappyAI::connectNbr(void)
     std::string str;
 
     this->_communication.sendPackage(ZP_CONNECT_NBR);
-    if (!this->handlePackageReception(RESPONSE_OTHER, str) &&
+    if (this->handlePackageReception(RESPONSE_OTHER, str) != 1 &&
     !strIsDigit(str))
         return (-1);
     return (atoi(str.c_str()));
@@ -610,13 +600,13 @@ int ZappyAI::connectNbr(void)
 bool ZappyAI::fork(void)
 {
     this->_communication.sendPackage(ZP_FORK);
-    return (this->handlePackageReception(RESPONSE_OK));
+    return (this->handlePackageReception(RESPONSE_OK) == 1);
 }
 
 bool ZappyAI::eject(void)
 {
     this->_communication.sendPackage(ZP_EJECT);
-    return (this->handlePackageReception(RESPONSE_OK));
+    return (this->handlePackageReception(RESPONSE_OK) == 1);
 }
 
 bool ZappyAI::elevation(void)
@@ -624,11 +614,10 @@ bool ZappyAI::elevation(void)
     std::string str;
 
     this->_communication.sendPackage(ZP_INCANTATION);
-    if (!this->handlePackageReception(RESPONSE_OTHER, str))
-        return (false);
-    if (str.compare("Elevation underway\n") != 0)
-        return (false);
-    if (!this->handlePackageReception(RESPONSE_OTHER, str))
+    this->handlePackageReception(RESPONSE_OTHER);
+    // if (str.compare("Elevation underway\n") != 0)
+    //     return (false);
+    if (this->handlePackageReception(RESPONSE_OTHER, str) != 1)
         return (false);
     ++(this->_playerLevel);
     if (PRINT_ACTION)
