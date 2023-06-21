@@ -67,17 +67,23 @@ tile_t **generate_map(int width, int height)
 {
     tile_t **map = malloc(sizeof(tile_t *) * height);
 
-    for (int i = 0; i < height; i++) {
-        map[i] = malloc(sizeof(tile_t) * width);
-        for (int j = 0; j < width; j++) {
-            map[i][j].food = rand() % 10;
-            map[i][j].linemate = rand() % 10;
-            map[i][j].deraumere = rand() % 10;
-            map[i][j].sibur = rand() % 10;
-            map[i][j].mendiane = rand() % 10;
-            map[i][j].phiras = rand() % 10;
-            map[i][j].thystame = rand() % 10;
-        }
-    }
+    if (!map)
+        return (NULL);
+
+    for (int i = 0; i < width * height * FOOD_DENSITY; i++)
+        generate_food(map, width, height);
+    for (int i = 0; i < width * height * LINEMATE_DENSITY; i++)
+        generate_linemate(map, width, height);
+    for (int i = 0; i < width * height * DERAUMERE_DENSITY; i++)
+        generate_deraumere(map, width, height);
+    for (int i = 0; i < width * height * SIBUR_DENSITY; i++)
+        generate_sibur(map, width, height);
+    for (int i = 0; i < width * height * MENDIANE_DENSITY; i++)
+        generate_mendiane(map, width, height);
+    for (int i = 0; i < width * height * PHIRAS_DENSITY; i++)
+        generate_phiras(map, width, height);
+    for (int i = 0; i < width * height * THYSTAME_DENSITY; i++)
+        generate_thystame(map, width, height);
+
     return (map);
 }
