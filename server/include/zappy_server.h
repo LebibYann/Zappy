@@ -21,6 +21,7 @@
 #include <stdio.h>
 
 #include "str_split.h"
+#include "clock.h"
 
 typedef struct parameter_s
 {
