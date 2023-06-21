@@ -20,6 +20,7 @@ typedef struct s_custom_fd {
  **
  ** @param c_fd
  */
+extern "C"
 void init_custom_fd(t_custom_fd *c_fd);
 
 /**
@@ -27,6 +28,7 @@ void init_custom_fd(t_custom_fd *c_fd);
  **
  ** @param c_fd
  */
+extern "C"
 void clear_custom_fd(t_custom_fd *c_fd);
 
 /**
@@ -38,7 +40,8 @@ void clear_custom_fd(t_custom_fd *c_fd);
  ** @param buf
  ** @param size
  */
-void write_in_custom_fd(t_custom_fd *c_fd, void *buf, size_t size);
+extern "C"
+void write_in_custom_fd(t_custom_fd *c_fd, const void *buf, size_t size);
 
 /**
  ** @brief Works as the syscall read works,
@@ -49,6 +52,7 @@ void write_in_custom_fd(t_custom_fd *c_fd, void *buf, size_t size);
  ** @param buf
  ** @param size
  */
+extern "C"
 size_t read_in_custom_fd(t_custom_fd *c_fd, void *buf, size_t size);
 
 /**
@@ -56,6 +60,7 @@ size_t read_in_custom_fd(t_custom_fd *c_fd, void *buf, size_t size);
  **
  ** @return t_custom_fd*
  */
+extern "C"
 t_custom_fd *new_custom_fd(void);
 
 /**
@@ -63,6 +68,7 @@ t_custom_fd *new_custom_fd(void);
  **
  ** @return t_custom_fd*
  */
+extern "C"
 void delete_custom_fd(t_custom_fd *c_fd);
 
 /**
@@ -72,4 +78,5 @@ void delete_custom_fd(t_custom_fd *c_fd);
  ** @param c_fd
  ** @return char*
  */
+extern "C"
 char *getline_in_custom_fd(t_custom_fd *c_fd);

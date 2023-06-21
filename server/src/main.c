@@ -9,14 +9,22 @@
 
 int main(int ac, char **av)
 {
+    bool run = true;
     server_t server;
+    struct timespec timing;
 
-    if (ac < 2)
+    init_server(&server);
+    if (read_parameters(&server, ac, av) == -1)
         return (84);
-    server.fd = create_server(atoi(av[1]), 5);
-    // FD_ZERO(&server.current_sockets);
+    if ((server.fd = open_server(server.port, 5)) < 0)
+        return (84);
     // FD_SET(server.fd, &server.current_sockets);
-    while (handle_client(&server));
+    while (run) {
+        clock_start(&timing);
+        // run = handle_client(&server);
+        clock_delay(&timing, server.frequency);
+        printf("Hey!\n");
+    }
     close(server.fd);
     return (0);
 }

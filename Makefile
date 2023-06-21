@@ -29,19 +29,25 @@ SBLINK	= 	"\033[0m"
 INVERT  =	"\033[7m"
 
 all:
-	@make zappy_gui --no-print-directory; \
+	@make lib --no-print-directory; \
+	make zappy_gui --no-print-directory; \
 	make zappy_server --no-print-directory; \
 	make zappy_ai --no-print-directory;
 
 re: fclean all
 
-zappy_gui:
+reall: lib_re fclean
+	@make zappy_gui --no-print-directory; \
+	make zappy_server --no-print-directory; \
+	make zappy_ai --no-print-directory;
+
+zappy_gui: FORCE
 	@make -C $(GUI_SRC) --no-print-directory
 
-zappy_server:
+zappy_server: FORCE
 	@make -C $(SERVER_SRC) --no-print-directory
 
-zappy_ai:
+zappy_ai: FORCE
 	@make -C $(AI_SRC) --no-print-directory
 
 clean:

@@ -7,11 +7,8 @@
 
 #pragma once
 
-class ZappyProtocol {
-public:
-    ZappyProtocol();
-    ~ZappyProtocol();
 
-protected:
-private:
-};
+#include "Client.hpp"
+#include "ZappyProtocolClass.hpp"
+#include "ZappyProtocolAI.hpp"
+#include "ZappyProtocolGUI.hpp"

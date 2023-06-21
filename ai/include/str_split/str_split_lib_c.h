@@ -25,6 +25,6 @@ char *split_strcat(char *dest, char const *src);
 
 char *split_strncat(char *dest, char const *src, size_t n);
 
-void *split_memcpy(void *restrict dest, const void *restrict src, size_t n);
+void *split_memcpy(void *dest, const void *src, size_t n);
 
 void *split_realloc(void *ptr, size_t old_size, size_t size);

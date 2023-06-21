@@ -31,7 +31,7 @@ static bool add_param(t_zp_gui_protocol *pkg, char *param)
         pkg->nbr_args = 0;
         return (false);
     }
-    pkg->args = realloc(pkg->args, (pkg->nbr_args + 1) * sizeof(int));
+    pkg->args = (int*) realloc(pkg->args, (pkg->nbr_args + 1) * sizeof(int));
     pkg->args[pkg->nbr_args] = atoi(param);
     ++(pkg->nbr_args);
     return (true);

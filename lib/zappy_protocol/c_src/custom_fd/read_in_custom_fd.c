@@ -17,7 +17,7 @@ size_t read_in_custom_fd(t_custom_fd *c_fd, void *buf, size_t size)
     } else {
         c_fd->size -= dumped_size;
         memmove(c_fd->buf, &(c_fd->buf)[dumped_size], c_fd->size);
-        c_fd->buf = realloc(c_fd->buf, c_fd->size);
+        c_fd->buf = (char*) realloc(c_fd->buf, c_fd->size);
     }
     return (dumped_size);
 }
