@@ -7,91 +7,65 @@
 
 #include "c_zappy_protocol.h"
 
-static ssize_t read_action(t_zp_pending_data *zp_pending_d)
+
+static int check_connection(t_zp_pending_data *zp_pending_d,
+fd_set *socks)
 {
-    char buf[BUFSIZE];
-    ssize_t bytes = read(zp_pending_d->fd, buf, BUFSIZE);
+    struct pollfd connectionCheck = {zp_pending_d->fd, 0, 0};
+    int result = poll(&connectionCheck, 1, 0);
 
-    switch (bytes) {
-        case -1:
-            return (-1);
-        case 0:
-            zp_pending_d->disconnected = true;
-            return (0);
+    if (result < 0 || connectionCheck.revents & POLLERR)
+        return (-3);
+    if (connectionCheck.revents & POLLNVAL)
+        return (-2);
+    if (connectionCheck.revents & POLLHUP || zp_pending_d->disconnected) {
+        zp_pending_d->disconnected = true;
+        return (-1);
     }
-    write_in_custom_fd(&(zp_pending_d->c_rfd), buf, bytes);
-    return (bytes);
-}
-
-static ssize_t write_action(t_zp_pending_data *zp_pending_d)
-{
-    char buf[BUFSIZE];
-    ssize_t buf_size = read_in_custom_fd(&(zp_pending_d->c_wfd), buf, BUFSIZE);
-
-    return (write(zp_pending_d->fd, buf, buf_size));
-}
-
-static ssize_t rw_action(t_zp_pending_data *zp_pending_d,
-bool *something_to_read, fd_set *rd_socket, fd_set *wr_socket)
-{
-    (*something_to_read) = false;
-    if (rd_socket != NULL && FD_ISSET(zp_pending_d->fd, rd_socket)) {
-        (*something_to_read) = true;
-        switch (read_action(zp_pending_d)) {
-            case -1:
-                return (-1);
-            case 0:
-                return (1);
-        }
-    }
-    if (wr_socket != NULL && FD_ISSET(zp_pending_d->fd, wr_socket)) {
-        if (write_action(zp_pending_d))
-            return (-1);
-    }
+    FD_ZERO(&socks[0]);
+    FD_ZERO(&socks[1]);
+    FD_SET(zp_pending_d->fd, &socks[0]);
+    FD_SET(zp_pending_d->fd, &socks[1]);
     return (0);
 }
 
-static int pick_select(const fd_set *rd_socket, const fd_set *wr_socket,
-fd_set *tmp_rd_sock, fd_set *tmp_wr_sock)
+static ssize_t do_select(t_zp_pending_data *zp_pending_d, fd_set **sock_ptr,
+enum e_zp_exchangeDataHandling rcv_handling)
 {
-    if (rd_socket != NULL) {
-        *tmp_rd_sock = *rd_socket;
-        if (wr_socket != NULL)
-            *tmp_wr_sock = *wr_socket;
-        else
-            *tmp_wr_sock = *rd_socket;
+    ssize_t out;
+    bool can_read = true;
+    struct pollfd fds = {zp_pending_d->fd, POLLIN | POLLPRI | POLLOUT, 0};
+    struct timespec timeout = {0, 1};
+
+    while (can_read || (zp_pending_d->c_wfd.size > 0 && sock_ptr[1] != NULL)) {
+        if (select(FD_SETSIZE, sock_ptr[0], sock_ptr[1], NULL, NULL) < 0)
+            return (-3);
+        if ((out = rw_action(zp_pending_d, &can_read, sock_ptr)) < 0)
+            return (out);
+        ppoll(&fds, 1, &timeout, NULL);
+        can_read = ((fds.revents & POLLIN) && rcv_handling != HANDLE_IGNORE);
     }
-    if (wr_socket != NULL) {
-        *tmp_wr_sock = *wr_socket;
-        if (rd_socket != NULL)
-            *tmp_rd_sock = *rd_socket;
-        else
-            *tmp_rd_sock = *wr_socket;
-    }
-    return (select(FD_SETSIZE, tmp_rd_sock, tmp_wr_sock, NULL, NULL));
+    return (0);
 }
 
 ssize_t zp_exchange_data(t_zp_pending_data *zp_pending_d,
-const fd_set *rd_socket, const fd_set *wr_socket)
+enum e_zp_exchangeDataHandling rcv_handling,
+enum e_zp_exchangeDataHandling snd_handling)
 {
-    bool can_read = true;
-    fd_set tmp_rd_sock;
-    fd_set tmp_wr_sock;
+    struct pollfd fds = {zp_pending_d->fd, POLLIN | POLLPRI | POLLOUT, 0};
+    struct timespec timeout = {0, 1};
+    fd_set socks[2];
+    fd_set *sock_ptr[2] = {NULL, NULL};
+    int out = check_connection(zp_pending_d, socks);
 
-    if (rd_socket == NULL && wr_socket == NULL)
-        return (0);
-    while (!zp_pending_d->disconnected && (can_read ||
-    (zp_pending_d->c_wfd.size > 0 && wr_socket != NULL))) {
-        if (pick_select(rd_socket, wr_socket, &tmp_rd_sock, &tmp_wr_sock) < 0)
-            return (-1);
-        switch (rw_action(zp_pending_d, &can_read,
-        ((rd_socket == NULL) ? NULL : &tmp_rd_sock),
-        ((wr_socket == NULL) ? NULL : &tmp_wr_sock))) {
-            case -1:
-                return (-1);
-            case 1:
-                return (1);
-        }
-    }
-    return (0);
+    if (out < 0)
+        return (out);
+    ppoll(&fds, 1, &timeout, NULL);
+    if (rcv_handling == HANDLE_WAIT ||
+    (rcv_handling == HANDLE_NO_WAIT && fds.revents & POLLIN))
+        sock_ptr[0] = &socks[0];
+    if (snd_handling == HANDLE_WAIT ||
+    (snd_handling == HANDLE_NO_WAIT && fds.revents & POLLOUT))
+        sock_ptr[1] = &socks[1];
+    return (do_select(zp_pending_d, sock_ptr, rcv_handling));
 }

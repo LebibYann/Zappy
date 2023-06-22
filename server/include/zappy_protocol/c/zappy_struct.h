@@ -11,6 +11,12 @@
 
 #define BUFSIZE 8192
 
+typedef enum e_zp_exchangeDataHandling {
+    HANDLE_IGNORE,
+    HANDLE_NO_WAIT,
+    HANDLE_WAIT
+} t_zp_exchangeDataHandling;
+
 typedef struct s_zp_pending_data {
     int fd;
     bool disconnected;

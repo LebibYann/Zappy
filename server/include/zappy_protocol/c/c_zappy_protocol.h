@@ -33,7 +33,8 @@
  */
 extern "C"
 ssize_t zp_exchange_data(t_zp_pending_data *zp_pending_d,
-const fd_set *rd_socket, const fd_set *wr_socket);
+enum e_zp_exchangeDataHandling rcv_handling,
+enum e_zp_exchangeDataHandling snd_handling);
 
 /**
  ** @brief Writes in c_wfd member of t_zp_pending_data.
@@ -61,6 +62,15 @@ size_t zp_write_data(
 extern "C"
 size_t zp_read_data(t_zp_pending_data *zp_pending_d, void *data, size_t size);
 
+/**
+ ** @brief Detect if a new connection is pending
+ **
+ ** @param socket_fd
+ ** @return true if there's a new connection false otherwise
+ */
+extern "C"
+bool zp_detect_new_connection(int socket_fd);
+
 extern "C"
 void zp_init_pending_data_struct(t_zp_pending_data *zp_pending_d, int fd);
 
@@ -77,5 +87,9 @@ extern "C"
 char *zp_getline_pending_data(t_zp_pending_data *zp_pending_d);
 
 extern "C"
-char *zp_getline_timeout_pending_data(t_zp_pending_data *zp_pending_d,
-int timeout_ms, fd_set rd_socket);
+char *zp_getline_wait_pending_data(t_zp_pending_data *zp_pending_d);
+
+
+extern "C"
+ssize_t rw_action(t_zp_pending_data *zp_pending_d,
+bool *something_to_read, fd_set **sock_ptr);
