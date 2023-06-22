@@ -29,6 +29,10 @@ typedef enum AIResponse_e {
 
 extern const aiCommand_t AI_CLI_COMMANDS[];
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  ** @brief This function let you easily send back basic response such as:
  ** ok ko dead. All other kind of response will be ignored by the function
@@ -36,7 +40,6 @@ extern const aiCommand_t AI_CLI_COMMANDS[];
  ** @param zp_pending_d
  ** @param response
  */
-extern "C"
 void zp_server_ai_send_basic_package(t_zp_pending_data *zp_pending_d,
 enum AIResponse_e response);
 
@@ -48,18 +51,17 @@ enum AIResponse_e response);
  ** @return true
  ** @return false
  */
-extern "C"
 bool zp_server_ai_receive_package(t_zp_pending_data *zp_pending_d,
 t_zp_ai_to_serv_data *zp_ais_data);
 
-extern "C"
 void zp_server_ai_clear_protocol_struct(t_zp_ai_to_serv_data *zp_ais_data);
 
-extern "C"
 void zp_server_ai_delete_protocol_struct(t_zp_ai_to_serv_data *zp_ais_data);
 
-extern "C"
 void zp_server_ai_init_protocol_struct(t_zp_ai_to_serv_data *zp_ais_data);
 
-extern "C"
 t_zp_ai_to_serv_data *zp_server_ai_new_protocol_struct(void);
+
+#ifdef __cplusplus
+}
+#endif
