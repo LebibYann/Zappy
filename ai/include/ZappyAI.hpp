@@ -43,6 +43,17 @@ typedef enum e_playerDirection {
     TOTAL_DIRECTION
 } t_playerDirection;
 
+typedef enum e_messageSubject {
+    lookingForElevation,
+    waitingForElevation,
+    comingForElevation,
+    readyForElevation,
+    alreadySomeone,
+    needToGo,
+    findRessource,
+    haveRessource
+} t_messageSubject;
+
 class ZappyAI {
     public:
         ZappyAI();
@@ -89,6 +100,13 @@ class ZappyAI {
         bool eject(void);
         bool elevation(void);
 
+        //Communication
+        void storeMessage(std::string msg);
+        void readMessageBuffer();
+        void readMessage(std::string msg);
+        void readSignal(std::string msg, int direction);
+        bool sendSignal(int recever, int subject, int parameter);
+
         void turn180(void);
         void turnTo(enum e_playerDirection direction);
 
@@ -96,6 +114,7 @@ class ZappyAI {
         bool moveTowardRelativeCoord(t_coords &relativeCoord);
         void moveRandom(void);
         void moveRandom(t_coords &relativeCoord);
+        void moveTo(int direction);
 
         void lookItemList(std::vector<int> &itemList);
         void lookResourceOnTile(std::vector<int> &itemList);
@@ -125,6 +144,13 @@ class ZappyAI {
         int _direction = 0;
         int _inventory[TOTAL_INVENTORY];
         int _ressourceToHave[TOTAL_INVENTORY];
+        std::vector<std::string> _messages;
+
+        //teamplay
+        bool _master = false;
+        int _friendID = -1;
+        int _playersToHave;
+        int _playersReady;
 
         // Look data
         bool _lookDone = false;

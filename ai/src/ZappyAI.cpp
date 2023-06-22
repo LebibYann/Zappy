@@ -286,7 +286,7 @@ bool ZappyAI::handlePackageReception(enum e_AIResponse expectedResponse, std::st
                 std::cout << "Eject" << std::endl;
                 break;
             case RESPONSE_MESSAGE:
-                std::cout << "Message" << std::endl;
+                storeMessage(str);
                 break;
             default:
                 if (out != expectedResponse) {
@@ -365,6 +365,7 @@ void ZappyAI::run(void)
     int seekedItem;
     (void)seekedItem;
 
+    this->_playerId = rand();
     while (this->_alive) {
         if (PRINT_ACTION)
             std::cout << "LOOP START" << std::endl;
@@ -375,6 +376,7 @@ void ZappyAI::run(void)
             this->takeAll(ELEM_FOOD);
         seekedItem = tryElevate();
         this->elevationBehaviour(static_cast<enum e_elemOnTile>(seekedItem));
+        this->readMessageBuffer();
     }
     std::cout << "dead" << std::endl;
 }
@@ -857,7 +859,120 @@ int ZappyAI::tryElevate(void)
         return (ELEM_FOOD);
     if (!this->setObjectForElevation(this->_playerLevel))
         return (-1);
+    if (_playersReady < ELEVATION_REQUIREMENT[this->_playerLevel][ELEM_PLAYER])
+        sendSignal(-1, lookingForElevation, _playerLevel);
     if (!this->elevation())
         return (-2);
     return (TOTAL_INVENTORY);
+}
+
+void ZappyAI::storeMessage(std::string str)
+{
+    _messages.push_back(str);
+    std::cout << str << std::endl;
+}
+
+void ZappyAI::readMessageBuffer()
+{
+    while (_messages.size() != 0){
+        readMessage(_messages.back());
+        _messages.pop_back();
+    }
+}
+
+void ZappyAI::readMessage(std::string msg)
+{
+    std::istringstream iss(msg);
+    std::string prompt;
+    int direction;
+    char commas;
+    std::string message;
+
+    iss >> prompt >> direction >> commas >> message;
+    readSignal(message, direction);
+}
+
+void ZappyAI::readSignal(std::string msg, int direction)
+{
+    std::string uncipheredMsg(msg);
+    uncipherStr(uncipheredMsg);
+    std::istringstream iss(uncipheredMsg);
+    char prompt;
+    int sender;
+    int recever;
+    int status;
+    int parameter;
+
+    iss >> prompt >> sender >> recever >> status >> parameter;
+    if (prompt != '!' || (recever != -1 && recever != _playerId))
+        return;
+    if (status == lookingForElevation && _friendID == -1){
+        if (parameter == _playerLevel){
+            _friendID = sender;
+            if (!sendSignal(_friendID, comingForElevation, _playerLevel))
+                _friendID = -1;
+        }
+    }
+    else if (status == comingForElevation){
+        if (_friendID == -1){
+            _friendID = sender;
+            _master = true;
+        } else if (_friendID != sender)
+            sendSignal(sender, alreadySomeone, _playerLevel);
+        sendSignal(_friendID, waitingForElevation, _playerLevel);
+    }
+    else if (status == waitingForElevation){
+        if (direction == 0)
+            sendSignal(_friendID, readyForElevation, _playerLevel);
+        else{
+            sendSignal(_friendID, comingForElevation, _playerLevel);
+            moveTo(direction);
+        }
+    } else if (status == alreadySomeone){
+        if (sender == _friendID)
+            _friendID = -1;
+    } else if (status == readyForElevation && sender == _friendID){
+        if (_master)
+            _playersReady++;
+        else
+            this->tryElevate();
+    } else if (status == needToGo){
+        if (direction == 0)
+            _playersReady--;
+        else {
+            _friendID = -1,
+            _master = false;
+        }
+    }
+}
+
+bool ZappyAI::sendSignal(int recever, int status, int parameter)
+{
+    return (broadcast("!" + std::to_string(this->_playerId) + " " + std::to_string(recever) + " " +
+    std::to_string(status) + " " + std::to_string(parameter)));
+}
+
+void ZappyAI::moveTo(int direction)
+{
+    int orientation = DIR_NORTH;
+
+    if (direction == 2 || direction == 1 || direction == 8)
+        this->forward();
+    if (direction >= 2 && direction <= 4){
+        orientation = DIR_WEST;
+        this->left();
+        this->forward();
+    } if (direction >= 6 && direction <= 8){
+        orientation = DIR_EAST;
+        this->right();
+        this->forward();
+    } if (direction >= 4 && direction <= 6){
+        if (orientation == DIR_WEST)
+            this->left();
+        else if (orientation == DIR_EAST)
+            this->right();
+        else
+            this->turn180();
+        this->forward();
+    }
 }
