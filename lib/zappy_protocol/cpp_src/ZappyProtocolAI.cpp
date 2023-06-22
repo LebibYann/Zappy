@@ -86,7 +86,7 @@ int ZappyProtocolAI::receivePackage(std::string &str)
     std::string tmpStr;
     std::stringstream stream;
 
-    switch (this->getlineTimeout(str)) {
+    switch (this->getlineWait(str)) {
         case -1:
             return (RESPONSE_DISCONNECTION);
         case 1:
