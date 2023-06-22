@@ -66,8 +66,8 @@ class ZappyAI {
         void generateCipherList(void);
         void cipherStr(std::string &str);
         void uncipherStr(std::string &str);
-        int handlePackageReception(enum e_AIResponse expectedResponse);
-        int handlePackageReception(enum e_AIResponse expectedResponse, std::string &str);
+        int handlePackageReception(enum AIResponse_e expectedResponse);
+        int handlePackageReception(enum AIResponse_e expectedResponse, std::string &str);
 
         void setRessourceToHave(void);
 

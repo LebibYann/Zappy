@@ -275,7 +275,7 @@ void ZappyAI::uncipherStr(std::string &str)
     }
 }
 
-int ZappyAI::handlePackageReception(enum e_AIResponse expectedResponse, std::string &str)
+int ZappyAI::handlePackageReception(enum AIResponse_e expectedResponse, std::string &str)
 {
     int out;
 
@@ -314,7 +314,7 @@ void ZappyAI::setRessourceToHave(void)
     }
 }
 
-int ZappyAI::handlePackageReception(enum e_AIResponse expectedResponse)
+int ZappyAI::handlePackageReception(enum AIResponse_e expectedResponse)
 {
     std::string str;
 
