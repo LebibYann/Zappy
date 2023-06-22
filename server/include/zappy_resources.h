@@ -14,3 +14,13 @@
 #define MENDIANE_DENSITY 0.1
 #define PHIRAS_DENSITY 0.08
 #define THYSTAME_DENSITY 0.05
+
+enum resources_e {
+    FOOD,
+    LINEMATE,
+    DERAUMERE,
+    SIBUR,
+    MENDIANE,
+    PHIRAS,
+    THYSTAME
+};
