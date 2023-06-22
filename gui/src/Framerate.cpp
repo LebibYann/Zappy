@@ -7,6 +7,14 @@
 
 #include "Framerate.hpp"
 
+Framerate::Framerate()
+{
+}
+
+Framerate::~Framerate()
+{
+}
+
 void Framerate::capFramerate(void)
 {
     this->_elapsedTime = this->_clock.getElapsedTime().asMicroseconds();

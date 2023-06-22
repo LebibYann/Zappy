@@ -57,9 +57,9 @@ public:
     void run();
 
 private:
-    ZappyProtocolGUI &_protocol;
     sf::RenderWindow &_window;
     sf::Event &_event;
+    ZappyProtocolGUI &_protocol;
     sf::Music _music;
     sf::Font _font;
     std::vector<sf::Sprite> _spriteDraw;

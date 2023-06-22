@@ -6,6 +6,7 @@
 */
 
 #include "GameScene.hpp"
+#include "ZappyProtocolGUI.hpp"
 
 GameScene::GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGUI &protocol)
 : _window(window), _event(event), _protocol(protocol)
@@ -18,6 +19,10 @@ GameScene::GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGU
     _gameInfo.teamNames = {};
     _gameInfo.nbrTeams = 0;
     _gameInfo.gameOver = false;
+}
+
+GameScene::~GameScene()
+{
 }
 
 void error(std::string str)
@@ -56,7 +61,7 @@ void GameScene::unloadScene()
     _music.stop();
 }
 
-void drawElements(sf::RenderWindow &window, sf::Event &event, t_gameInfo &gameInfo)
+void drawElements(sf::RenderWindow &window, t_gameInfo &gameInfo)
 {
     if (gameInfo.gameOver == true)
         return;
@@ -91,4 +96,5 @@ void GameScene::run()
     while (_protocol.receivePackage(package) == 0)
         packages.push_back(package);
     _gameInfo = analysePackages(packages);
+    drawElements(_window, _gameInfo);
 }

@@ -11,17 +11,23 @@
 #include <unistd.h>
 
 #include "Framerate.hpp"
+#include "ZappyProtocolGUI.hpp"
 #include "SceneManager.hpp"
+#include "GameScene.hpp"
 
 int main(void)
 {
     srand(time(nullptr));
 
-    sf::RenderWindow window(sf::VideoMode(1280, 720), "Reverse");
     Framerate fps;
+    sf::RenderWindow window(sf::VideoMode(1280, 720), "Reverse");
     sf::Event event;
+    ZappyProtocolGUI protocol(69);
+    GameScene gameScene(window, event, protocol);
 
-    SceneManager scene = sceneSetup();
+
+    SceneManager scene;
+    scene.addMenu("GameScene", &gameScene);
 
     scene.changeMenu("GameScene");
     while (window.isOpen()) {
@@ -31,7 +37,7 @@ int main(void)
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
             window.close();
         window.clear();
-        scene.display(NULL);
+        scene.display();
         window.display();
         fps.capFramerate();
         fps.printLog();

@@ -10,8 +10,11 @@
 #include <map>
 #include <string>
 #include <iostream>
+#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 
 #include "IScene.hpp"
+#include "ZappyProtocolGUI.hpp"
 
 class SceneManager {
 public:
@@ -19,7 +22,7 @@ public:
     ~SceneManager();
 
     void addMenu(std::string menuName, IScene *scene);
-    void display(void *data);
+    void display();
     void changeMenu(std::string sceneName);
 
 protected:
@@ -29,4 +32,4 @@ protected:
     IScene *_activeScene = nullptr;
 };
 
-SceneManager sceneSetup(void);
+SceneManager sceneSetup(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGUI &protocol);
