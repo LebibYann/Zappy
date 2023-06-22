@@ -7,6 +7,8 @@
 
 #pragma once
 
+#define RESOURCES_COUNT 7
+
 #define FOOD_DENSITY 0.5
 #define LINEMATE_DENSITY 0.3
 #define DERAUMERE_DENSITY 0.15
@@ -14,6 +16,16 @@
 #define MENDIANE_DENSITY 0.1
 #define PHIRAS_DENSITY 0.08
 #define THYSTAME_DENSITY 0.05
+
+static const double resource_densities[RESOURCES_COUNT] = {
+    FOOD_DENSITY,
+    LINEMATE_DENSITY,
+    DERAUMERE_DENSITY,
+    SIBUR_DENSITY,
+    MENDIANE_DENSITY,
+    PHIRAS_DENSITY,
+    THYSTAME_DENSITY
+};
 
 enum resources_e {
     FOOD,
@@ -26,11 +38,11 @@ enum resources_e {
 };
 
 typedef struct tile_s {
-    int food;
-    int linemate;
-    int deraumere;
-    int sibur;
-    int mendiane;
-    int phiras;
-    int thystame;
+    int resources[RESOURCES_COUNT];
 }   tile_t;
+
+tile_t **initialize_map(int w, int h);
+
+void generate_map(tile_t **map, int w, int h);
+
+void generate_resource(tile_t **map, int w, int h, int resource);
