@@ -26,7 +26,7 @@ FLAGS = -g -g3 -Wextra -Wall -W -Werror -lsfml-graphics -lsfml-audio -lsfml-wind
 
 #LIB
 LIB_DIRS = ../lib/
-LIB_FLAGS =
+LIB_FLAGS = -lzappy_protocol
 LIB_INCL_PATH = ./include/
 
 #EXCLUDED

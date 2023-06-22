@@ -9,23 +9,17 @@
 
 ZappyProtocol::ZappyProtocol(int fd)
 {
-    FD_ZERO(&(this->_readSocket));
-    FD_ZERO(&(this->_writeSocket));
     zp_init_pending_data_struct(&(this->_data), fd);
 }
 
 ZappyProtocol::ZappyProtocol()
 {
-    FD_ZERO(&(this->_readSocket));
-    FD_ZERO(&(this->_writeSocket));
     zp_init_pending_data_struct(&(this->_data), -1);
 }
 
 ZappyProtocol::~ZappyProtocol()
 {
     zp_clear_pending_data_struct(&(this->_data));
-    FD_CLR(this->_data.fd, &(this->_readSocket));
-    FD_CLR(this->_data.fd, &(this->_writeSocket));
 }
 
 ssize_t ZappyProtocol::refresh(void)
@@ -91,12 +85,6 @@ int ZappyProtocol::getFd(void) const
 
 void ZappyProtocol::setFd(int fd)
 {
-    if (this->_data.fd >= 0) {
-        FD_CLR(this->_data.fd, &(this->_readSocket));
-        FD_CLR(this->_data.fd, &(this->_writeSocket));
-    }
     zp_clear_pending_data_struct(&(this->_data));
     zp_init_pending_data_struct(&(this->_data), fd);
-    FD_SET(fd, &(this->_readSocket));
-    FD_SET(fd, &(this->_writeSocket));
 }
