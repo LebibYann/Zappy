@@ -18,6 +18,7 @@
 
 #include "zappy_struct.h"
 #include "c_zappy_protocol_gui.h"
+#include "c_zappy_protocol_server_ai.h"
 
 /**
  ** @brief Fills c_rfd member of t_zp_pending_data
