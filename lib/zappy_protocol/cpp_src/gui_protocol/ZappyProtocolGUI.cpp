@@ -14,7 +14,6 @@ ZappyProtocol::ZappyProtocol(fd)
 
 ZappyProtocolGUI::~ZappyProtocolGUI()
 {
-    ZappyProtocol::~ZappyProtocol();
 }
 
 bool ZappyProtocolGUI::sendPackage(enum e_zp_command cmd_type, ...)
