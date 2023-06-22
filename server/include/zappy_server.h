@@ -21,6 +21,8 @@
 #include <stdio.h>
 
 #include "str_split.h"
+#include "zappy_resources.h"
+#include "clock.h"
 
 typedef struct parameter_s
 {
@@ -38,6 +40,7 @@ typedef struct server_s {
     int frequency;
     fd_set read_sockets;
     fd_set write_sockets;
+    tile_t **map;
 }   server_t;
 
 typedef struct client_s {
