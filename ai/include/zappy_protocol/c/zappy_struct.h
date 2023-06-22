@@ -11,6 +11,12 @@
 
 #define BUFSIZE 8192
 
+typedef enum e_zp_exchangeDataHandling {
+    HANDLE_IGNORE,
+    HANDLE_NO_WAIT,
+    HANDLE_WAIT
+} t_zp_exchangeDataHandling;
+
 typedef struct s_zp_pending_data {
     int fd;
     bool disconnected;
@@ -27,7 +33,8 @@ typedef struct s_coords {
 typedef enum e_zp_command {
     ZP_END = -1,
     // AI
-    ZP_FORWARD,
+    ZP_AI_START_CMD,
+    ZP_FORWARD = ZP_AI_START_CMD,
     ZP_RIGHT,
     ZP_LEFT,
     ZP_LOOK,
@@ -40,9 +47,11 @@ typedef enum e_zp_command {
     ZP_TAKE_OBJ,
     ZP_SET_OBJ,
     ZP_INCANTATION,
+    ZP_TOTAL_AI_CMD,
 
     // GUI
-    ZP_GRAPHIC,
+    ZP_GUI_START_CMD = ZP_TOTAL_AI_CMD,
+    ZP_GRAPHIC = ZP_TOTAL_AI_CMD,
     ZP_MSZ,
     ZP_BCT,
     ZP_MCT,
@@ -68,7 +77,8 @@ typedef enum e_zp_command {
     ZP_SMG,
     ZP_SUC,
     ZP_SBP,
-    ZP_TOTAL_CMD
+    ZP_TOTAL_CMD,
+    ZP_TOAL_GUI_CMD = (ZP_TOTAL_CMD - ZP_TOTAL_AI_CMD)
 } t_zp_command;
 
 typedef struct s_zp_ai_to_serv_data {
@@ -119,7 +129,6 @@ typedef struct s_inventoryPair {
 it's here only to avoid potential bug */
 static const t_inventoryPair
 INVENTORY_PAIR[TOTAL_ELEM_ON_TILE] = {
-    {"player", ELEM_PLAYER},
     {"food", ELEM_FOOD},
     {"linemate", ELEM_LINEMATE},
     {"deraumere", ELEM_DERAUMERE},
@@ -127,4 +136,5 @@ INVENTORY_PAIR[TOTAL_ELEM_ON_TILE] = {
     {"mendiane", ELEM_MENDIANE},
     {"phiras", ELEM_PHIRAS},
     {"thystame", ELEM_THYSTAME},
+    {"player", ELEM_PLAYER},
 };
