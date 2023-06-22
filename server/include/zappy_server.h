@@ -30,16 +30,6 @@ typedef struct parameter_s
     int (*f)();
 } parameter_t;
 
-typedef struct tile_s {
-    int food;
-    int linemate;
-    int deraumere;
-    int sibur;
-    int mendiane;
-    int phiras;
-    int thystame;
-}   tile_t;
-
 typedef struct server_s {
     int fd;
     int port;

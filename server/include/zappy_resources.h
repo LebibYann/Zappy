@@ -24,3 +24,13 @@ enum resources_e {
     PHIRAS,
     THYSTAME
 };
+
+typedef struct tile_s {
+    int food;
+    int linemate;
+    int deraumere;
+    int sibur;
+    int mendiane;
+    int phiras;
+    int thystame;
+}   tile_t;

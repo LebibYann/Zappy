@@ -103,5 +103,4 @@ tile_t **initialize_map(int w, int h)
         }
     }
     return (map);
-
 }
