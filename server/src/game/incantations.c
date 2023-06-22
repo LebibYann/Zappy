@@ -26,4 +26,10 @@ bool start_incantation(tile_t **map, client_t *player)
         fprintf(stderr, "Player %d is already level 8.\n", player->fd);
         return (false);
     }
+    if (!verify_incantation(map, player)) {
+        fprintf(stderr, "Player %d does not have the necessary resources.\n",
+            player->fd);
+        return (false);
+    }
+    return (true);
 }
