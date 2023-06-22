@@ -32,7 +32,7 @@ static enum e_zp_command get_command_type(char *line)
     for (size_t i = ZP_AI_START_CMD; i < ZP_TOTAL_AI_CMD; ++i) {
         if (strcmp(cmd, AI_CLI_COMMANDS->name) == 0) {
             free(cmd);
-            return (i);
+            return ((enum e_zp_command) i);
         }
     }
     free(cmd);
