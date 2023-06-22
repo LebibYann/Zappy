@@ -8,23 +8,10 @@
 #pragma once
 
 #include <iostream>
+#include <string>
+#include <sstream>
 
 #include "ZappyProtocolClass.hpp"
-
-typedef struct aiCommand_s {
-    enum e_zp_command id;
-    std::string name;
-} aiCommand_t;
-
-typedef enum e_AIResponse {
-    RESPONSE_DISCONNECTION = -2,
-    RESPONSE_NOTHING,
-    RESPONSE_OK,
-    RESPONSE_KO,
-    RESPONSE_DEAD,
-    RESPONSE_OTHER,
-    RESPONSE_TOTAL
-} t_AIResponse;
 
 class ZappyProtocolAI : public ZappyProtocol {
     public:

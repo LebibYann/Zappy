@@ -7,23 +7,6 @@
 
 #include "ZappyProtocolAI.hpp"
 
-const aiCommand_t COMMANDS[13] =
-{
-    {ZP_FORWARD, "Forward"},
-    {ZP_RIGHT, "Right"},
-    {ZP_LEFT, "Left"},
-    {ZP_LOOK, "Look"},
-    {ZP_INVENTORY, "Inventory"},
-    {ZP_BROADCAST, "Broadcast"},
-    {ZP_CONNECT_NBR, "Connect_nbr"},
-    {ZP_FORK, "Fork"},
-    {ZP_EJECT, "Eject"},
-    {ZP_DEAD, ""},
-    {ZP_TAKE_OBJ, "Take"},
-    {ZP_SET_OBJ, "Set"},
-    {ZP_INCANTATION, "Incantation"}
-};
-
 ZappyProtocolAI::ZappyProtocolAI() : ZappyProtocol()
 {
     _pkg.cmd_type = ZP_END;
@@ -43,8 +26,8 @@ ZappyProtocolAI::~ZappyProtocolAI()
 bool ZappyProtocolAI::sendPackage(enum e_zp_command cmd_type)
 {
     for (size_t i = 0; i < 13; ++i){
-        if (COMMANDS[i].id == cmd_type){
-            writeData(COMMANDS[i].name.c_str(), COMMANDS[i].name.size());
+        if (AI_CLI_COMMANDS[i].id == cmd_type){
+            writeData(AI_CLI_COMMANDS[i].name, strlen(AI_CLI_COMMANDS[i].name));
             writeData("\n", 1);
             _pkg.cmd_type = cmd_type;
             this->send();
@@ -57,11 +40,13 @@ bool ZappyProtocolAI::sendPackage(enum e_zp_command cmd_type)
 bool ZappyProtocolAI::sendPackage(enum e_zp_command cmd_type, const std::string &str)
 {
     for (size_t i = 0; i < 13; ++i){
-        if (COMMANDS[i].id == cmd_type) {
-            this->writeData(COMMANDS[i].name, COMMANDS[i].name.size());
+        if (AI_CLI_COMMANDS[i].id == cmd_type) {
+            this->writeData(AI_CLI_COMMANDS[i].name, strlen(AI_CLI_COMMANDS[i].name));
             this->writeData(" ", 1);
             this->writeData(str, str.size());
             this->writeData("\n", 1);
+            write(STDOUT_FILENO, "COMMAND: ", 9);
+            write(STDOUT_FILENO, this->_data.c_wfd.buf, this->_data.c_wfd.size);
             _pkg.cmd_type = cmd_type;
             this->send();
             return (true);
@@ -70,10 +55,21 @@ bool ZappyProtocolAI::sendPackage(enum e_zp_command cmd_type, const std::string 
     return (false);
 }
 
+// static bool strIsDigit(const std::string &str)
+// {
+//     for (size_t i = 0; i < str.length() && str[i] != '\n'; ++i) {
+//         if (str[i] < '0' || str[i] > '9')
+//             return (false);
+//     }
+//     return (true);
+// }
+
 int ZappyProtocolAI::receivePackage(std::string &str)
 {
-    int out = this->getlineTimeout(str);
-    switch (out) {
+    std::string tmpStr;
+    std::stringstream stream;
+
+    switch (this->getlineWait(str)) {
         case -1:
             return (RESPONSE_DISCONNECTION);
         case 1:
@@ -85,6 +81,12 @@ int ZappyProtocolAI::receivePackage(std::string &str)
         return (RESPONSE_KO);
     if (str.compare("dead\n") == 0)
         return (RESPONSE_DEAD);
+    stream.str(str);
+    getline(stream, tmpStr, ' ');
+    if (tmpStr.compare("message") == 0)
+        return (RESPONSE_MESSAGE);
+    if (tmpStr.compare("eject") == 0)
+        return (RESPONSE_EJECT);
     return (RESPONSE_OTHER);
 }
 
