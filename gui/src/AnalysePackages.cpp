@@ -163,8 +163,8 @@ t_gameInfo analysePackages(std::vector<t_zp_guiProtocol> packages)
 
     for (size_t i = 0; i < packages.size(); ++i) {
         if (packages[i].cmdType == ZP_MSZ) {
-            gameInfo.mapSize.push_back(packages[i].args[0]);
-            gameInfo.mapSize.push_back(packages[i].args[1]);
+            gameInfo.mapSize[0] = packages[i].args[0];
+            gameInfo.mapSize[1] = packages[i].args[1];
         } else if (packages[i].cmdType == ZP_BCT)
             getTileContent(gameInfo, packages[i]);
         else if (packages[i].cmdType == ZP_MCT)

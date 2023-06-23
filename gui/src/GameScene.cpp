@@ -11,7 +11,7 @@
 GameScene::GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGUI &protocol, Client &connection)
 : _window(window), _event(event), _protocol(protocol), _connection(connection)
 {
-    _gameInfo.mapSize = {};
+    _gameInfo.mapSize = {0, 0};
     _gameInfo.map = {};
     _gameInfo.mapContent = {};
     _gameInfo.players = {};
