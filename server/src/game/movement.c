@@ -82,9 +82,14 @@ static void update_player_position(map_t *map, client_t *player)
         player->position.y = map->h - 1;
 }
 
-void forward(map_t *map, client_t *player)
+void forward(map_t *map, client_t *player, int frequency)
 {
+    struct timespec start, now;
+    int time = 7 / frequency;
     tile_t *tile;
+
+    timespec_get(&start, TIME_UTC);
+    timespec_get(&now, TIME_UTC);
 
     tile = &map->tiles[player->position.y][player->position.x];
     remove_player_on_tile(tile, player);
@@ -93,4 +98,7 @@ void forward(map_t *map, client_t *player)
 
     tile = &map->tiles[player->position.y][player->position.x];
     add_player_on_tile(tile, player);
+
+    while (now.tv_sec - start.tv_sec < time)
+        timespec_get(&now, TIME_UTC);
 }
