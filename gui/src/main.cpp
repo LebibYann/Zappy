@@ -27,7 +27,7 @@ int main(int ac, char **av)
     connection.Connect(connectionID[0], atoi(connectionID[1].c_str()));
     ZappyProtocolGUI protocol(69);
     protocol.setFd(connection.FD());
-    protocol.sendPackage("GRAPHIC\n");
+    protocol.sendPackage(ZP_GRAPHIC);
     GameScene gameScene(window, event, protocol, connection);
 
     SceneManager scene;
