@@ -13,15 +13,17 @@ static int get_fov_size(int player_level)
     return player_level * player_level;
 }
 
-static tile_t get_tile()
+static tile_t get_tile(map_t *map, client_t *player, int tile_index)
 {
+    for (int i )
+
     return (tile_t) {
         .resources = {0, 0, 0, 0, 0, 0, 0},
         .players = NULL,
     };
 }
 
-tile_t *look(tile_t **map, int w, int h, client_t *player)
+tile_t *look(map_t *map, client_t *player)
 {
     int player_level = player->level;
     int fov_size = get_fov_size(player->level);
@@ -35,8 +37,6 @@ tile_t *look(tile_t **map, int w, int h, client_t *player)
     }
 
     (void)map;
-    (void)w;
-    (void)h;
     (void)player_level;
 
     return fov;
