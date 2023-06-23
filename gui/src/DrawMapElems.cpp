@@ -52,8 +52,8 @@ void drawPlayers(sf::RenderWindow &window, t_gameInfo &gameInfo)
 
 void drawElements(sf::RenderWindow &window, t_gameInfo &gameInfo)
 {
-    //if (gameInfo.gameOver == true)
-    //    return;
+    if (gameInfo.gameOver == true)
+        return;
     drawGround(window, gameInfo);
     drawEggs(window, gameInfo);
     drawPlayers(window, gameInfo);

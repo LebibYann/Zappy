@@ -12,6 +12,8 @@
 #include <iostream>
 #include <unistd.h>
 #include <vector>
+#include <map>
+#include <string>
 
 #include "IScene.hpp"
 #include "ZappyProtocolGUI.hpp"
@@ -62,6 +64,8 @@ private:
     sf::Event &_event;
     ZappyProtocolGUI &_protocol;
     Client &_connection;
+
+
     sf::Music _music;
     sf::Font _font;
     std::vector<sf::Sprite> _spriteDraw;
@@ -71,5 +75,6 @@ private:
     t_gameInfo _gameInfo;
 };
 
+std::vector<std::string> analyseArgs(int ac, char **av);
 t_gameInfo analysePackages(std::vector<t_zp_guiProtocol> packages);
 void drawElements(sf::RenderWindow &window, t_gameInfo &gameInfo);
