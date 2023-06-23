@@ -60,10 +60,12 @@ static bool verify_incantation(tile_t **map, client_t *player)
     return true;
 }
 
-void start_incantation(tile_t **map, client_t *player)
+void start_incantation(tile_t **map, client_t *player, int frequency)
 {
     if (!verify_incantation(map, player))
         return;
+
+    (void)frequency;
 
     player->incantation = true;
 }
