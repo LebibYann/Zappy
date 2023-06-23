@@ -23,4 +23,5 @@ enum AIResponse_e response)
         default:
             break;
     }
+    zp_exchange_data(zp_pending_d, HANDLE_IGNORE, HANDLE_NO_WAIT);
 }
