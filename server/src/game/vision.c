@@ -81,7 +81,7 @@ static tile_t *get_west_tiles(map_t *map, client_t *player)
     fov[0] = map->tiles[player->position.y][player->position.x];
     for (int x = 1; x < player->level; x++) {
         for (int y = x; y >= -x; y--) {
-            fov[i++] = map->tiles[player->position.y + y][player->position.x - x];
+            fov[i] = map->tiles[player->position.y + y][player->position.x - x];
             i++;
         }
     }
@@ -91,8 +91,7 @@ static tile_t *get_west_tiles(map_t *map, client_t *player)
 
 tile_t *look(map_t *map, client_t *player)
 {
-    switch (player->orientation)
-    {
+    switch (player->orientation) {
     case NORTH:
         return get_north_tiles(map, player);
         break;
