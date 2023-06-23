@@ -61,28 +61,6 @@ void GameScene::unloadScene()
     _music.stop();
 }
 
-void drawElements(sf::RenderWindow &window, t_gameInfo &gameInfo)
-{
-    if (gameInfo.gameOver == true)
-        return;
-    for (size_t i = 0; i < gameInfo.eggs.size(); ++i) {
-        sf::RectangleShape egg(sf::Vector2f(50, 50));
-        sf::Vector2f pos(gameInfo.eggs[i].x * 50, gameInfo.eggs[i].y * 50);
-
-        egg.setFillColor(sf::Color::Green);
-        egg.setPosition(pos);
-        window.draw(egg);
-    }
-    for (size_t i = 0; i < gameInfo.players.size(); ++i) {
-        sf::RectangleShape player(sf::Vector2f(50, 50));
-        sf::Vector2f pos(gameInfo.players[i].x * 50, gameInfo.players[i].y * 50);
-
-        player.setFillColor(sf::Color::Blue);
-        player.setPosition(pos);
-        window.draw(player);
-    }
-}
-
 void GameScene::run()
 {
     std::vector<t_zp_guiProtocol> packages;
@@ -93,6 +71,7 @@ void GameScene::run()
     this->_music.play();
     this->_music.setVolume(80);
     */
+    this->_protocol.receive();   
     while (_protocol.receivePackage(package) == 0)
         packages.push_back(package);
     _gameInfo = analysePackages(packages);

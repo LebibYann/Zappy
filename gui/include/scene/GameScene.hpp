@@ -72,3 +72,4 @@ private:
 };
 
 t_gameInfo analysePackages(std::vector<t_zp_guiProtocol> packages);
+void drawElements(sf::RenderWindow &window, t_gameInfo &gameInfo);
