@@ -14,14 +14,14 @@ fd_set *socks)
     struct pollfd connectionCheck = {zp_pending_d->fd, 0, 0};
     int result = poll(&connectionCheck, 1, 0);
 
-    if (result < 0 || connectionCheck.revents & POLLERR)
-        return (-3);
-    if (connectionCheck.revents & POLLNVAL)
-        return (-2);
     if (connectionCheck.revents & POLLHUP || zp_pending_d->disconnected) {
         zp_pending_d->disconnected = true;
         return (-1);
     }
+    if (result < 0 || connectionCheck.revents & POLLERR)
+        return (-3);
+    if (connectionCheck.revents & POLLNVAL)
+        return (-2);
     FD_ZERO(&socks[0]);
     FD_ZERO(&socks[1]);
     FD_SET(zp_pending_d->fd, &socks[0]);
@@ -33,7 +33,7 @@ static ssize_t do_select(t_zp_pending_data *zp_pending_d, fd_set **sock_ptr,
 enum e_zp_exchangeDataHandling rcv_handling)
 {
     ssize_t out;
-    bool can_read = true;
+    bool can_read = (rcv_handling != HANDLE_IGNORE);
     struct pollfd fds = {zp_pending_d->fd, POLLIN | POLLPRI | POLLOUT, 0};
     struct timespec timeout = {0, 1};
 
@@ -67,5 +67,7 @@ enum e_zp_exchangeDataHandling snd_handling)
     if (snd_handling == HANDLE_WAIT ||
     (snd_handling == HANDLE_NO_WAIT && fds.revents & POLLOUT))
         sock_ptr[1] = &socks[1];
+    if (sock_ptr[0] == NULL && sock_ptr[1] == NULL)
+        return (0);
     return (do_select(zp_pending_d, sock_ptr, rcv_handling));
 }
