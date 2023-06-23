@@ -62,10 +62,16 @@ static bool verify_incantation(tile_t **map, client_t *player)
 
 void start_incantation(tile_t **map, client_t *player, int frequency)
 {
+    struct timespec start, now;
+    int time = 300 / frequency;
+
     if (!verify_incantation(map, player))
         return;
 
-    (void)frequency;
-
+    timespec_get(&start, TIME_UTC);
+    timespec_get(&now, TIME_UTC);
     player->incantation = true;
+
+    while (start.tv_nsec - now.tv_nsec <= time)
+        timespec_get(&now, TIME_UTC);
 }
