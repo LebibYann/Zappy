@@ -8,9 +8,9 @@
 #include "zappy_server.h"
 #include "zappy_incantations.h"
 
-bool verify_player_incantation(tile_t *tile, int level)
+static bool verify_player_incantation(tile_t tile, int level)
 {
-    client_list_t *player_list = tile->players;
+    client_list_t *player_list = tile.players;
     int player_count = 0;
 
     while (player_list) {
@@ -24,14 +24,27 @@ bool verify_player_incantation(tile_t *tile, int level)
     return true;
 }
 
-bool verify_incantation(tile_t **map, client_t *player)
+static bool verify_resources_incantation(tile_t tile, int level)
 {
-    const incantations_t *incantation = &INCANTATIONS[player->level - 1];
-    tile_t *tile = &map[player->position.y][player->position.x];
+    int stone_count = 0;
 
-    for (int resource = 0; resource < RESOURCES_COUNT; resource++)
-        if (tile->resources[resource] < incantation->prerequisites[resource])
+    for (int stone = 1; stone < RESOURCES_COUNT; stone++) {
+        stone_count = tile.resources[stone];
+        if (stone_count < INCANTATIONS[level - 1].prerequisites[stone])
             return false;
+    }
+
+    return true;
+}
+
+static bool verify_incantation(tile_t **map, client_t *player)
+{
+    tile_t tile = map[player->position.y][player->position.x];
+
+    if (!verify_player_incantation(tile, player->level))
+        return false;
+    if (!verify_resources_incantation(tile, player->level))
+        return false;
 
     return true;
 }
