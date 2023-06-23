@@ -12,6 +12,11 @@
 #include "zappy_resources.h"
 #include "zappy_client.h"
 
+typedef struct tile_s {
+    int resources[RESOURCES_COUNT];
+    struct player_list_s *players;
+}   tile_t;
+
 typedef struct map_s {
     int w;
     int h;
