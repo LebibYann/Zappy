@@ -28,3 +28,10 @@ typedef struct position_s {
     int x;
     int y;
 }   position_t;
+
+enum orientation_e {
+    NORTH,
+    EAST,
+    SOUTH,
+    WEST
+};
