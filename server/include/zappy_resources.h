@@ -44,6 +44,6 @@ typedef struct tile_s {
 
 tile_t **initialize_map(int w, int h);
 
-void generate_map(tile_t **map, int w, int h);
+void generate_map(map_t *map);
 
-void generate_resource(tile_t **map, int w, int h, int resource);
+void generate_resource(map_t *map, int resource);
