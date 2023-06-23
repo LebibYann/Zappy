@@ -13,6 +13,7 @@
 typedef struct aiCommand_s {
     enum e_zp_command id;
     const char *name;
+    int tick;
 } aiCommand_t;
 
 typedef enum AIResponse_e {
