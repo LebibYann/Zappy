@@ -49,17 +49,19 @@ typedef struct s_gameInfo {
 
 class GameScene: public IScene {
 public:
-    GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGUI &protocol);
+    GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGUI &protocol, Client &connection);
     ~GameScene();
 
     void loadScene();
     void unloadScene();
     void run();
+    bool setConnection(std::string ip, std::string port);
 
 private:
     sf::RenderWindow &_window;
     sf::Event &_event;
     ZappyProtocolGUI &_protocol;
+    Client &_connection;
     sf::Music _music;
     sf::Font _font;
     std::vector<sf::Sprite> _spriteDraw;
