@@ -13,8 +13,8 @@ int set_width(server_t *server, int *index, int ac, char **av)
         fprintf(stderr,  "./server: option requires an argument -- '%s'\n", "-x");
         return (-1);
     }
-    server->width = atoi(av[*index]);
-    if (server->width < 10 || server->width > 30){
+    server->map.w = atoi(av[*index]);
+    if (server->map.w < 10 || server->map.w > 30){
         fprintf(stderr, "-x option only accepts integer values between 10 and 30\n");
         return (-1);
     }

@@ -25,21 +25,23 @@ void generate_map(map_t *map)
         generate_resource(map, resource);
 }
 
-map_t *initialize_map(int w, int h)
+void allocate_map(map_t *map)
 {
-    map_t *map = malloc(sizeof(map_t));
+    map->tiles = malloc(sizeof(tile_t *) * map->h);
 
-    if (!map)
-        return (NULL);
+    if (!map->tiles)
+        return;
 
+    for (int i = 0; i < map->h; i++) {
+        map->tiles[i] = calloc(map->w, sizeof(tile_t));
+        if (!map->tiles[i])
+            return;
+    }
+}
+
+void initialize_map(map_t *map, int w, int h)
+{
     map->w = w;
     map->h = h;
-    map->tiles = malloc(sizeof(tile_t *) * h);
-
-    for (int i = 0; i < h; i++) {
-        map->tiles[i] = calloc(w, sizeof(tile_t));
-        if (!map->tiles[i])
-            return (NULL);
-    }
-    return (map);
+    map->tiles = NULL;
 }
