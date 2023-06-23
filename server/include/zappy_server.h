@@ -25,8 +25,7 @@
 #include "zappy_resources.h"
 #include "clock.h"
 
-typedef struct parameter_s
-{
+typedef struct parameter_s {
     char *parameter;
     int (*f)();
 }   parameter_t;
