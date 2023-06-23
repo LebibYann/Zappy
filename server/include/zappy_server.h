@@ -39,8 +39,6 @@ int open_server(int port, int queue);
 void run_server(server_t *server);
 void close_server(server_t *server);
 
-
-
 int read_parameters(server_t *server, int ac, char **av);
 int set_port(server_t *server, int *index, int ac, char **av);
 int set_width(server_t *server, int *index, int ac, char **av);

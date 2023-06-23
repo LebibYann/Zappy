@@ -36,9 +36,9 @@ static bool verify_stone_incantation(tile_t tile, int level)
     return true;
 }
 
-static bool verify_incantation(tile_t **map, client_t *player)
+static bool verify_incantation(tile_t **tiles, client_t *player)
 {
-    tile_t tile = map[player->position.y][player->position.x];
+    tile_t tile = tiles[player->position.y][player->position.x];
     const int player_level = player->level;
 
     if (player_level >= 8){
@@ -60,12 +60,12 @@ static bool verify_incantation(tile_t **map, client_t *player)
     return true;
 }
 
-void start_incantation(tile_t **map, client_t *player, int frequency)
+void start_incantation(tile_t **tiles, client_t *player, int frequency)
 {
     struct timespec start, now;
     int time = 300 / frequency;
 
-    if (!verify_incantation(map, player))
+    if (!verify_incantation(tiles, player))
         return;
 
     timespec_get(&start, TIME_UTC);
@@ -74,4 +74,6 @@ void start_incantation(tile_t **map, client_t *player, int frequency)
 
     while (start.tv_nsec - now.tv_nsec <= time)
         timespec_get(&now, TIME_UTC);
+    if (player->incantation)
+        player->level++;
 }

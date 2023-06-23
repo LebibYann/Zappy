@@ -16,7 +16,7 @@ const char *HELP =
 \tclientsNb\tis the number of authorized clients per team\n\
 \tfreq\tis the reciprocal of time unit for execution of actions\n";
 
-const parameter_t PARAMETERS[6] = 
+const parameter_t PARAMETERS[6] =
 {
     {"-p", set_port},
     {"-x", set_width},
@@ -28,7 +28,7 @@ const parameter_t PARAMETERS[6] =
 
 static int handle_parameter(server_t *server, int *index, int ac, char **av)
 {
-    if (strcmp(av[*index], "-h") == 0)    
+    if (strcmp(av[*index], "-h") == 0)
         return (-1);
     for (size_t i = 0; i < 6; i++)
         if (strcmp(av[*index], PARAMETERS[i].parameter) == 0){
