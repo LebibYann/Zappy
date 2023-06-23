@@ -55,7 +55,7 @@ BLINK 	= 	"\033[1;92m"
 SBLINK	= 	"\033[0m"
 INVERT  =	"\033[7m"
 
-SHELL := /bin/sh
+SHELL := /bin/bash
 _ERROR_LOG_EXT_NAME = .errlog
 
 # ---------------------- AUTO GENERATED DATA, DON'T TOUCH ----------------------

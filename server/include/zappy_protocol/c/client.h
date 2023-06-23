@@ -25,11 +25,17 @@ typedef struct client_s{
     fd_set write_sockets;
 } client_t;
 
-extern "C"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int handle_connexion(char *addr, int port);
 
-extern "C"
 int create_client(const char *ip_adress, int port);
 
-extern "C"
 void run_client(client_t *client);
+
+#ifdef __cplusplus
+}
+#endif
