@@ -9,12 +9,16 @@
 
 void init_server(server_t *server)
 {
+    char *base_team_list[] = {"Team1", "Team2", "Team3", "Team4", NULL};
+
     server->port = 4242;
     server->width = 10;
     server->height = 10;
-    server->teams = NULL;
-    server->nclients = 1;
-    server->frequency = 10;
-    FD_ZERO(&server->read_sockets);
-    FD_ZERO(&server->write_sockets);
+    server->teams = split_dup(base_team_list);
+    server->max_team_cli = malloc(sizeof(int) * split_len(server->teams));
+    for (size_t i = 0; i < split_len(server->teams); ++i)
+        server->max_team_cli[i] = 3;
+    server->nclients = 0;
+    server->frequency = 100;
+    LIST_INIT(&(server->client_list));
 }

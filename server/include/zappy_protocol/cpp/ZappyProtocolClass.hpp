@@ -59,6 +59,4 @@ public:
 
 protected:
     t_zp_pending_data _data;
-    fd_set _readSocket;
-    fd_set _writeSocket;
 };

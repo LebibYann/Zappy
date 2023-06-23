@@ -9,17 +9,17 @@
 
 const aiCommand_t AI_CLI_COMMANDS[ZP_TOTAL_AI_CMD] =
 {
-    {ZP_FORWARD, "Forward"},
-    {ZP_RIGHT, "Right"},
-    {ZP_LEFT, "Left"},
-    {ZP_LOOK, "Look"},
-    {ZP_INVENTORY, "Inventory"},
-    {ZP_BROADCAST, "Broadcast"},
-    {ZP_CONNECT_NBR, "Connect_nbr"},
-    {ZP_FORK, "Fork"},
-    {ZP_EJECT, "Eject"},
-    {ZP_DEAD, ""},
-    {ZP_TAKE_OBJ, "Take"},
-    {ZP_SET_OBJ, "Set"},
-    {ZP_INCANTATION, "Incantation"}
+    {ZP_FORWARD, "Forward", 7},
+    {ZP_RIGHT, "Right", 7},
+    {ZP_LEFT, "Left", 7},
+    {ZP_LOOK, "Look", 7},
+    {ZP_INVENTORY, "Inventory", 1},
+    {ZP_BROADCAST, "Broadcast", 7},
+    {ZP_CONNECT_NBR, "Connect_nbr", 0},
+    {ZP_FORK, "Fork", 42},
+    {ZP_EJECT, "Eject", 7},
+    {ZP_DEAD, "", 0},
+    {ZP_TAKE_OBJ, "Take", 7},
+    {ZP_SET_OBJ, "Set", 7},
+    {ZP_INCANTATION, "Incantation", 0}
 };
