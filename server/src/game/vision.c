@@ -13,23 +13,9 @@ static int get_fov_size(int player_level)
     return player_level * player_level;
 }
 
-static tile_t get_tile(map_t *map, int x, int y)
-{
-    if (x < 0)
-        x = map->w + x;
-    if (y < 0)
-        y = map->h + y;
-    if (x >= map->w)
-        x = x - map->w;
-    if (y >= map->h)
-        y = y - map->h;
-    return map->tiles[y][x];
-}
-
 static tile_t *get_north_tiles(map_t *map, client_t *player)
 {
-    tile_t *fov = malloc(sizeof(tile_t) * player->level);
-    int fov_size = get_fov_size(player->level);
+    tile_t *fov = malloc(sizeof(tile_t) * get_fov_size(player->level));
     int i = 1;
 
     if (!fov)
@@ -48,8 +34,7 @@ static tile_t *get_north_tiles(map_t *map, client_t *player)
 
 static tile_t *get_east_tiles(map_t *map, client_t *player)
 {
-    tile_t *fov = malloc(sizeof(tile_t) * player->level);
-    int fov_size = get_fov_size(player->level);
+    tile_t *fov = malloc(sizeof(tile_t) * get_fov_size(player->level));
     int i = 1;
 
     if (!fov)
@@ -68,8 +53,7 @@ static tile_t *get_east_tiles(map_t *map, client_t *player)
 
 static tile_t *get_south_tiles(map_t *map, client_t *player)
 {
-    tile_t *fov = malloc(sizeof(tile_t) * player->level);
-    int fov_size = get_fov_size(player->level);
+    tile_t *fov = malloc(sizeof(tile_t) * get_fov_size(player->level));
     int i = 1;
 
     if (!fov)
@@ -88,8 +72,7 @@ static tile_t *get_south_tiles(map_t *map, client_t *player)
 
 static tile_t *get_west_tiles(map_t *map, client_t *player)
 {
-    tile_t *fov = malloc(sizeof(tile_t) * player->level);
-    int fov_size = get_fov_size(player->level);
+    tile_t *fov = malloc(sizeof(tile_t) * get_fov_size(player->level));
     int i = 1;
 
     if (!fov)
