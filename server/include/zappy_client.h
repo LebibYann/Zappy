@@ -15,7 +15,7 @@ typedef struct client_s {
     int level;
     char *team;
     bool dead;
-    bool evolving;
+    bool incantation;
     bool egg;
 }   client_t;
 
