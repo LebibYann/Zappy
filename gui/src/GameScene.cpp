@@ -93,6 +93,7 @@ void GameScene::run()
     this->_music.play();
     this->_music.setVolume(80);
     */
+    this->_protocol.receive();
     while (_protocol.receivePackage(package) == 0)
         packages.push_back(package);
     _gameInfo = analysePackages(packages);
