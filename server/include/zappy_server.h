@@ -22,6 +22,7 @@
 #include <signal.h>
 
 #include "str_split.h"
+#include "zappy_client.h"
 #include "zappy_resources.h"
 #include "clock.h"
 #include "c_zappy_protocol.h"

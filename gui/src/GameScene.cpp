@@ -8,8 +8,8 @@
 #include "GameScene.hpp"
 #include "ZappyProtocolGUI.hpp"
 
-GameScene::GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGUI &protocol)
-: _window(window), _event(event), _protocol(protocol)
+GameScene::GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGUI &protocol, Client &connection)
+: _window(window), _event(event), _protocol(protocol), _connection(connection)
 {
     _gameInfo.mapSize = {};
     _gameInfo.map = {};
@@ -93,8 +93,18 @@ void GameScene::run()
     this->_music.play();
     this->_music.setVolume(80);
     */
+    this->_protocol.receive();
     while (_protocol.receivePackage(package) == 0)
         packages.push_back(package);
     _gameInfo = analysePackages(packages);
     drawElements(_window, _gameInfo);
+}
+
+bool GameScene::setConnection(std::string ip, std::string port)
+{
+    if (!_connection.Connect(ip, atoi(port.c_str()))) {
+        error("Error: Connection failed");
+        exit(84);
+    }
+    return (true);
 }

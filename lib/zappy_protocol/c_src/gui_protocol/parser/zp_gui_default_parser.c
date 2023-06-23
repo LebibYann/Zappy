@@ -43,12 +43,10 @@ int zp_gui_default_parser(char *cmd_line, t_zp_gui_protocol *pkg)
 
     if (param == NULL)
         return (-1);
-    free(param);
     zp_gui_clear_protocol_struct(pkg);
     while ((param = strtok(NULL, " ")) != NULL) {
         if (!add_param(pkg, param))
             return (-1);
-        free(param);
     }
     return (0);
 }

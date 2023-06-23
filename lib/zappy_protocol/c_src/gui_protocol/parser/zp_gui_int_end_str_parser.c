@@ -42,12 +42,10 @@ char *param, char *next_param)
 {
     if (next_param != NULL) {
         if (!add_param(pkg, param)) {
-            free(next_param);
             return (-1);
         }
-        free(param);
     } else {
-        pkg->str = param;
+        pkg->str = strdup(param);
     }
     return (0);
 }
@@ -59,7 +57,6 @@ int zp_gui_int_end_str_parser(char *cmd_line, t_zp_gui_protocol *pkg)
 
     if (param == NULL)
         return (-1);
-    free(param);
     zp_gui_clear_protocol_struct(pkg);
     param = strtok(NULL, " ");
     while (param != NULL) {
