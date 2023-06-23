@@ -39,18 +39,19 @@ static bool verify_stone_incantation(tile_t tile, int level)
 static bool verify_incantation(tile_t **map, client_t *player)
 {
     tile_t tile = map[player->position.y][player->position.x];
+    const int player_level = player->level;
 
-    if (player->level >= 8){
+    if (player_level >= 8){
         fprintf(stderr, "Player %d is already level 8.\n", player->fd);
         return false;
     }
 
-    if (!verify_player_incantation(tile, player->level)) {
+    if (!verify_player_incantation(tile, player_level)) {
         fprintf(stderr, "Player %d does not have the necessary players.\n",
             player->fd);
         return false;
     }
-    if (!verify_stone_incantation(tile, player->level)) {
+    if (!verify_stone_incantation(tile, player_level)) {
         fprintf(stderr, "Player %d does not have the necessary stones.\n",
             player->fd);
         return false;
