@@ -43,28 +43,6 @@ typedef struct server_s {
     tile_t **map;
 }   server_t;
 
-typedef struct position_s {
-    int x;
-    int y;
-}   position_t;
-
-typedef struct client_s {
-    int fd;
-    position_t position;
-    int orientation;
-    int inventory[7];
-    int level;
-    char *team;
-    bool dead;
-    bool evolving;
-    bool egg;
-}   client_t;
-
-typedef struct client_list_s {
-    client_t *client;
-    struct client_list_s *next;
-}   client_list_t;
-
 void init_server(server_t *server);
 int open_server(int port, int queue);
 bool handle_client(server_t *server);
