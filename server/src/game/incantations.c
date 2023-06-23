@@ -27,7 +27,7 @@ bool verify_player_incantation(tile_t *tile, int level)
 bool verify_incantation(tile_t **map, client_t *player)
 {
     const incantations_t *incantation = &INCANTATIONS[player->level - 1];
-    tile_t *tile = &map[player->y][player->x];
+    tile_t *tile = &map[player->position.y][player->position.x];
 
     for (int resource = 0; resource < RESOURCES_COUNT; resource++)
         if (tile->resources[resource] < incantation->prerequisites[resource])

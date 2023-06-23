@@ -43,10 +43,14 @@ typedef struct server_s {
     tile_t **map;
 }   server_t;
 
-typedef struct client_s {
-    int fd;
+typedef struct position_s {
     int x;
     int y;
+}   position_t;
+
+typedef struct client_s {
+    int fd;
+    position_t position;
     int orientation;
     int inventory[7];
     int level;
