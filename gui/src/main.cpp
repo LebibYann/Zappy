@@ -15,21 +15,24 @@
 #include "SceneManager.hpp"
 #include "GameScene.hpp"
 
-int main(void)
+int main(int ac, char **av)
 {
     srand(time(nullptr));
 
     Framerate fps;
-    sf::RenderWindow window(sf::VideoMode(1280, 720), "Reverse");
     sf::Event event;
+    sf::RenderWindow window(sf::VideoMode(1280, 720), "Reverse");
+    Client connection;
+    std::vector<std::string> connectionID = analyseArgs(ac - 1, &av[1]);
     ZappyProtocolGUI protocol(69);
-    GameScene gameScene(window, event, protocol);
-
+    connection.Connect(connectionID[0], atoi(connectionID[1].c_str()));
+    GameScene gameScene(window, event, protocol, connection);
 
     SceneManager scene;
     scene.addMenu("GameScene", &gameScene);
-
     scene.changeMenu("GameScene");
+
+
     while (window.isOpen()) {
         window.pollEvent(event);
         if (event.type == sf::Event::Closed)

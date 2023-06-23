@@ -32,4 +32,4 @@ protected:
     IScene *_activeScene = nullptr;
 };
 
-SceneManager sceneSetup(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGUI &protocol);
+std::vector<std::string> analyseArgs(int ac, char **av);
