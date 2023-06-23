@@ -365,7 +365,6 @@ void ZappyAI::elevationBehaviour(enum e_elemOnTile seekedItem)
 void ZappyAI::run(void)
 {
     int seekedItem;
-    (void)seekedItem;
 
     while (this->_alive) {
         if (PRINT_ACTION)

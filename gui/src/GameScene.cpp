@@ -11,8 +11,18 @@
 GameScene::GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGUI &protocol, Client &connection)
 : _window(window), _event(event), _protocol(protocol), _connection(connection)
 {
-    _gameInfo.mapSize = {0, 0};
-    _gameInfo.map = {};
+    t_zp_guiProtocol pkg;
+
+    sleep(1);
+    this->_protocol.receivePackage(pkg);
+    this->_protocol.receivePackage(pkg);
+    _gameInfo.mapSize = {pkg.args[0], pkg.args[1]};
+    _gameInfo.map.resize(_gameInfo.mapSize[0]);
+    for (int x = 0; x < _gameInfo.mapSize[0]; ++x){
+        _gameInfo.map[x].resize(_gameInfo.mapSize[1]);
+        for (int y = 0; y < _gameInfo.mapSize[1]; ++y)
+            _gameInfo.map[x][y].resize(TOTAL_INVENTORY);
+    };
     _gameInfo.mapContent = {};
     _gameInfo.players = {};
     _gameInfo.eggs = {};
@@ -71,10 +81,9 @@ void GameScene::run()
     this->_music.play();
     this->_music.setVolume(80);
     */
-    this->_protocol.receive();
     while (_protocol.receivePackage(package) == 0)
         packages.push_back(package);
-    _gameInfo = analysePackages(packages);
+    refreshPackages(packages);
     drawElements(_window, _gameInfo);
 }
 

@@ -9,15 +9,12 @@
 
 const t_zp_gui_pair *zp_gui_find_command(char *cmd_line)
 {
-    char *cmd_name = strtok(cmd_line, " ");
+    size_t cmd_line_size;
 
-    if (cmd_name == NULL)
-        return (NULL);
     for (size_t i = 0; GUI_PAIR[i].cmd_type != ZP_END; ++i) {
-        if (strcmp(cmd_name, GUI_PAIR[i].cmd_name) == 0) {
-            cmd_line[strlen(cmd_name)] = ' ';
+        cmd_line_size = strlen(GUI_PAIR[i].cmd_name);
+        if (strncmp(cmd_line, GUI_PAIR[i].cmd_name, cmd_line_size) == 0)
             return (&GUI_PAIR[i]);
-        }
     }
     return (NULL);
 }

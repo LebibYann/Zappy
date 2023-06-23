@@ -76,7 +76,7 @@ enum e_zp_command cmd_type, va_list *args);
  ** -2 if the command receive is unknown, -3 if parameters are invalid.
  */
 int zp_gui_receive_package(t_zp_pending_data *pdata, t_zp_gui_protocol *pkg,
-enum e_sender expected_sender);
+enum e_sender expected_sender, bool wait);
 
 
 // Struct

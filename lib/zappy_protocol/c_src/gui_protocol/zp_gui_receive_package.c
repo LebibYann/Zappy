@@ -7,15 +7,23 @@
 
 #include "c_zappy_protocol_gui.h"
 
+static char *modular_getline(t_zp_pending_data *pdata, bool wait)
+{
+    if (wait)
+        return (zp_getline_wait_pending_data(pdata));
+    return (zp_getline_pending_data(pdata));
+}
+
 int zp_gui_receive_package(t_zp_pending_data *pdata, t_zp_gui_protocol *pkg,
-enum e_sender expected_sender)
+enum e_sender expected_sender, bool wait)
 {
     int result = 0;
     char *cmd_line;
     const t_zp_gui_pair *pair;
 
-    if ((cmd_line = zp_getline_pending_data(pdata)) == NULL)
+    if ((cmd_line = modular_getline(pdata, wait)) == NULL)
         return (-1);
+    printf("GUI RECEIVED COMMAND: %s\n", cmd_line);
     if ((pair = zp_gui_find_command(cmd_line)) == NULL) {
         free(cmd_line);
         return (-2);

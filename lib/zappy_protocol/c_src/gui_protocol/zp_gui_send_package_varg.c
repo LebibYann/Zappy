@@ -18,6 +18,7 @@ enum e_zp_command cmd_type, va_list *args)
     data = pair->gui_generator_func(pair, args, sender);
     zp_write_data(pdata, data, strlen(data));
     zp_write_data(pdata, "\n", 1);
+    zp_exchange_data(pdata, HANDLE_IGNORE, HANDLE_NO_WAIT);
     free(data);
     return (true);
 }
