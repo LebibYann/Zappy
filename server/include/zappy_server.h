@@ -28,7 +28,7 @@ typedef struct parameter_s
 {
     char *parameter;
     int (*f)();
-} parameter_t;
+}   parameter_t;
 
 typedef struct server_s {
     int fd;
@@ -55,6 +55,11 @@ typedef struct client_s {
     bool evolving;
     bool egg;
 }   client_t;
+
+typedef struct client_list_s {
+    client_t *client;
+    struct client_list_s *next;
+}   client_list_t;
 
 void init_server(server_t *server);
 int open_server(int port, int queue);

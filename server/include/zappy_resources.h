@@ -39,7 +39,7 @@ enum resources_e {
 
 typedef struct tile_s {
     int resources[RESOURCES_COUNT];
-    struct client_s *players;
+    struct client_list_s *players;
 }   tile_t;
 
 tile_t **initialize_map(int w, int h);
