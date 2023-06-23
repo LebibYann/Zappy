@@ -52,20 +52,6 @@ enum orientation_e {
     WEST
 };
 
-/*
-** EPITECH PROJECT, 2023
-** server
-** File description:
-** zappy_client
-*/
-
-#pragma once
-
-
-
-
-
-
 client_t *new_client_struct(int fd);
 
 void init_client_struct(client_t *client, int fd);
