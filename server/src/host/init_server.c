@@ -12,8 +12,7 @@ void init_server(server_t *server)
     char *base_team_list[] = {"Team1", "Team2", "Team3", "Team4", NULL};
 
     server->port = 4242;
-    server->width = 10;
-    server->height = 10;
+    initialize_map(&server->map, 10, 10);
     server->teams = split_dup(base_team_list);
     server->max_team_cli = malloc(sizeof(int) * split_len(server->teams));
     for (size_t i = 0; i < split_len(server->teams); ++i)

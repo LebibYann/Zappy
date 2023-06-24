@@ -12,7 +12,7 @@ const t_zp_gui_pair GUI_PAIR[] = {
         zp_gui_default_parser, zp_gui_default_generator},
     {ZP_MSZ, "msz", {2, 0},
         zp_gui_default_parser, zp_gui_default_generator},
-    {ZP_BCT, "bct", {9, 2},
+    {ZP_BCT, "bct", {8, 2},
         zp_gui_default_parser, zp_gui_default_generator},
     {ZP_MCT, "mct", {-1, 0},
         zp_gui_default_parser, zp_gui_default_generator},

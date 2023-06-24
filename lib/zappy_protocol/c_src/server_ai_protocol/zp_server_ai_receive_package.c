@@ -44,8 +44,10 @@ t_zp_ai_to_serv_data *zp_ais_data)
 {
     char *line;
 
+    printf("ah\n");
     if ((line = zp_getline_pending_data(zp_pending_d)) == NULL)
         return (false);
+    printf("%s\n", line);
     zp_server_ai_clear_protocol_struct(zp_ais_data);
     zp_ais_data->cmd_type = get_command_type(line);
     if (zp_ais_data->cmd_type == ZP_END) {
