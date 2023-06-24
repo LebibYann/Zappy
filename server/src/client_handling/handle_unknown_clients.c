@@ -18,8 +18,7 @@ static void send_gui_init(server_t *server, client_t *client)
     for (int y = 0; y < server->map.h && server->map.tiles != NULL; ++y) {
         for (int x = 0; x < server->map.w; ++x) {
             items = server->map.tiles[y][x].resources;
-            zp_gui_send_package(pdata, SERVER_SENT,
-                ZP_BCT, x, y,
+            zp_gui_send_package(pdata, SERVER_SENT, ZP_BCT, x, y,
                 items[LINEMATE], items[DERAUMERE], items[SIBUR],
                 items[MENDIANE], items[PHIRAS], items[THYSTAME]);
         }
@@ -80,7 +79,6 @@ void handle_unknown_clients(server_t *server, client_t *client)
     zp_exchange_data(&(client->data), HANDLE_NO_WAIT, HANDLE_IGNORE);
     if ((line = zp_getline_pending_data(&(client->data))) == NULL)
         return;
-    printf("%s\n", line);
     if (strcmp(line, "GRAPHIC\n") == 0) {
         free(line);
         configure_client_as_gui(client);

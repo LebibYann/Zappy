@@ -48,6 +48,7 @@ typedef enum e_zp_command {
     ZP_SET_OBJ,
     ZP_INCANTATION,
     ZP_TOTAL_AI_CMD,
+    ZP_END_AI_CMD = ZP_TOTAL_AI_CMD,
 
     // GUI
     ZP_GUI_START_CMD = ZP_TOTAL_AI_CMD,
@@ -78,7 +79,8 @@ typedef enum e_zp_command {
     ZP_SUC,
     ZP_SBP,
     ZP_TOTAL_CMD,
-    ZP_TOAL_GUI_CMD = (ZP_TOTAL_CMD - ZP_TOTAL_AI_CMD)
+    ZP_END_GUI_CMD = ZP_TOTAL_CMD,
+    ZP_TOTAL_GUI_CMD = (ZP_TOTAL_CMD - ZP_TOTAL_AI_CMD)
 } t_zp_command;
 
 typedef struct s_zp_ai_to_serv_data {

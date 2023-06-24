@@ -28,6 +28,7 @@
 #include "c_zappy_protocol.h"
 #include "zappy_client.h"
 #include "zappy_client_handling.h"
+#include "zappy_pending_command.h"
 
 typedef struct parameter_s {
     char *parameter;

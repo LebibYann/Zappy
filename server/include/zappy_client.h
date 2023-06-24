@@ -10,6 +10,7 @@
 #include <sys/queue.h>
 
 #include "c_zappy_protocol.h"
+#include "zappy_pending_command_struct.h"
 
 typedef enum client_category_e {
     CATEGORY_UNKNOWN,
@@ -35,6 +36,7 @@ typedef struct client_s {
     bool dead;
     bool incantation;
     bool egg;
+    pending_command_t pending_list[MAX_PENDING_COMMAND];
     LIST_ENTRY(client_s) other_clients;
 }   client_t;
 
