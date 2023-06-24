@@ -330,20 +330,14 @@ void ZappyAI::surviveBehaviour(void)
     while (this->_inventory[ELEM_FOOD] < 10 && this->_alive) {
         if (this->lookFor(ELEM_FOOD, relPos) > 0) {
             this->takeAll(ELEM_FOOD);
-            while (!ON_RELATIVE_TILE(relPos) && this->_alive) {
-                // std::cout << relPos.x << " " << relPos.y << " " << this->_direction << std::endl;
-                this->moveTowardRelativeCoord(relPos);
-                this->takeAll(ELEM_FOOD);
-                while (!ON_RELATIVE_TILE(relPos) && this->_alive) {
-                    // std::cout << relPos.x << " " << relPos.y << " " << this->_direction << std::endl;
-                    std::cout << "survive caca" << std::endl;
-                    this->moveTowardRelativeCoord(relPos);
-                    this->takeAll(ELEM_FOOD);
+            std::cout << "Relative START " << relPos.x << " " << relPos.y << " " << this->_direction << std::endl;
+            while (!this->moveTowardRelativeCoord(relPos) && this->_alive) {
+                std::cout << "Relative " << relPos.x << " " << relPos.y << " " << this->_direction << std::endl;
+                this->takeAll(ELEM_FOOD);        
             }
-        
-            }
+            std::cout << "Relative OK " << relPos.x << " " << relPos.y << " " << this->_direction << std::endl;
         } else {
-            this->moveRandom(this->_targetPos);
+            this->moveRandom(relPos);
         }
         this->inventory();
     }
@@ -550,8 +544,9 @@ int ZappyAI::take(enum e_elemOnTile elem, int count)
     for (int i = 0; elemIndex != -1 && i < count; ++i) {
         this->_communication.sendPackage(ZP_TAKE_OBJ, INVENTORY_PAIR[elemIndex].item_name);
         out = this->handlePackageReception(RESPONSE_OK);
-        if (out < 0)
+        if (out < 0 || out == RESPONSE_KO)
             return (elemSet);
+        this->_lookDone = false;
         elemSet += (out == 1);
         this->_inventory[elem] += (out == 1);
     }
@@ -575,8 +570,9 @@ int ZappyAI::set(enum e_elemOnTile elem, int count)
     for (int i = 0; elemIndex != -1 && i < count && this->_inventory[elem] > 0; ++i) {
         this->_communication.sendPackage(ZP_SET_OBJ, INVENTORY_PAIR[elemIndex].item_name);
         out = this->handlePackageReception(RESPONSE_OK);
-        if (out < 0)
+        if (out < 0 || out == RESPONSE_KO)
             return (elemSet);
+        this->_lookDone = false;
         elemSet += (out == 1);
         this->_inventory[elem] -= (out == 1);
     }
@@ -668,7 +664,8 @@ bool ZappyAI::moveTowardRelativeCoord(t_coords &relativeCoord)
     if (!xOk && finalDirection != this->_direction)
         finalDirection = (relativeCoord.x < 0) ? DIR_WEST : DIR_EAST;
     this->turnTo(finalDirection);
-    return (this->forward(relativeCoord));
+    this->forward(relativeCoord);
+    return (false);
 }
 
 
@@ -769,52 +766,17 @@ int ZappyAI::lookFor(enum e_elemOnTile seekedElem, t_coords &relativeCoord)
 
 int ZappyAI::takeAll(enum e_elemOnTile elem)
 {
-    int out;
-    int sentRequest = 0;
     t_coords coords;
-    int elemIndex = -1;
     int elemToTake = this->lookFor(elem, coords);
-    int elemTaken = 0;
 
 
-    if (PRINT_ACTION)
-        std::cout << "Take all: " << elem << std::endl;
-    if (elemToTake <= 0 || !ON_RELATIVE_TILE(coords))
-        return (elemTaken);
-    for (int i = 0; i < TOTAL_INVENTORY; ++i) {
-        if (INVENTORY_PAIR[i].item_type == elem) {
-            elemIndex = i;
-            break;
-        }
-    }
-    if (elemIndex == -1)
-        return (elemTaken);
-    for (int i = 0; i < elemToTake; ++i) {
-        if (sentRequest < MAX_ACTION_AT_ONCE) {
-            this->_communication.sendPackage(ZP_TAKE_OBJ, INVENTORY_PAIR[elemIndex].item_name);
-            ++sentRequest;
-        } else {
-            out = this->_communication.receivePackage();
-            if (out == RESPONSE_DISCONNECTION || out == RESPONSE_DEAD) {
-                this->_alive = false;
-                return (elemTaken);
-            }
-            elemTaken += (out == RESPONSE_OK);
-            --sentRequest;
-        }
-    }
-    while (sentRequest > 0) {
-        out = this->_communication.receivePackage();
-        if (out == RESPONSE_DISCONNECTION || out == RESPONSE_DEAD) {
-            this->_alive = false;
-            return (elemTaken);
-        }
-        elemTaken += (out == RESPONSE_OK);
-        --sentRequest;
-    }
-    this->_inventory[elem] += elemTaken;
-    this->_lookDone = false;
-    return (elemTaken);
+    if (elem == ELEM_FOOD)
+    // if (PRINT_ACTION)
+    //     std::cout << "Take all: " << elem << std::endl;
+    // if (elemToTake <= 0 || !ON_RELATIVE_TILE(coords))
+    //     return (0);
+    std::cout << "Take all: food " << this->take(elem, elemToTake) << std::endl;
+    return (1);
 }
 
 void ZappyAI::takeUsefulResource(const std::vector<int> &itemList)
