@@ -32,6 +32,7 @@ GameScene::GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGU
         _gameInfo.tileSizeX = tileSizeWithHeight;
         _gameInfo.tileSizeY = tileSizeWithHeight;
     }
+    _imageBank.rescaleTexture(_gameInfo.tileSizeX, _gameInfo.tileSizeY);
     _gameInfo.mapContent = {};
     _gameInfo.players = {};
     _gameInfo.eggs = {};

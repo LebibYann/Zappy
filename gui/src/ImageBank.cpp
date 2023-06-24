@@ -32,6 +32,7 @@ ImageBank::ImageBank()
     _layingTexture[0].loadFromFile("assets/incant1.png");
     _layingTexture[1].loadFromFile("assets/incant2.png");
     _layingTexture[2].loadFromFile("assets/incant3.png");
+
     _layingSprites.resize(3);
     _layingSprites[0].setTexture(_layingTexture[0]);
     _layingSprites[1].setTexture(_layingTexture[1]);
@@ -72,13 +73,50 @@ ImageBank::ImageBank()
     _rssSprites[5].setTexture(_rssTexture[5]);
     _rssSprites[6].setTexture(_rssTexture[6]);
 
-
-    //texture.loadFromFile("assets/ground.png");
-    //_groundTexture.push_back(texture);
+    _groundTexture.resize(1);
+    _groundTexture[0].loadFromFile("assets/ground.png");
+    _groundSprites.resize(1);
+    _groundSprites[0].setTexture(_groundTexture[0]);
 }
 
 ImageBank::~ImageBank()
 {
+}
+
+void ImageBank::rescaleTexture(float x, float y)
+{
+    float multiplyerX = x / 32;
+    float multiplyerY = y / 32;
+
+    _idleSprites[0].scale(multiplyerX, multiplyerY);
+    _idleSprites[1].scale(multiplyerX, multiplyerY);
+    _idleSprites[2].scale(multiplyerX, multiplyerY);
+
+    _incantSprites[0].scale(multiplyerX, multiplyerY);
+    _incantSprites[1].scale(multiplyerX, multiplyerY);
+    _incantSprites[2].scale(multiplyerX, multiplyerY);
+
+    _layingSprites[0].scale(multiplyerX, multiplyerY);
+    _layingSprites[1].scale(multiplyerX, multiplyerY);
+    _layingSprites[2].scale(multiplyerX, multiplyerY);
+
+    _deadSprites[0].scale(multiplyerX, multiplyerY);
+    _deadSprites[1].scale(multiplyerX, multiplyerY);
+    _deadSprites[2].scale(multiplyerX, multiplyerY);
+
+    _eggSprites[0].scale(multiplyerX, multiplyerY);
+    _eggSprites[1].scale(multiplyerX, multiplyerY);
+    _eggSprites[2].scale(multiplyerX, multiplyerY);
+
+    _rssSprites[0].scale(multiplyerX, multiplyerY);
+    _rssSprites[1].scale(multiplyerX, multiplyerY);
+    _rssSprites[2].scale(multiplyerX, multiplyerY);
+    _rssSprites[3].scale(multiplyerX, multiplyerY);
+    _rssSprites[4].scale(multiplyerX, multiplyerY);
+    _rssSprites[5].scale(multiplyerX, multiplyerY);
+    _rssSprites[6].scale(multiplyerX, multiplyerY);
+
+    _groundSprites[0].scale(multiplyerX, multiplyerY);
 }
 
 sf::Sprite &ImageBank::getIdleSprite(int index)
