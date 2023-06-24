@@ -26,6 +26,22 @@ void drawGround(sf::RenderWindow &window, t_gameInfo &gameInfo)
     }
 }
 
+void drawFood(sf::RenderWindow &window, t_gameInfo &gameInfo, ImageBank &imageBank)
+{
+    sf::Sprite sprite;
+    sprite.setTexture(imageBank.getRssSprite(0));
+ 
+    for (size_t i = 0; i < gameInfo.map.size(); ++i) {
+        for (size_t j = 0; j < gameInfo.map[i].size(); ++j) {
+            if (gameInfo.map[j][i][0] > 0) {
+                sprite.setPosition(j * TILE_SIZE, i * TILE_SIZE);
+                window.draw(sprite);
+            }
+
+        }
+    }
+}
+
 void drawEggs(sf::RenderWindow &window, t_gameInfo &gameInfo)
 {
     for (size_t i = 0; i < gameInfo.eggs.size(); ++i) {
@@ -42,11 +58,12 @@ void drawPlayers(sf::RenderWindow &window, t_gameInfo &gameInfo)
     }
 }
 
-void drawElements(sf::RenderWindow &window, t_gameInfo &gameInfo)
+void drawElements(sf::RenderWindow &window, t_gameInfo &gameInfo, ImageBank &imageBank)
 {
     if (gameInfo.gameOver == true)
         return;
     drawGround(window, gameInfo);
+    drawFood(window, gameInfo, imageBank);
     drawEggs(window, gameInfo);
     drawPlayers(window, gameInfo);
 }
