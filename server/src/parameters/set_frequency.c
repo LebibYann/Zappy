@@ -10,14 +10,14 @@
 int set_frequency(server_t *server, int *index, int ac, char **av)
 {
     if (*index >= ac){
-        fprintf(stderr,  "./server: option requires an argument -- '%s'\n", "-f");
+        fprintf(stderr, "./server: option requires an argument -- '-f'\n");
         return (-1);
     }
     server->frequency = atoi(av[*index]);
     if (server->frequency < 2 || server->frequency > 10000){
-        fprintf(stderr, "-f option only accepts integer values between 2 and 10000\n");
+        fprintf(stderr, "-f option only accepts integer values"
+        " between 2 and 10000\n");
         return (-1);
     }
-    *index = *index + 1;
     return (0);
 }

@@ -10,10 +10,13 @@
 int set_name(server_t *server, int *index, int ac, char **av)
 {
     if (*index >= ac){
-        fprintf(stderr,  "./server: option requires an argument -- '%s'\n", "-n");
+        fprintf(stderr, "./server: option requires an argument -- '-n'\n");
         return (-1);
     }
-    for (; av[*index][0] != '-' && *index < ac; index++)
-        split_insert(&server->teams, strdup(av[*index]), -1);
+    split_free(server->teams);
+    server->teams = NULL;
+    for (; *index < ac && av[*index][0] != '-'; ++(*index))
+        split_insert(&server->teams, av[*index], -1);
+    --(*index);
     return (0);
 }

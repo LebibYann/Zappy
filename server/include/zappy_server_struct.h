@@ -31,7 +31,6 @@ typedef struct server_s {
     char **teams;
     int *max_team_cli;
 
-    int nclients;
     struct client_list_s client_list;
 
     map_t map;
