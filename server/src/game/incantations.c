@@ -8,7 +8,7 @@
 #include "zappy_server.h"
 #include "zappy_incantations.h"
 
-static bool verify_player_incantation(tile_t *tile, int level, char *team)
+static bool verify_player_incantation(tile_t *tile, const int level, const char *team)
 {
     int player_count = 0;
     player_list_t *player_list = tile->players;
@@ -26,7 +26,7 @@ static bool verify_player_incantation(tile_t *tile, int level, char *team)
     return false;
 }
 
-static bool verify_stone_incantation(tile_t *tile, int level)
+static bool verify_stone_incantation(tile_t *tile, const int level)
 {
     int stone_count = 0;
 
@@ -48,7 +48,7 @@ static bool verify_incantation(tile_t *tile, client_t *player)
         return false;
     }
 
-    if (!verify_player_incantation(tile, player_level)) {
+    if (!verify_player_incantation(tile, player_level, player->team)) {
         fprintf(stderr, "Player %d does not have the necessary players.\n",
             player->data.fd);
         return false;
