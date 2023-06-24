@@ -17,6 +17,7 @@
 
 #include "IScene.hpp"
 #include "ZappyProtocolGUI.hpp"
+#include "ImageBank.hpp"
 
 typedef struct s_playerStruct {
     int id;
@@ -28,6 +29,7 @@ typedef struct s_playerStruct {
     bool eggLaying;
     bool isIncanting;
     bool isDead;
+    sf::Sprite sprite;
 } t_playerStruct;
 
 typedef struct s_eggStruct {
@@ -36,6 +38,7 @@ typedef struct s_eggStruct {
     int y;
     bool isHatching;
     bool isDead;
+    sf::Sprite sprite;
 } t_eggStruct;
 
 typedef struct s_gameInfo {
@@ -64,6 +67,7 @@ private:
     sf::Event &_event;
     ZappyProtocolGUI &_protocol;
     Client &_connection;
+    ImageBank _imageBank;
 
 
     sf::Music _music;

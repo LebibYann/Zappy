@@ -29,24 +29,16 @@ void drawGround(sf::RenderWindow &window, t_gameInfo &gameInfo)
 void drawEggs(sf::RenderWindow &window, t_gameInfo &gameInfo)
 {
     for (size_t i = 0; i < gameInfo.eggs.size(); ++i) {
-        sf::RectangleShape egg(sf::Vector2f(TILE_SIZE, TILE_SIZE));
-        sf::Vector2f pos(gameInfo.eggs[i].x * TILE_SIZE, gameInfo.eggs[i].y * TILE_SIZE);
-
-        egg.setFillColor(sf::Color::White);
-        egg.setPosition(pos);
-        window.draw(egg);
+        gameInfo.eggs[i].sprite.setPosition(gameInfo.eggs[i].x * TILE_SIZE, gameInfo.eggs[i].y * TILE_SIZE);
+        window.draw(gameInfo.eggs[i].sprite);
     }
 }
 
 void drawPlayers(sf::RenderWindow &window, t_gameInfo &gameInfo)
 {
     for (size_t i = 0; i < gameInfo.players.size(); ++i) {
-        sf::RectangleShape player(sf::Vector2f(TILE_SIZE, TILE_SIZE));
-        sf::Vector2f pos(gameInfo.players[i].x * TILE_SIZE, gameInfo.players[i].y * TILE_SIZE);
-
-        player.setFillColor(sf::Color::Blue);
-        player.setPosition(pos);
-        window.draw(player);
+        gameInfo.players[i].sprite.setPosition(gameInfo.players[i].x * TILE_SIZE, gameInfo.players[i].y * TILE_SIZE);
+        window.draw(gameInfo.players[i].sprite);
     }
 }
 
