@@ -31,5 +31,13 @@ void set_object_down(tile_t *tile, client_t *player, int resource)
 
 void inventory(client_t *player)
 {
-    (void)player;
+    char response[1024] = {0};
+
+    sprintf(response, "[food %d, linemate %d, deraumere %d, sibur %d, \
+mendiane %d, phiras %d, thystame %d]\n",
+            player->inventory[FOOD],
+            player->inventory[LINEMATE], player->inventory[DERAUMERE],
+            player->inventory[SIBUR], player->inventory[MENDIANE],
+            player->inventory[PHIRAS], player->inventory[THYSTAME]);
+    zp_server_ai_send_package(&player->data, response);
 }

@@ -44,6 +44,8 @@ extern "C" {
 void zp_server_ai_send_basic_package(t_zp_pending_data *zp_pending_d,
 enum AIResponse_e response);
 
+void zp_server_ai_send_package(t_zp_pending_data *zp_pending_d, char *response);
+
 /**
  ** @brief
  **
