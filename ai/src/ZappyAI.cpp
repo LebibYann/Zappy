@@ -286,7 +286,7 @@ int ZappyAI::handlePackageReception(enum AIResponse_e expectedResponse, std::str
                 std::cout << "Eject" << std::endl;
                 break;
             case RESPONSE_MESSAGE:
-                std::cout << "Message" << std::endl;
+                storeMessage(str);
                 break;
             default:
                 if (out != expectedResponse) {
@@ -330,13 +330,14 @@ void ZappyAI::surviveBehaviour(void)
     while (this->_inventory[ELEM_FOOD] < 10 && this->_alive) {
         if (this->lookFor(ELEM_FOOD, relPos) > 0) {
             this->takeAll(ELEM_FOOD);
-            while (!ON_RELATIVE_TILE(relPos) && this->_alive) {
-                // std::cout << relPos.x << " " << relPos.y << " " << this->_direction << std::endl;
-                this->moveTowardRelativeCoord(relPos);
-                this->takeAll(ELEM_FOOD);
+            std::cout << "Relative START " << relPos.x << " " << relPos.y << " " << this->_direction << std::endl;
+            while (!this->moveTowardRelativeCoord(relPos) && this->_alive) {
+                std::cout << "Relative " << relPos.x << " " << relPos.y << " " << this->_direction << std::endl;
+                this->takeAll(ELEM_FOOD);        
             }
+            std::cout << "Relative OK " << relPos.x << " " << relPos.y << " " << this->_direction << std::endl;
         } else {
-            this->moveRandom(this->_targetPos);
+            this->moveRandom(relPos);
         }
         this->inventory();
     }
@@ -366,16 +367,19 @@ void ZappyAI::run(void)
 {
     int seekedItem;
 
+    this->_playerId = rand();
     while (this->_alive) {
         if (PRINT_ACTION)
             std::cout << "LOOP START" << std::endl;
-        this->inventory();
-        if (this->_inventory[ELEM_FOOD] < 4)
-            this->surviveBehaviour();
-        if (this->_inventory[ELEM_FOOD] < 30)
-            this->takeAll(ELEM_FOOD);
         seekedItem = tryElevate();
+        if (seekedItem == ELEM_FOOD)
+            this->surviveBehaviour();
+        // if (this->_inventory[ELEM_FOOD] < 30)
+        //     this->takeAll(ELEM_FOOD);
+        if (seekedItem == TOTAL_ELEM_ON_TILE)
+            this->elevation();
         this->elevationBehaviour(static_cast<enum e_elemOnTile>(seekedItem));
+        this->readMessageBuffer();
     }
     std::cout << "dead" << std::endl;
 }
@@ -540,8 +544,9 @@ int ZappyAI::take(enum e_elemOnTile elem, int count)
     for (int i = 0; elemIndex != -1 && i < count; ++i) {
         this->_communication.sendPackage(ZP_TAKE_OBJ, INVENTORY_PAIR[elemIndex].item_name);
         out = this->handlePackageReception(RESPONSE_OK);
-        if (out < 0)
+        if (out < 0 || out == RESPONSE_KO)
             return (elemSet);
+        this->_lookDone = false;
         elemSet += (out == 1);
         this->_inventory[elem] += (out == 1);
     }
@@ -565,8 +570,9 @@ int ZappyAI::set(enum e_elemOnTile elem, int count)
     for (int i = 0; elemIndex != -1 && i < count && this->_inventory[elem] > 0; ++i) {
         this->_communication.sendPackage(ZP_SET_OBJ, INVENTORY_PAIR[elemIndex].item_name);
         out = this->handlePackageReception(RESPONSE_OK);
-        if (out < 0)
+        if (out < 0 || out == RESPONSE_KO)
             return (elemSet);
+        this->_lookDone = false;
         elemSet += (out == 1);
         this->_inventory[elem] -= (out == 1);
     }
@@ -658,7 +664,8 @@ bool ZappyAI::moveTowardRelativeCoord(t_coords &relativeCoord)
     if (!xOk && finalDirection != this->_direction)
         finalDirection = (relativeCoord.x < 0) ? DIR_WEST : DIR_EAST;
     this->turnTo(finalDirection);
-    return (this->forward(relativeCoord));
+    this->forward(relativeCoord);
+    return (false);
 }
 
 
@@ -759,52 +766,17 @@ int ZappyAI::lookFor(enum e_elemOnTile seekedElem, t_coords &relativeCoord)
 
 int ZappyAI::takeAll(enum e_elemOnTile elem)
 {
-    int out;
-    int sentRequest = 0;
     t_coords coords;
-    int elemIndex = -1;
     int elemToTake = this->lookFor(elem, coords);
-    int elemTaken = 0;
 
 
-    if (PRINT_ACTION)
-        std::cout << "Take all: " << elem << std::endl;
-    if (elemToTake <= 0 || !ON_RELATIVE_TILE(coords))
-        return (elemTaken);
-    for (int i = 0; i < TOTAL_INVENTORY; ++i) {
-        if (INVENTORY_PAIR[i].item_type == elem) {
-            elemIndex = i;
-            break;
-        }
-    }
-    if (elemIndex == -1)
-        return (elemTaken);
-    for (int i = 0; i < elemToTake; ++i) {
-        if (sentRequest < MAX_ACTION_AT_ONCE) {
-            this->_communication.sendPackage(ZP_TAKE_OBJ, INVENTORY_PAIR[elemIndex].item_name);
-            ++sentRequest;
-        } else {
-            out = this->_communication.receivePackage();
-            if (out == RESPONSE_DISCONNECTION || out == RESPONSE_DEAD) {
-                this->_alive = false;
-                return (elemTaken);
-            }
-            elemTaken += (out == RESPONSE_OK);
-            --sentRequest;
-        }
-    }
-    while (sentRequest > 0) {
-        out = this->_communication.receivePackage();
-        if (out == RESPONSE_DISCONNECTION || out == RESPONSE_DEAD) {
-            this->_alive = false;
-            return (elemTaken);
-        }
-        elemTaken += (out == RESPONSE_OK);
-        --sentRequest;
-    }
-    this->_inventory[elem] += elemTaken;
-    this->_lookDone = false;
-    return (elemTaken);
+    if (elem == ELEM_FOOD)
+    // if (PRINT_ACTION)
+    //     std::cout << "Take all: " << elem << std::endl;
+    // if (elemToTake <= 0 || !ON_RELATIVE_TILE(coords))
+    //     return (0);
+    std::cout << "Take all: food " << this->take(elem, elemToTake) << std::endl;
+    return (1);
 }
 
 void ZappyAI::takeUsefulResource(const std::vector<int> &itemList)
@@ -837,15 +809,126 @@ int ZappyAI::tryElevate(void)
     if (PRINT_ACTION)
         std::cout << "Try elevate" << std::endl;
     this->inventory();
+    if (this->_inventory[ELEM_FOOD] < 5)
+        return (ELEM_FOOD);
     for (size_t i = 0; i < TOTAL_INVENTORY; ++i) {
         if (this->_inventory[i] < ELEVATION_REQUIREMENT[this->_playerLevel][i])
             return (i);
     }
-    if (this->_inventory[ELEM_FOOD] < 5)
-        return (ELEM_FOOD);
+    if (this->_playersReady != ELEVATION_REQUIREMENT[this->_playerLevel][ELEM_PLAYER])
+        return (ELEM_PLAYER);
     if (!this->setObjectForElevation(this->_playerLevel))
         return (-1);
-    if (!this->elevation())
-        return (-2);
-    return (TOTAL_INVENTORY);
+    return (TOTAL_ELEM_ON_TILE);
+}
+
+void ZappyAI::storeMessage(std::string str)
+{
+    _messages.push_back(str);
+    std::cout << str << std::endl;
+}
+
+void ZappyAI::readMessageBuffer()
+{
+    while (_messages.size() != 0){
+        readMessage(_messages.back());
+        _messages.pop_back();
+    }
+}
+
+void ZappyAI::readMessage(std::string msg)
+{
+    std::istringstream iss(msg);
+    std::string prompt;
+    int direction;
+    char commas;
+    std::string message;
+
+    iss >> prompt >> direction >> commas >> message;
+    readSignal(message, direction);
+}
+
+void ZappyAI::readSignal(std::string msg, int direction)
+{
+    std::string uncipheredMsg(msg);
+    uncipherStr(uncipheredMsg);
+    std::istringstream iss(uncipheredMsg);
+    char prompt;
+    int sender;
+    int recever;
+    int status;
+    int parameter;
+
+    iss >> prompt >> sender >> recever >> status >> parameter;
+    if (prompt != '!' || (recever != -1 && recever != _playerId))
+        return;
+    if (status == lookingForElevation && _friendID == -1){
+        if (parameter == _playerLevel){
+            _friendID = sender;
+            if (!sendSignal(_friendID, comingForElevation, _playerLevel))
+                _friendID = -1;
+        }
+    }
+    else if (status == comingForElevation){
+        if (_friendID == -1){
+            _friendID = sender;
+            _master = true;
+        } else if (_friendID != sender)
+            sendSignal(sender, alreadySomeone, _playerLevel);
+        sendSignal(_friendID, waitingForElevation, _playerLevel);
+    }
+    else if (status == waitingForElevation){
+        if (direction == 0)
+            sendSignal(_friendID, readyForElevation, _playerLevel);
+        else{
+            sendSignal(_friendID, comingForElevation, _playerLevel);
+            moveTo(direction);
+        }
+    } else if (status == alreadySomeone){
+        if (sender == _friendID)
+            _friendID = -1;
+    } else if (status == readyForElevation && sender == _friendID){
+        if (_master)
+            _playersReady++;
+        else
+            this->tryElevate();
+    } else if (status == needToGo){
+        if (direction == 0)
+            _playersReady--;
+        else {
+            _friendID = -1,
+            _master = false;
+        }
+    }
+}
+
+bool ZappyAI::sendSignal(int recever, int status, int parameter)
+{
+    return (broadcast("!" + std::to_string(this->_playerId) + " " + std::to_string(recever) + " " +
+    std::to_string(status) + " " + std::to_string(parameter)));
+}
+
+void ZappyAI::moveTo(int direction)
+{
+    int orientation = DIR_NORTH;
+
+    if (direction == 2 || direction == 1 || direction == 8)
+        this->forward();
+    if (direction >= 2 && direction <= 4){
+        orientation = DIR_WEST;
+        this->left();
+        this->forward();
+    } if (direction >= 6 && direction <= 8){
+        orientation = DIR_EAST;
+        this->right();
+        this->forward();
+    } if (direction >= 4 && direction <= 6){
+        if (orientation == DIR_WEST)
+            this->left();
+        else if (orientation == DIR_EAST)
+            this->right();
+        else
+            this->turn180();
+        this->forward();
+    }
 }
