@@ -7,11 +7,10 @@
 
 #include "ZappyAIParam.hpp"
 
-int paramHelp(const std::vector<std::string> &argvList, std::size_t &argPos, ZappyAI &targetClass)
+
+
+int paramHelp(__attribute__((unused))const std::vector<std::string> &argvList, __attribute__((unused))std::size_t &argPos, __attribute__((unused))ZappyAI &targetClass)
 {
-    (void)argvList;
-    (void)argPos;
-    (void)targetClass;
 
     std::cout << "USAGE: ./zappy_ai -p port -n name -h machine" << std::endl;
     std::cout << "\tport\tis the port number" << std::endl;

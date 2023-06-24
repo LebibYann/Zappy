@@ -8,6 +8,7 @@
 #pragma once
 
 #include <string>
+#include <iostream>
 
 #include "c_zappy_protocol.h"
 
