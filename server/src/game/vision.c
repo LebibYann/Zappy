@@ -13,76 +13,19 @@ static int get_fov_size(int player_level)
     return player_level * player_level;
 }
 
-static tile_t *get_north_tiles(map_t *map, client_t *player)
+static tile_t *get_tiles(map_t *map, client_t *player, int dx, int dy)
 {
     tile_t *fov = malloc(sizeof(tile_t) * get_fov_size(player->level));
-    int i = 1;
+    int i = 0;
 
     if (!fov)
         return NULL;
 
-    fov[0] = map->tiles[player->position.y][player->position.x];
-    for (int y = 1; y < player->level; y++) {
-        for (int x = -y; x <= y; x++) {
-            fov[i] = map->tiles[player->position.y - y][player->position.x + x];
-            i++;
-        }
-    }
-
-    return fov;
-}
-
-static tile_t *get_east_tiles(map_t *map, client_t *player)
-{
-    tile_t *fov = malloc(sizeof(tile_t) * get_fov_size(player->level));
-    int i = 1;
-
-    if (!fov)
-        return NULL;
-
-    fov[0] = map->tiles[player->position.y][player->position.x];
-    for (int x = 1; x < player->level; x++) {
-        for (int y = -x; y <= x; y++) {
-            fov[i] = map->tiles[player->position.y + y][player->position.x + x];
-            i++;
-        }
-    }
-
-    return fov;
-}
-
-static tile_t *get_south_tiles(map_t *map, client_t *player)
-{
-    tile_t *fov = malloc(sizeof(tile_t) * get_fov_size(player->level));
-    int i = 1;
-
-    if (!fov)
-        return NULL;
-
-    fov[0] = map->tiles[player->position.y][player->position.x];
-    for (int y = 1; y < player->level; y++) {
-        for (int x = y; x >= -y; x--) {
-            fov[i] = map->tiles[player->position.y + y][player->position.x + x];
-            i++;
-        }
-    }
-
-    return fov;
-}
-
-static tile_t *get_west_tiles(map_t *map, client_t *player)
-{
-    tile_t *fov = malloc(sizeof(tile_t) * get_fov_size(player->level));
-    int i = 1;
-
-    if (!fov)
-        return NULL;
-
-    fov[0] = map->tiles[player->position.y][player->position.x];
-    for (int x = 1; x < player->level; x++) {
-        for (int y = x; y >= -x; y--) {
-            fov[i] = map->tiles[player->position.y + y][player->position.x - x];
-            i++;
+    for (int depth = 0; depth < player->level; depth++) {
+        for (int width = -depth; width <= depth; width++) {
+            int y = player->position.y + dy * ((dx != dy) ? depth : width);
+            int x = player->position.x + dy * ((dx != dy) ? width : depth);
+            fov[i++] = map->tiles[y][x];
         }
     }
 
@@ -93,16 +36,16 @@ tile_t *look_around(map_t *map, client_t *player)
 {
     switch (player->orientation) {
     case NORTH:
-        return get_north_tiles(map, player);
+        return get_tiles(map, player, 1, -1);
         break;
     case EAST:
-        return get_east_tiles(map, player);
+        return get_tiles(map, player, 1, 1);
         break;
     case SOUTH:
-        return get_south_tiles(map, player);
+        return get_tiles(map, player, -1, 1);
         break;
     case WEST:
-        return get_west_tiles(map, player);
+        return get_tiles(map, player, -1, -1);
         break;
     default:
         return NULL;
