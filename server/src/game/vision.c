@@ -89,7 +89,7 @@ static tile_t *get_west_tiles(map_t *map, client_t *player)
     return fov;
 }
 
-tile_t *look(map_t *map, client_t *player)
+static tile_t *look_direction(map_t *map, client_t *player)
 {
     switch (player->orientation) {
     case NORTH:
@@ -108,4 +108,20 @@ tile_t *look(map_t *map, client_t *player)
         return NULL;
         break;
     }
+}
+
+tile_t *look(map_t *map, client_t *player)
+{
+    struct timespec start, now;
+    tile_t *fov;
+
+    timespec_get(&start, TIME_UTC);
+    timespec_get(&now, TIME_UTC);
+
+    fov = look_direction(map, player);
+
+    while (now.tv_sec - start.tv_sec < 7)
+        timespec_get(&now, TIME_UTC);
+
+    return fov;
 }

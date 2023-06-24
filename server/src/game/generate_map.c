@@ -36,6 +36,8 @@ void allocate_map(map_t *map)
         map->tiles[i] = calloc(map->w, sizeof(tile_t));
         if (!map->tiles[i])
             return;
+        for (int j = 0; j < map->w; j++)
+            map->tiles[i][j].players = NULL;
     }
 }
 
