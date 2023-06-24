@@ -12,32 +12,31 @@
 
 void drawGround(sf::RenderWindow &window, t_gameInfo &gameInfo)
 {
-    sf::RectangleShape ground(sf::Vector2f(TILE_SIZE, TILE_SIZE));
+    sf::RectangleShape ground(sf::Vector2f(gameInfo.tileSizeX, gameInfo.tileSizeY));
     sf::Vector2f pos(0, 0);
 
     ground.setFillColor(sf::Color::Green);
-    for (int i = 0; i < gameInfo.mapSize[1]; ++i) {
-        for (int j = 0; j < gameInfo.mapSize[0]; ++j) {
-            pos.x = i * TILE_SIZE;
-            pos.y = j * TILE_SIZE;
+    for (int i = 0; i < gameInfo.mapSize[0]; ++i) {
+        for (int j = 0; j < gameInfo.mapSize[1]; ++j) {
+            pos.x = i * gameInfo.tileSizeX;
+            pos.y = j * gameInfo.tileSizeY;
             ground.setPosition(pos);
             window.draw(ground);
         }
     }
 }
 
-void drawFood(sf::RenderWindow &window, t_gameInfo &gameInfo, ImageBank &imageBank)
+void drawRss(sf::RenderWindow &window, t_gameInfo &gameInfo, ImageBank &imageBank)
 {
-    sf::Sprite sprite;
-    sprite = imageBank.getRssSprite(0);
- 
     for (size_t i = 0; i < gameInfo.map.size(); ++i) {
         for (size_t j = 0; j < gameInfo.map[i].size(); ++j) {
-            if (gameInfo.map[j][i][0] > 0) {
-                sprite.setPosition(j * TILE_SIZE, i * TILE_SIZE);
-                window.draw(sprite);
+            for (size_t k = 0; k < TOTAL_INVENTORY; k++){
+                if (gameInfo.map[i][j][k] > 0) {
+                    sf::Sprite sprite = imageBank.getRssSprite(k);
+                    sprite.setPosition(i * gameInfo.tileSizeX, j * gameInfo.tileSizeY);
+                    window.draw(sprite);
+                }
             }
-
         }
     }
 }
@@ -45,7 +44,7 @@ void drawFood(sf::RenderWindow &window, t_gameInfo &gameInfo, ImageBank &imageBa
 void drawEggs(sf::RenderWindow &window, t_gameInfo &gameInfo)
 {
     for (size_t i = 0; i < gameInfo.eggs.size(); ++i) {
-        gameInfo.eggs[i].sprite.setPosition(gameInfo.eggs[i].x * TILE_SIZE, gameInfo.eggs[i].y * TILE_SIZE);
+        gameInfo.eggs[i].sprite.setPosition(gameInfo.eggs[i].x * gameInfo.tileSizeX, gameInfo.eggs[i].y * gameInfo.tileSizeY);
         window.draw(gameInfo.eggs[i].sprite);
     }
 }
@@ -53,7 +52,7 @@ void drawEggs(sf::RenderWindow &window, t_gameInfo &gameInfo)
 void drawPlayers(sf::RenderWindow &window, t_gameInfo &gameInfo)
 {
     for (size_t i = 0; i < gameInfo.players.size(); ++i) {
-        gameInfo.players[i].sprite.setPosition(gameInfo.players[i].x * TILE_SIZE, gameInfo.players[i].y * TILE_SIZE);
+        gameInfo.players[i].sprite.setPosition(gameInfo.players[i].x * gameInfo.tileSizeX, gameInfo.players[i].y * gameInfo.tileSizeY);
         window.draw(gameInfo.players[i].sprite);
     }
 }
@@ -63,7 +62,7 @@ void drawElements(sf::RenderWindow &window, t_gameInfo &gameInfo, ImageBank &ima
     if (gameInfo.gameOver == true)
         return;
     drawGround(window, gameInfo);
-    drawFood(window, gameInfo, imageBank);
+    drawRss(window, gameInfo, imageBank);
     drawEggs(window, gameInfo);
     drawPlayers(window, gameInfo);
 }

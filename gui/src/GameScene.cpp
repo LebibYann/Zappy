@@ -13,9 +13,9 @@ GameScene::GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGU
 {
     t_zp_guiProtocol pkg;
 
-    sleep(1);
     this->_protocol.receivePackage(pkg);
     this->_protocol.receivePackage(pkg);
+
     _gameInfo.mapSize = {pkg.args[0], pkg.args[1]};
     _gameInfo.map.resize(_gameInfo.mapSize[0]);
     for (int x = 0; x < _gameInfo.mapSize[0]; ++x){
@@ -23,6 +23,15 @@ GameScene::GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGU
         for (int y = 0; y < _gameInfo.mapSize[1]; ++y)
             _gameInfo.map[x][y].resize(TOTAL_INVENTORY);
     };
+    double tileSizeWithWidth = this->_window.getSize().x / _gameInfo.mapSize[0];
+    double tileSizeWithHeight = this->_window.getSize().y / _gameInfo.mapSize[1];
+    if (tileSizeWithWidth < tileSizeWithHeight) {
+        _gameInfo.tileSizeX = tileSizeWithWidth;
+        _gameInfo.tileSizeY = tileSizeWithWidth;
+    } else {
+        _gameInfo.tileSizeX = tileSizeWithHeight;
+        _gameInfo.tileSizeY = tileSizeWithHeight;
+    }
     _gameInfo.mapContent = {};
     _gameInfo.players = {};
     _gameInfo.eggs = {};

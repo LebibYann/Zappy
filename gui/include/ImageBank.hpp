@@ -16,6 +16,7 @@ class ImageBank {
     public:
         ImageBank();
         ~ImageBank();
+        void rescaleTexture(float x, float y);
         sf::Sprite &getIdleSprite(int index);
         sf::Sprite &getIncantSprite(int index);
         sf::Sprite &getLayingSprite(int index);
@@ -32,7 +33,7 @@ class ImageBank {
         std::vector<sf::Texture> _eggTexture;
         std::vector<sf::Texture> _rssTexture;
         std::vector<sf::Texture> _groundTexture;
-        
+
         std::vector<sf::Sprite> _idleSprites;
         std::vector<sf::Sprite> _incantSprites;
         std::vector<sf::Sprite> _layingSprites;

@@ -9,7 +9,7 @@
 
 
 ImageBank::ImageBank()
-{    
+{
     _idleTexture.resize(3);
     _idleTexture[0].loadFromFile("assets/idle1.png");
     _idleTexture[1].loadFromFile("assets/idle2.png");

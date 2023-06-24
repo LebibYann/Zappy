@@ -48,6 +48,8 @@ typedef struct s_gameInfo {
     std::vector<t_playerStruct> players;
     std::vector<t_eggStruct> eggs;
     std::vector<std::string> teamNames;
+    float tileSizeX;
+    float tileSizeY;
     int nbrTeams;
     bool gameOver;
 } t_gameInfo;
@@ -68,7 +70,7 @@ private:
     ZappyProtocolGUI &_protocol;
     Client &_connection;
     ImageBank &_imageBank;
-
+    sf::RectangleShape _tileSize;
 
     sf::Music _music;
     sf::Font _font;
