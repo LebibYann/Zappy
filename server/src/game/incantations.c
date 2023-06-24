@@ -78,15 +78,19 @@ void start_incantation(tile_t *tile, client_t *player)
 
     timespec_get(&player->incantation_start, TIME_UTC);
     player->incantation = true;
+    zp_server_ai_send_package(&player->data, "Elevation underway\n");
 }
 
 bool complete_incantation(tile_t *tile, client_t *player, int frequency)
 {
+    char response[32];
     struct timespec now;
     long elapsed_time;
 
-    if (!player->incantation)
+    if (!player->incantation){
+        zp_server_ai_send_basic_package(&player->data, RESPONSE_KO);
         return false;
+    }
 
     timespec_get(&now, TIME_UTC);
     elapsed_time = (now.tv_sec - player->incantation_start.tv_sec) * 1000
@@ -98,5 +102,7 @@ bool complete_incantation(tile_t *tile, client_t *player, int frequency)
     remove_stones(tile, player);
     player->level++;
     player->incantation = false;
+    sprintf(response, "Current level: %d\n", player->level);
+    zp_server_ai_send_package(&player->data, response);
     return true;
 }
