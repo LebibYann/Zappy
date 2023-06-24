@@ -20,17 +20,14 @@ static void signal_handler(int signl_num)
 
 void run_server(server_t *server)
 {
-    struct timespec timing;
     server->run = true;
     server_cpy_addr = server;
     signal(SIGINT, signal_handler);
 
     while (server->run) {
-        clock_start(&timing);
         while (zp_detect_new_connection(server->fd))
             add_new_client(server);
         handle_clients(server);
         remove_disconnected_client(&(server->client_list));
-        clock_delay(&timing, 4);
     }
 }

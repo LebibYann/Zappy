@@ -12,17 +12,14 @@ client_t *client, t_zp_ai_to_serv_data *command)
 {
     size_t i = 0;
 
-    printf("oh\n");
     if (!zp_server_ai_receive_package(&(client->data), command))
         return (false);
     for (; i < ZP_TOTAL_AI_CMD; ++i) {
         if (command->cmd_type == AI_CLI_COMMANDS[i].id)
             break;
     }
-    if (AI_CLI_COMMANDS[i].tick == 0)
-        return (true);
     if (add_command_to_pending_list(
-    client->pending_list, command, AI_CLI_COMMANDS[i].tick))
+    &(client->pending_list), command, AI_CLI_COMMANDS[i].tick))
         zp_server_ai_clear_protocol_struct(command);
     return (false);
 }
@@ -33,5 +30,5 @@ int frequency)
     if (receive_last_package(client, command))
         return (true);
     return (get_ready_command_from_pending_list(
-        client->pending_list, command, frequency));
+        &(client->pending_list), command, frequency));
 }
