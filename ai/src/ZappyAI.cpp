@@ -334,6 +334,13 @@ void ZappyAI::surviveBehaviour(void)
                 // std::cout << relPos.x << " " << relPos.y << " " << this->_direction << std::endl;
                 this->moveTowardRelativeCoord(relPos);
                 this->takeAll(ELEM_FOOD);
+                while (!ON_RELATIVE_TILE(relPos) && this->_alive) {
+                    // std::cout << relPos.x << " " << relPos.y << " " << this->_direction << std::endl;
+                    std::cout << "survive caca" << std::endl;
+                    this->moveTowardRelativeCoord(relPos);
+                    this->takeAll(ELEM_FOOD);
+            }
+        
             }
         } else {
             this->moveRandom(this->_targetPos);
@@ -370,12 +377,13 @@ void ZappyAI::run(void)
     while (this->_alive) {
         if (PRINT_ACTION)
             std::cout << "LOOP START" << std::endl;
-        this->inventory();
-        if (this->_inventory[ELEM_FOOD] < 4)
-            this->surviveBehaviour();
-        if (this->_inventory[ELEM_FOOD] < 30)
-            this->takeAll(ELEM_FOOD);
         seekedItem = tryElevate();
+        if (seekedItem == ELEM_FOOD)
+            this->surviveBehaviour();
+        // if (this->_inventory[ELEM_FOOD] < 30)
+        //     this->takeAll(ELEM_FOOD);
+        if (seekedItem == TOTAL_ELEM_ON_TILE)
+            this->elevation();
         this->elevationBehaviour(static_cast<enum e_elemOnTile>(seekedItem));
         this->readMessageBuffer();
     }
@@ -839,19 +847,17 @@ int ZappyAI::tryElevate(void)
     if (PRINT_ACTION)
         std::cout << "Try elevate" << std::endl;
     this->inventory();
+    if (this->_inventory[ELEM_FOOD] < 5)
+        return (ELEM_FOOD);
     for (size_t i = 0; i < TOTAL_INVENTORY; ++i) {
         if (this->_inventory[i] < ELEVATION_REQUIREMENT[this->_playerLevel][i])
             return (i);
     }
-    if (this->_inventory[ELEM_FOOD] < 5)
-        return (ELEM_FOOD);
+    if (this->_playersReady != ELEVATION_REQUIREMENT[this->_playerLevel][ELEM_PLAYER])
+        return (ELEM_PLAYER);
     if (!this->setObjectForElevation(this->_playerLevel))
         return (-1);
-    if (_playersReady < ELEVATION_REQUIREMENT[this->_playerLevel][ELEM_PLAYER])
-        sendSignal(-1, lookingForElevation, _playerLevel);
-    if (!this->elevation())
-        return (-2);
-    return (TOTAL_INVENTORY);
+    return (TOTAL_ELEM_ON_TILE);
 }
 
 void ZappyAI::storeMessage(std::string str)

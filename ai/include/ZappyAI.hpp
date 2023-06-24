@@ -156,8 +156,7 @@ class ZappyAI {
         //teamplay
         bool _master = false;
         int _friendID = -1;
-        int _playersToHave;
-        int _playersReady;
+        int _playersReady = 1;
 
         // Look data
         bool _lookDone = false;
