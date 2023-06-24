@@ -28,3 +28,8 @@ void set_object_down(tile_t *tile, client_t *player, int resource)
 
     zp_server_ai_send_basic_package(&player->data, RESPONSE_OK);
 }
+
+void inventory(client_t *player)
+{
+    (void)player;
+}

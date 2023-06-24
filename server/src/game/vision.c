@@ -89,7 +89,7 @@ static tile_t *get_west_tiles(map_t *map, client_t *player)
     return fov;
 }
 
-tile_t *look(map_t *map, client_t *player)
+tile_t *look_around(map_t *map, client_t *player)
 {
     switch (player->orientation) {
     case NORTH:

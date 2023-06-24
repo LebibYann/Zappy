@@ -27,11 +27,13 @@ static void remove_player_on_tile(tile_t *tile, client_t *player)
     player_list_t *prev = NULL;
 
     while (tmp) {
-        if (tmp->client == player) {
-            if (prev)
-                prev->next = tmp->next;
-            else
-                tile->players = tmp->next;
+        if (tmp->client == player && prev) {
+            prev->next = tmp->next;
+            free(tmp);
+            return;
+        }
+        if (tmp->client == player && !prev) {
+            tile->players = tmp->next;
             free(tmp);
             return;
         }
