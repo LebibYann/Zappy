@@ -7,7 +7,7 @@
 
 #include "zappy_server.h"
 
-void take_object(tile_t *tile, client_t *player, int resource, int frequency)
+void take_object(tile_t *tile, client_t *player, int resource)
 {
     if (tile->resources[resource] == 0) {
         //ko

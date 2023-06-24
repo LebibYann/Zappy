@@ -82,7 +82,7 @@ static void update_player_position(map_t *map, client_t *player)
         player->position.y = map->h - 1;
 }
 
-void forward(map_t *map, client_t *player, int frequency)
+void forward(map_t *map, client_t *player)
 {
     tile_t *tile;
 
