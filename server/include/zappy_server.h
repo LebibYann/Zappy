@@ -28,6 +28,7 @@
 #include "c_zappy_protocol.h"
 #include "zappy_client.h"
 #include "zappy_client_handling.h"
+#include "zappy_pending_command.h"
 
 typedef struct parameter_s {
     char *parameter;
@@ -38,6 +39,9 @@ void init_server(server_t *server);
 int open_server(int port, int queue);
 void run_server(server_t *server);
 void close_server(server_t *server);
+
+int get_client_count_in_team(const char *team,
+struct client_list_s *client_list);
 
 int read_parameters(server_t *server, int ac, char **av);
 int set_port(server_t *server, int *index, int ac, char **av);

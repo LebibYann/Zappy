@@ -73,6 +73,7 @@ int ZappyProtocol::getlineWait(std::string &output)
     }
     if (str == nullptr)
         return (1);
+    std::cout << "AI RECEIVED COMMAND: " << str << std::endl;
     output = str;
     free(str);
     return (0);

@@ -10,11 +10,11 @@
 
 void handle_ai_clients(server_t *server, client_t *client)
 {
-    char *line;
-    (void)server;
+    t_zp_ai_to_serv_data command;
 
-    zp_exchange_data(&(client->data), HANDLE_NO_WAIT, HANDLE_IGNORE);
-    if ((line = zp_getline_pending_data(&(client->data))) == NULL)
-        return;
-    free(line);
+    zp_server_ai_init_protocol_struct(&command);
+    while (get_pending_command(client, &command, server->frequency)) {
+        zp_server_ai_send_basic_package(&(client->data), RESPONSE_OK);
+        zp_server_ai_clear_protocol_struct(&command);
+    }
 }

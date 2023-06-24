@@ -10,17 +10,9 @@
 
 void getTileContent(t_gameInfo &gameInfo, t_zp_guiProtocol package)
 {
-    std::vector<int> tile;
-
-    for (int i = 0; i < 9; ++i)
-        tile.push_back(package.args[i]);
-    gameInfo.map.push_back(tile);
-}
-
-void getMapContent(t_gameInfo &gameInfo, t_zp_guiProtocol package)
-{
-    for (int i = 0; i < 9; ++i)
-        gameInfo.mapContent.push_back(package.args[i]);
+    gameInfo.map[package.args[0]][package.args[1]] =
+    {package.args[2], package.args[3], package.args[4], package.args[5], package.args[6],
+    package.args[7], package.args[8]};
 }
 
 void getTeamName(t_gameInfo &gameInfo, t_zp_guiProtocol package)
@@ -157,50 +149,68 @@ void endGame(t_gameInfo &gameInfo)
     gameInfo.gameOver = true;
 }
 
-t_gameInfo analysePackages(std::vector<t_zp_guiProtocol> packages)
+void GameScene::refreshPackages(std::vector<t_zp_guiProtocol> packages)
 {
-    t_gameInfo gameInfo;
 
     for (size_t i = 0; i < packages.size(); ++i) {
-        if (packages[i].cmdType == ZP_MSZ) {
-            gameInfo.mapSize.push_back(packages[i].args[0]);
-            gameInfo.mapSize.push_back(packages[i].args[1]);
-        } else if (packages[i].cmdType == ZP_BCT)
-            getTileContent(gameInfo, packages[i]);
-        else if (packages[i].cmdType == ZP_MCT)
-            getMapContent(gameInfo, packages[i]);
-        else if (packages[i].cmdType == ZP_TNA)
-            getTeamName(gameInfo, packages[i]);
-        else if (packages[i].cmdType == ZP_PNW)
-            getPlayerInfo(gameInfo, packages[i]);
-        else if (packages[i].cmdType == ZP_PPO)
-            changePlayerPos(gameInfo, packages[i]);
-        else if (packages[i].cmdType == ZP_PLV)
-            changePlayerLvl(gameInfo, packages[i]);
-        else if (packages[i].cmdType == ZP_PBC)
-            std::cout << "Broadcast: " << packages[i].str << std::endl;
-        else if (packages[i].cmdType == ZP_PIC)
-            playIncantationAnimation(gameInfo, packages[i]);
-        else if (packages[i].cmdType == ZP_PIE)
-            endIncantationAnimation(gameInfo, packages[i]);
-        else if (packages[i].cmdType == ZP_PFK)
-            eggLaying(gameInfo, packages[i]);
-        else if (packages[i].cmdType == ZP_PDR)
-            playSoundDrop(gameInfo, packages[i]);
-        else if (packages[i].cmdType == ZP_PGT)
-            playSoundCollect(gameInfo, packages[i]);
-        else if (packages[i].cmdType == ZP_PDI)
-            playerDeath(gameInfo, packages[i]);
-        else if (packages[i].cmdType == ZP_ENW)
-            playerStopEggLaying(gameInfo, packages[i]);
-        else if (packages[i].cmdType == ZP_EBO)
-            eggConnection(gameInfo, packages[i]);
-        else if (packages[i].cmdType == ZP_EDI)
-            eggDeath(gameInfo, packages[i]);
-        else if (packages[i].cmdType == ZP_SEG)
-            endGame(gameInfo);
-        else if (packages[i].cmdType == ZP_SMG)
-            std::cout << "Server message: " << packages[i].str << std::endl;
+        switch (packages[i].cmdType) {
+            case ZP_MSZ:
+                _gameInfo.mapSize[0] = packages[i].args[0];
+                _gameInfo.mapSize[1] = packages[i].args[1];
+                break;
+            case ZP_BCT:
+                getTileContent(_gameInfo, packages[i]);
+                break;
+            case ZP_TNA:
+                getTeamName(_gameInfo, packages[i]);
+                break;
+            case ZP_PNW:
+                getPlayerInfo(_gameInfo, packages[i]);
+                break;
+            case ZP_PPO:
+                changePlayerPos(_gameInfo, packages[i]);
+                break;
+            case ZP_PLV:
+                changePlayerLvl(_gameInfo, packages[i]);
+                break;
+            case ZP_PBC:
+                std::cout << "Broadcast: " << packages[i].str << std::endl;
+                break;
+            case ZP_PIC:
+                playIncantationAnimation(_gameInfo, packages[i]);
+                break;
+            case ZP_PIE:
+                endIncantationAnimation(_gameInfo, packages[i]);
+                break;
+            case ZP_PFK:
+                eggLaying(_gameInfo, packages[i]);
+                break;
+            case ZP_PDR:
+                playSoundDrop(_gameInfo, packages[i]);
+                break;
+            case ZP_PGT:
+                playSoundCollect(_gameInfo, packages[i]);
+                break;
+            case ZP_PDI:
+                playerDeath(_gameInfo, packages[i]);
+                break;
+            case ZP_ENW:
+                playerStopEggLaying(_gameInfo, packages[i]);
+                break;
+            case ZP_EBO:
+                eggConnection(_gameInfo, packages[i]);
+                break;
+            case ZP_EDI:
+                eggDeath(_gameInfo, packages[i]);
+                break;
+            case ZP_SEG:
+                endGame(_gameInfo);
+                break;
+            case ZP_SMG:
+                std::cout << "Server message: " << packages[i].str << std::endl;
+                break;
+            default:
+                break;
+        }
     }
-    return (gameInfo);
 }
