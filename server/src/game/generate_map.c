@@ -7,35 +7,41 @@
 
 #include "zappy_server.h"
 
-void generate_resource(tile_t **map, int w, int h, int resource)
+void generate_resource(map_t *map, int resource)
 {
     int x, y;
 
-    for (int i = 0; i < w * h * resource_densities[resource]; i++) {
-        x = rand() % w;
-        y = rand() % h;
+    for (int i = 0; i < map->w * map->h * resource_densities[resource]; i++) {
+        x = rand() % map->w;
+        y = rand() % map->h;
 
-        map[y][x].resources[resource] += 1;
+        map->tiles[y][x].resources[resource] += 1;
     }
 }
 
-void generate_map(tile_t **map, int w, int h)
+void generate_map(map_t *map)
 {
     for (int resource = 0; resource < RESOURCES_COUNT; resource++)
-        generate_resource(map, w, h, resource);
+        generate_resource(map, resource);
 }
 
-tile_t **initialize_map(int w, int h)
+void allocate_map(map_t *map)
 {
-    tile_t **map = malloc(sizeof(tile_t *) * h);
+    map->tiles = malloc(sizeof(tile_t *) * map->h);
 
-    if (!map)
-        return (NULL);
+    if (!map->tiles)
+        return;
 
-    for (int i = 0; i < h; i++) {
-        map[i] = calloc(w, sizeof(tile_t));
-        if (!map[i])
-            return (NULL);
+    for (int i = 0; i < map->h; i++) {
+        map->tiles[i] = calloc(map->w, sizeof(tile_t));
+        if (!map->tiles[i])
+            return;
     }
-    return (map);
+}
+
+void initialize_map(map_t *map, int w, int h)
+{
+    map->w = w;
+    map->h = h;
+    map->tiles = NULL;
 }

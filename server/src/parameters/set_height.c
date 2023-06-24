@@ -13,8 +13,8 @@ int set_height(server_t *server, int *index, int ac, char **av)
         fprintf(stderr,  "./server: option requires an argument -- '%s'\n", "-y");
         return (-1);
     }
-    server->height = atoi(av[*index]);
-    if (server->height < 10 || server->height > 30){
+    server->map.h = atoi(av[*index]);
+    if (server->map.h < 10 || server->map.h > 30){
         fprintf(stderr, "-x option only accepts integer values between 10 and 30\n");
         return (-1);
     }
