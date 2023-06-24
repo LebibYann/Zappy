@@ -29,7 +29,7 @@ void drawGround(sf::RenderWindow &window, t_gameInfo &gameInfo)
 void drawFood(sf::RenderWindow &window, t_gameInfo &gameInfo, ImageBank &imageBank)
 {
     sf::Sprite sprite;
-    sprite.setTexture(imageBank.getRssSprite(0));
+    sprite = imageBank.getRssSprite(0);
  
     for (size_t i = 0; i < gameInfo.map.size(); ++i) {
         for (size_t j = 0; j < gameInfo.map[i].size(); ++j) {

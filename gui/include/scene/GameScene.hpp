@@ -54,7 +54,7 @@ typedef struct s_gameInfo {
 
 class GameScene: public IScene {
 public:
-    GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGUI &protocol, Client &connection);
+    GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGUI &protocol, Client &connection, ImageBank &_imageBank);
     ~GameScene();
 
     void loadScene();
@@ -67,7 +67,7 @@ private:
     sf::Event &_event;
     ZappyProtocolGUI &_protocol;
     Client &_connection;
-    ImageBank _imageBank;
+    ImageBank &_imageBank;
 
 
     sf::Music _music;
@@ -80,4 +80,4 @@ private:
 };
 
 std::vector<std::string> analyseArgs(int ac, char **av);
-void drawElements(sf::RenderWindow &window, t_gameInfo &gameInfo);
+void drawElements(sf::RenderWindow &window, t_gameInfo &gameInfo, ImageBank &imageBank);

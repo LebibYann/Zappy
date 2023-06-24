@@ -7,99 +7,111 @@
 
 #include "ImageBank.hpp"
 
+
 ImageBank::ImageBank()
-{
-    sf::Texture texture;
+{    
+    _idleTexture.resize(3);
+    _idleTexture[0].loadFromFile("assets/idle1.png");
+    _idleTexture[1].loadFromFile("assets/idle2.png");
+    _idleTexture[2].loadFromFile("assets/idle3.png");
+    _idleSprites.resize(3);
+    _idleSprites[0].setTexture(_idleTexture[0]);
+    _idleSprites[1].setTexture(_idleTexture[1]);
+    _idleSprites[2].setTexture(_idleTexture[2]);
 
-    texture.loadFromFile("assets/idle1.png");
-    _idleSprites.push_back(texture);
-    texture.loadFromFile("assets/idle2.png");
-    _idleSprites.push_back(texture);
-    texture.loadFromFile("assets/idle3.png");
-    _idleSprites.push_back(texture);
+    _incantTexture.resize(3);
+    _incantTexture[0].loadFromFile("assets/incant1.png");
+    _incantTexture[1].loadFromFile("assets/incant2.png");
+    _incantTexture[2].loadFromFile("assets/incant3.png");
+    _incantSprites.resize(3);
+    _incantSprites[0].setTexture(_incantTexture[0]);
+    _incantSprites[1].setTexture(_incantTexture[1]);
+    _incantSprites[2].setTexture(_incantTexture[2]);
 
-    texture.loadFromFile("assets/incant1.png");
-    _incantSprites.push_back(texture);
-    texture.loadFromFile("assets/incant2.png");
-    _incantSprites.push_back(texture);
-    texture.loadFromFile("assets/incant3.png");
-    _incantSprites.push_back(texture);
+    _layingTexture.resize(3);
+    _layingTexture[0].loadFromFile("assets/incant1.png");
+    _layingTexture[1].loadFromFile("assets/incant2.png");
+    _layingTexture[2].loadFromFile("assets/incant3.png");
+    _layingSprites.resize(3);
+    _layingSprites[0].setTexture(_layingTexture[0]);
+    _layingSprites[1].setTexture(_layingTexture[1]);
+    _layingSprites[2].setTexture(_layingTexture[2]);
 
-    texture.loadFromFile("assets/incant1.png");
-    _layingSprites.push_back(texture);
-    texture.loadFromFile("assets/incant2.png");
-    _layingSprites.push_back(texture);
-    texture.loadFromFile("assets/incant3.png");
-    _layingSprites.push_back(texture);
+    _deadTexture.resize(3);
+    _deadTexture[0].loadFromFile("assets/dead1.png");
+    _deadTexture[1].loadFromFile("assets/dead2.png");
+    _deadTexture[2].loadFromFile("assets/dead3.png");
+    _deadSprites.resize(3);
+    _deadSprites[0].setTexture(_deadTexture[0]);
+    _deadSprites[1].setTexture(_deadTexture[1]);
+    _deadSprites[2].setTexture(_deadTexture[2]);
 
-    texture.loadFromFile("assets/dead1.png");
-    _deadSprites.push_back(texture);
-    texture.loadFromFile("assets/dead2.png");
-    _deadSprites.push_back(texture);
-    texture.loadFromFile("assets/dead3.png");
-    _deadSprites.push_back(texture);
+    _eggTexture.resize(3);
+    _eggTexture[0].loadFromFile("assets/egg.png");
+    _eggTexture[1].loadFromFile("assets/eggCracked.png");
+    _eggTexture[2].loadFromFile("assets/eggBroken.png");
+    _eggSprites.resize(3);
+    _eggSprites[0].setTexture(_eggTexture[0]);
+    _eggSprites[1].setTexture(_eggTexture[1]);
+    _eggSprites[2].setTexture(_eggTexture[2]);
 
-    texture.loadFromFile("assets/egg.png");
-    _eggSprites.push_back(texture);
-    texture.loadFromFile("assets/eggCracked.png");
-    _eggSprites.push_back(texture);
-    texture.loadFromFile("assets/eggBroken.png");
-    _eggSprites.push_back(texture);
+    _rssTexture.resize(7);
+    _rssTexture[0].loadFromFile("assets/food.png");
+    _rssTexture[1].loadFromFile("assets/linemate.png");
+    _rssTexture[2].loadFromFile("assets/deraumere.png");
+    _rssTexture[3].loadFromFile("assets/sibur.png");
+    _rssTexture[4].loadFromFile("assets/mendiane.png");
+    _rssTexture[5].loadFromFile("assets/phiras.png");
+    _rssTexture[6].loadFromFile("assets/thystame.png");
+    _rssSprites.resize(7);
+    _rssSprites[0].setTexture(_rssTexture[0]);
+    _rssSprites[1].setTexture(_rssTexture[1]);
+    _rssSprites[2].setTexture(_rssTexture[2]);
+    _rssSprites[3].setTexture(_rssTexture[3]);
+    _rssSprites[4].setTexture(_rssTexture[4]);
+    _rssSprites[5].setTexture(_rssTexture[5]);
+    _rssSprites[6].setTexture(_rssTexture[6]);
 
-    texture.loadFromFile("assets/food.png");
-    _rssSprites.push_back(texture);
-    texture.loadFromFile("assets/linemate.png");
-    _rssSprites.push_back(texture);
-    texture.loadFromFile("assets/deraumere.png");
-    _rssSprites.push_back(texture);
-    texture.loadFromFile("assets/sibur.png");
-    _rssSprites.push_back(texture);
-    texture.loadFromFile("assets/mendiane.png");
-    _rssSprites.push_back(texture);
-    texture.loadFromFile("assets/phiras.png");
-    _rssSprites.push_back(texture);
-    texture.loadFromFile("assets/thystame.png");
-    _rssSprites.push_back(texture);
 
     //texture.loadFromFile("assets/ground.png");
-    //_groundSprites.push_back(texture);
+    //_groundTexture.push_back(texture);
 }
 
 ImageBank::~ImageBank()
 {
 }
 
-sf::Texture ImageBank::getIdleSprite(int index)
+sf::Sprite &ImageBank::getIdleSprite(int index)
 {
     return _idleSprites[index];
 }
 
-sf::Texture ImageBank::getIncantSprite(int index)
+sf::Sprite &ImageBank::getIncantSprite(int index)
 {
     return _incantSprites[index];
 }
 
-sf::Texture ImageBank::getLayingSprite(int index)
+sf::Sprite &ImageBank::getLayingSprite(int index)
 {
     return _layingSprites[index];
 }
 
-sf::Texture ImageBank::getDeadSprite(int index)
+sf::Sprite &ImageBank::getDeadSprite(int index)
 {
     return _deadSprites[index];
 }
 
-sf::Texture ImageBank::getEggSprite(int index)
+sf::Sprite &ImageBank::getEggSprite(int index)
 {
     return _eggSprites[index];
 }
 
-sf::Texture ImageBank::getRssSprite(int index)
+sf::Sprite &ImageBank::getRssSprite(int index)
 {
     return _rssSprites[index];
 }
 
-sf::Texture ImageBank::getGroundSprite(int index)
+sf::Sprite &ImageBank::getGroundSprite(int index)
 {
     return _groundSprites[index];
 }

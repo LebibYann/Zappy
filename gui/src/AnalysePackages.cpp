@@ -46,7 +46,7 @@ void getPlayerInfo(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &_i
         player.eggLaying = false;
         player.isIncanting = false;
         player.isDead = false;
-        player.sprite.setTexture(_imageBank.getIdleSprite(player.level - 1));
+        player.sprite = _imageBank.getIdleSprite(player.level - 1);
         gameInfo.players.push_back(player);
     }
 }
@@ -67,7 +67,7 @@ void changePlayerLvl(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &
     for (size_t i = 0; i < gameInfo.players.size(); ++i) {
         if (gameInfo.players[i].id == package.args[0]) {
             gameInfo.players[i].level = package.args[1];
-            gameInfo.players[i].sprite.setTexture(_imageBank.getIdleSprite(gameInfo.players[i].level - 1));
+            gameInfo.players[i].sprite = _imageBank.getIdleSprite(gameInfo.players[i].level - 1);
         }
     }
 }
@@ -77,7 +77,7 @@ void playIncantationAnimation(t_gameInfo &gameInfo, t_zp_guiProtocol package, Im
     for (size_t i = 0; i < gameInfo.players.size(); ++i) {
         if (gameInfo.players[i].id == package.args[0]) {
             gameInfo.players[i].isIncanting = true;
-            gameInfo.players[i].sprite.setTexture(_imageBank.getIncantSprite(gameInfo.players[i].level - 1));
+            gameInfo.players[i].sprite = _imageBank.getIncantSprite(gameInfo.players[i].level - 1);
         }
     }
 }
@@ -87,7 +87,7 @@ void endIncantationAnimation(t_gameInfo &gameInfo, t_zp_guiProtocol package, Ima
     for (size_t i = 0; i < gameInfo.players.size(); ++i) {
         if (gameInfo.players[i].id == package.args[0]) {
             gameInfo.players[i].isIncanting = false;
-            gameInfo.players[i].sprite.setTexture(_imageBank.getIdleSprite(gameInfo.players[i].level - 1));
+            gameInfo.players[i].sprite = _imageBank.getIdleSprite(gameInfo.players[i].level - 1);
         }
     }
 }
@@ -97,7 +97,7 @@ void eggLaying(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &_image
     for (size_t i = 0; i < gameInfo.players.size(); ++i) {
         if (gameInfo.players[i].id == package.args[0]) {
             gameInfo.players[i].eggLaying = true;
-            gameInfo.players[i].sprite.setTexture(_imageBank.getLayingSprite(gameInfo.players[i].level - 1));
+            gameInfo.players[i].sprite = _imageBank.getLayingSprite(gameInfo.players[i].level - 1);
         }
     }
 }
@@ -109,13 +109,13 @@ void playerStopEggLaying(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBa
     for (size_t i = 0; i < gameInfo.players.size(); ++i) {
         if (gameInfo.players[i].id == package.args[1]) {
             gameInfo.players[i].eggLaying = false;
-            gameInfo.players[i].sprite.setTexture(_imageBank.getIdleSprite(gameInfo.players[i].level - 1));
+            gameInfo.players[i].sprite = _imageBank.getIdleSprite(gameInfo.players[i].level - 1);
             egg.id = package.args[0];
             egg.x = package.args[2];
             egg.y = package.args[3];
             egg.isDead = false;
             egg.isHatching = false;
-            egg.sprite.setTexture(_imageBank.getEggSprite(0));
+            egg.sprite = _imageBank.getEggSprite(0);
             gameInfo.eggs.push_back(egg);
         }
     }
@@ -126,7 +126,7 @@ void eggConnection(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &_i
     for (size_t i = 0; i < gameInfo.eggs.size(); ++i) {
         if (gameInfo.eggs[i].id == package.args[0]) {
             gameInfo.eggs[i].isHatching = true;
-            gameInfo.eggs[i].sprite.setTexture(_imageBank.getEggSprite(1));
+            gameInfo.eggs[i].sprite = _imageBank.getEggSprite(1);
         }
     }
 }
@@ -136,7 +136,7 @@ void eggDeath(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &_imageB
     for (size_t i = 0; i < gameInfo.eggs.size(); ++i) {
         if (gameInfo.eggs[i].id == package.args[0]) {
             gameInfo.eggs[i].isDead = true;
-            gameInfo.eggs[i].sprite.setTexture(_imageBank.getEggSprite(2));
+            gameInfo.eggs[i].sprite = _imageBank.getEggSprite(2);
         }
     }
 }
@@ -158,7 +158,7 @@ void playerDeath(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &_ima
     for (size_t i = 0; i < gameInfo.players.size(); ++i) {
         if (gameInfo.players[i].id == package.args[0]) {
             gameInfo.players[i].isDead = true;
-            gameInfo.players[i].sprite.setTexture(_imageBank.getDeadSprite(gameInfo.players[i].level - 1));
+            gameInfo.players[i].sprite = _imageBank.getDeadSprite(gameInfo.players[i].level - 1);
         }
     }
 }

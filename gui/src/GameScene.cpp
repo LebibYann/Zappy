@@ -8,8 +8,8 @@
 #include "GameScene.hpp"
 #include "ZappyProtocolGUI.hpp"
 
-GameScene::GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGUI &protocol, Client &connection)
-: _window(window), _event(event), _protocol(protocol), _connection(connection)
+GameScene::GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGUI &protocol, Client &connection, ImageBank &imageBank)
+: _window(window), _event(event), _protocol(protocol), _connection(connection), _imageBank(imageBank)
 {
     t_zp_guiProtocol pkg;
 
@@ -84,7 +84,7 @@ void GameScene::run()
     while (_protocol.receivePackage(package) == 0)
         packages.push_back(package);
     refreshPackages(packages);
-    drawElements(_window, _gameInfo);
+    drawElements(_window, _gameInfo, _imageBank);
 }
 
 bool GameScene::setConnection(std::string ip, std::string port)
