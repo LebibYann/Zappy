@@ -32,8 +32,7 @@ typedef struct s_zp_gui_pair {
 extern const t_zp_gui_pair GUI_PAIR[];
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 /**

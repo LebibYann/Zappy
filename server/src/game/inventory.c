@@ -7,22 +7,37 @@
 
 #include "zappy_server.h"
 
-void take_object(tile_t *tile, client_t *player, int resource, int frequency)
+void take_object(tile_t *tile, client_t *player, int resource)
 {
-    struct timespec start, now;
-    int time = 7 / frequency;
+    if (tile->resources[resource] == 0)
+        return zp_server_ai_send_basic_package(&player->data, RESPONSE_KO);
 
-    timespec_get(&start, TIME_UTC);
-    timespec_get(&now, TIME_UTC);
-
-    if (tile->resources[resource] == 0) {
-        //ko
-        return;
-    }
     tile->resources[resource]--;
     player->inventory[resource]++;
 
-    while (now.tv_sec - start.tv_sec < time)
-        timespec_get(&now, TIME_UTC);
-    //ok
+    zp_server_ai_send_basic_package(&player->data, RESPONSE_OK);
+}
+
+void set_object_down(tile_t *tile, client_t *player, int resource)
+{
+    if (player->inventory[resource] == 0)
+        return zp_server_ai_send_basic_package(&player->data, RESPONSE_KO);
+
+    tile->resources[resource]++;
+    player->inventory[resource]--;
+
+    zp_server_ai_send_basic_package(&player->data, RESPONSE_OK);
+}
+
+void inventory(client_t *player)
+{
+    char response[256] = {0};
+
+    sprintf(response, "[food %d, linemate %d, deraumere %d, sibur %d, "
+                      "mendiane %d, phiras %d, thystame %d]\n",
+            player->inventory[FOOD],
+            player->inventory[LINEMATE], player->inventory[DERAUMERE],
+            player->inventory[SIBUR], player->inventory[MENDIANE],
+            player->inventory[PHIRAS], player->inventory[THYSTAME]);
+    zp_server_ai_send_package(&player->data, response);
 }

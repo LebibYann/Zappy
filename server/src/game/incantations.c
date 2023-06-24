@@ -8,13 +8,16 @@
 #include "zappy_server.h"
 #include "zappy_incantations.h"
 
-static bool verify_player_incantation(tile_t *tile, int level)
+static bool verify_player_incantation(tile_t *tile, const int level, const char *team)
 {
     int player_count = 0;
     player_list_t *player_list = tile->players;
+    client_t *player = NULL;
 
     while (player_list) {
-        player_list->client->level >= level ? player_count++ : 0;
+        player = player_list->client;
+        if (player->level >= level && strcmp(player->team, team) == 0)
+            player_count++;
         if (player_count >= INCANTATIONS[level - 1].prerequisites[0])
             return true;
         player_list = player_list->next;
@@ -23,7 +26,7 @@ static bool verify_player_incantation(tile_t *tile, int level)
     return false;
 }
 
-static bool verify_stone_incantation(tile_t *tile, int level)
+static bool verify_stone_incantation(tile_t *tile, const int level)
 {
     int stone_count = 0;
 
@@ -45,7 +48,7 @@ static bool verify_incantation(tile_t *tile, client_t *player)
         return false;
     }
 
-    if (!verify_player_incantation(tile, player_level)) {
+    if (!verify_player_incantation(tile, player_level, player->team)) {
         fprintf(stderr, "Player %d does not have the necessary players.\n",
             player->data.fd);
         return false;
@@ -68,22 +71,38 @@ void remove_stones(tile_t *tile, client_t *player)
     player->incantation = false;
 }
 
-void start_incantation(tile_t **tiles, client_t *player, int frequency)
+void start_incantation(tile_t *tile, client_t *player)
 {
-    struct timespec start, now;
-    int time = 300 / frequency;
-    tile_t *tile = &tiles[player->position.y][player->position.x];
-
     if (!verify_incantation(tile, player))
         return;
 
-    timespec_get(&start, TIME_UTC);
-    timespec_get(&now, TIME_UTC);
+    timespec_get(&player->incantation_start, TIME_UTC);
     player->incantation = true;
+    zp_server_ai_send_package(&player->data, "Elevation underway\n");
+}
 
-    while (now.tv_nsec - start.tv_nsec < time)
-        timespec_get(&now, TIME_UTC);
+bool complete_incantation(tile_t *tile, client_t *player, int frequency)
+{
+    char response[32];
+    struct timespec now;
+    long elapsed_time;
+
+    if (!player->incantation){
+        zp_server_ai_send_basic_package(&player->data, RESPONSE_KO);
+        return false;
+    }
+
+    timespec_get(&now, TIME_UTC);
+    elapsed_time = (now.tv_sec - player->incantation_start.tv_sec) * 1000
+        + (now.tv_nsec - player->incantation_start.tv_nsec) / 1000000;
+
+    if (elapsed_time < (300 / frequency))
+        return false;
+
     remove_stones(tile, player);
-    if (player->incantation)
-        player->level++;
+    player->level++;
+    player->incantation = false;
+    sprintf(response, "Current level: %d\n", player->level);
+    zp_server_ai_send_package(&player->data, response);
+    return true;
 }

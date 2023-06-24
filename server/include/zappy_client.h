@@ -33,6 +33,7 @@ typedef struct client_s {
     int level;
     const char *team;
     struct timespec last_meal;
+    struct timespec incantation_start;
     bool dead;
     bool incantation;
     bool egg;
