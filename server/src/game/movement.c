@@ -7,16 +7,18 @@
 
 #include "zappy_server.h"
 
-void turn_right(client_t *client)
+void turn_right(client_t *player)
 {
-    client->orientation = (client->orientation + 1) % 4;
+    player->orientation = (player->orientation + 1) % 4;
+    zp_server_ai_send_basic_package(&player->data, RESPONSE_OK);
 }
 
-void turn_left(client_t *client)
+void turn_left(client_t *player)
 {
-    client->orientation = (client->orientation - 1) % 4;
-    if (client->orientation < 0)
-        client->orientation = 3;
+    player->orientation = (player->orientation - 1) % 4;
+    if (player->orientation < 0)
+        player->orientation = 3;
+    zp_server_ai_send_basic_package(&player->data, RESPONSE_OK);
 }
 
 static void remove_player_on_tile(tile_t *tile, client_t *player)
@@ -93,4 +95,5 @@ void forward(map_t *map, client_t *player)
 
     tile = &map->tiles[player->position.y][player->position.x];
     add_player_on_tile(tile, player);
+    zp_server_ai_send_basic_package(&player->data, RESPONSE_OK);
 }

@@ -8,13 +8,16 @@
 #include "zappy_server.h"
 #include "zappy_incantations.h"
 
-static bool verify_player_incantation(tile_t *tile, int level)
+static bool verify_player_incantation(tile_t *tile, int level, char *team)
 {
     int player_count = 0;
     player_list_t *player_list = tile->players;
+    client_t *player = NULL;
 
     while (player_list) {
-        player_list->client->level >= level ? player_count++ : 0;
+        player = player_list->client;
+        if (player->level >= level && strcmp(player->team, team) == 0)
+            player_count++;
         if (player_count >= INCANTATIONS[level - 1].prerequisites[0])
             return true;
         player_list = player_list->next;
