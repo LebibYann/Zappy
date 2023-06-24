@@ -28,13 +28,13 @@ bool ZappyProtocolGUI::sendPackage(enum e_zp_command cmd_type, ...)
     return (out);
 }
 
-int ZappyProtocolGUI::receivePackage(t_zp_guiProtocol &pkg)
+int ZappyProtocolGUI::receivePackage(t_zp_guiProtocol &pkg, bool wait)
 {
     int out;
     t_zp_gui_protocol cPkg;
 
     zp_gui_init_protocol_struct(&cPkg);
-    out = zp_gui_receive_package(&(this->_data), &cPkg, SERVER_SENT);
+    out = zp_gui_receive_package(&(this->_data), &cPkg, SERVER_SENT, wait);
     if (out < 0) {
         zp_gui_clear_protocol_struct(&cPkg);
         return (out);

@@ -10,29 +10,22 @@
 #include <iostream>
 #include <unistd.h>
 
-#include "Framerate.hpp"
 #include "ZappyProtocolGUI.hpp"
-#include "SceneManager.hpp"
 #include "GameScene.hpp"
 
 int main(int ac, char **av)
 {
     srand(time(nullptr));
 
-    Framerate fps;
     sf::Event event;
     sf::RenderWindow window(sf::VideoMode(1280, 720), "Reverse");
     Client connection;
     std::vector<std::string> connectionID = analyseArgs(ac - 1, &av[1]);
     connection.Connect(connectionID[0], atoi(connectionID[1].c_str()));
-    ZappyProtocolGUI protocol(69);
+    ZappyProtocolGUI protocol(connection.FD());
     protocol.setFd(connection.FD());
+    protocol.sendPackage(ZP_GRAPHIC);
     GameScene gameScene(window, event, protocol, connection);
-
-    SceneManager scene;
-    scene.addMenu("GameScene", &gameScene);
-    scene.changeMenu("GameScene");
-
 
     while (window.isOpen()) {
         window.pollEvent(event);
@@ -41,10 +34,8 @@ int main(int ac, char **av)
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
             window.close();
         window.clear();
-        scene.display();
+        gameScene.run();
         window.display();
-        fps.capFramerate();
-        fps.printLog();
     }
     return 0;
 }

@@ -10,6 +10,7 @@
 #include <sys/queue.h>
 
 #include "c_zappy_protocol.h"
+#include "zappy_pending_command_struct.h"
 
 typedef enum client_category_e {
     CATEGORY_UNKNOWN,
@@ -35,6 +36,7 @@ typedef struct client_s {
     bool dead;
     bool incantation;
     bool egg;
+    struct pending_command_list_s pending_list;
     LIST_ENTRY(client_s) other_clients;
 }   client_t;
 
@@ -51,20 +53,6 @@ enum orientation_e {
     SOUTH,
     WEST
 };
-
-/*
-** EPITECH PROJECT, 2023
-** server
-** File description:
-** zappy_client
-*/
-
-#pragma once
-
-
-
-
-
 
 client_t *new_client_struct(int fd);
 

@@ -29,13 +29,14 @@ static enum e_zp_command get_command_type(char *line)
 {
     char *cmd = strtok(line, " ");
 
-    for (size_t i = ZP_AI_START_CMD; i < ZP_TOTAL_AI_CMD; ++i) {
-        if (strcmp(cmd, AI_CLI_COMMANDS->name) == 0) {
-            free(cmd);
+    if (cmd == NULL)
+        return (ZP_END);
+    for (size_t i = 0; i < ZP_TOTAL_AI_CMD; ++i) {
+        if (strcmp(cmd, AI_CLI_COMMANDS[i].name) == 0) {
+            line[strlen(cmd)] = ' ';
             return ((enum e_zp_command) i);
         }
     }
-    free(cmd);
     return (ZP_END);
 }
 
@@ -46,6 +47,7 @@ t_zp_ai_to_serv_data *zp_ais_data)
 
     if ((line = zp_getline_pending_data(zp_pending_d)) == NULL)
         return (false);
+    line[strlen(line) - 1] = ' ';
     zp_server_ai_clear_protocol_struct(zp_ais_data);
     zp_ais_data->cmd_type = get_command_type(line);
     if (zp_ais_data->cmd_type == ZP_END) {

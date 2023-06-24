@@ -18,7 +18,7 @@ char *getline_in_custom_fd(t_custom_fd *c_fd)
         return (NULL);
     ++i;
     line = (char*) malloc((i + 1) * sizeof(char));
-    read_in_custom_fd(c_fd, line, i + 1);
+    read_in_custom_fd(c_fd, line, i);
     if (i > 0)
         line[i - 1] = '\n';
     line[i] = '\0';

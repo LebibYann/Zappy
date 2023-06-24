@@ -47,7 +47,7 @@ public:
      ** @return int 0 on success, -1 if no data has been received,
      ** -2 if the command receive is unknown, -3 if parameters are invalid.
      */
-    int receivePackage(t_zp_guiProtocol &pkg);
+    int receivePackage(t_zp_guiProtocol &pkg, bool wait = false);
 protected:
 private:
 };

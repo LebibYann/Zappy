@@ -37,13 +37,12 @@ enum resources_e {
     THYSTAME
 };
 
-typedef struct tile_s {
-    int resources[RESOURCES_COUNT];
-    struct player_list_s *players;
-}   tile_t;
+struct map_s;
 
-tile_t **initialize_map(int w, int h);
+void initialize_map(struct map_s *map, int w, int h);
 
-void generate_map(tile_t **map, int w, int h);
+void allocate_map(struct map_s *map);
 
-void generate_resource(tile_t **map, int w, int h, int resource);
+void generate_map(struct map_s *map);
+
+void generate_resource(struct map_s *map, int resource);
