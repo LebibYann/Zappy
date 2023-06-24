@@ -19,47 +19,29 @@
 #include <time.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <signal.h>
 
 #include "str_split.h"
+#include "zappy_client.h"
 #include "zappy_resources.h"
 #include "clock.h"
+#include "c_zappy_protocol.h"
+#include "zappy_client.h"
+#include "zappy_client_handling.h"
+#include "zappy_pending_command.h"
 
-typedef struct parameter_s
-{
+typedef struct parameter_s {
     char *parameter;
     int (*f)();
 } parameter_t;
 
-typedef struct server_s {
-    int fd;
-    int port;
-    int width;
-    int height;
-    char **teams;
-    int nclients;
-    int frequency;
-    fd_set read_sockets;
-    fd_set write_sockets;
-    tile_t **map;
-}   server_t;
-
-typedef struct client_s {
-    int fd;
-    int x;
-    int y;
-    int orientation;
-    int inventory[7];
-    int level;
-    char *team;
-    bool dead;
-    bool evolving;
-    bool egg;
-}   client_t;
-
 void init_server(server_t *server);
 int open_server(int port, int queue);
-bool handle_client(server_t *server);
-int handle_connexion(server_t *server);
+void run_server(server_t *server);
+void close_server(server_t *server);
+
+int get_client_count_in_team(const char *team,
+struct client_list_s *client_list);
 
 int read_parameters(server_t *server, int ac, char **av);
 int set_port(server_t *server, int *index, int ac, char **av);

@@ -10,14 +10,12 @@
 static bool str_is_int(const char *str)
 {
     size_t len = strlen(str);
-    size_t i = 0;
 
-    for (; i < len && (str[i] == '-' || str[i] == '+'); ++i);
-    if (i >= len)
-        return (false);
-    for (; i < len; ++i) {
-        if (('0' < str[i] || '9' > str[i]))
+    for (size_t i = 0; i < len && str[i] != '\n'; ++i) {
+        if (str[i] < '0' || str[i] > '9') {
+            printf("ha %c\n", str[i]);
             return (false);
+        }
     }
     return (true);
 }
@@ -26,7 +24,6 @@ static bool add_param(t_zp_gui_protocol *pkg, char *param)
 {
     if (!str_is_int(param)) {
         free(pkg->args);
-        free(param);
         pkg->args = NULL;
         pkg->nbr_args = 0;
         return (false);
@@ -42,12 +39,10 @@ char *param, char *next_param)
 {
     if (next_param != NULL) {
         if (!add_param(pkg, param)) {
-            free(next_param);
             return (-1);
         }
-        free(param);
     } else {
-        pkg->str = param;
+        pkg->str = strdup(param);
     }
     return (0);
 }
@@ -59,7 +54,6 @@ int zp_gui_int_end_str_parser(char *cmd_line, t_zp_gui_protocol *pkg)
 
     if (param == NULL)
         return (-1);
-    free(param);
     zp_gui_clear_protocol_struct(pkg);
     param = strtok(NULL, " ");
     while (param != NULL) {

@@ -8,11 +8,21 @@
 #include "GameScene.hpp"
 #include "ZappyProtocolGUI.hpp"
 
-GameScene::GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGUI &protocol)
-: _window(window), _event(event), _protocol(protocol)
+GameScene::GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGUI &protocol, Client &connection)
+: _window(window), _event(event), _protocol(protocol), _connection(connection)
 {
-    _gameInfo.mapSize = {};
-    _gameInfo.map = {};
+    t_zp_guiProtocol pkg;
+
+    sleep(1);
+    this->_protocol.receivePackage(pkg);
+    this->_protocol.receivePackage(pkg);
+    _gameInfo.mapSize = {pkg.args[0], pkg.args[1]};
+    _gameInfo.map.resize(_gameInfo.mapSize[0]);
+    for (int x = 0; x < _gameInfo.mapSize[0]; ++x){
+        _gameInfo.map[x].resize(_gameInfo.mapSize[1]);
+        for (int y = 0; y < _gameInfo.mapSize[1]; ++y)
+            _gameInfo.map[x][y].resize(TOTAL_INVENTORY);
+    };
     _gameInfo.mapContent = {};
     _gameInfo.players = {};
     _gameInfo.eggs = {};
@@ -61,28 +71,6 @@ void GameScene::unloadScene()
     _music.stop();
 }
 
-void drawElements(sf::RenderWindow &window, t_gameInfo &gameInfo)
-{
-    if (gameInfo.gameOver == true)
-        return;
-    for (size_t i = 0; i < gameInfo.eggs.size(); ++i) {
-        sf::RectangleShape egg(sf::Vector2f(50, 50));
-        sf::Vector2f pos(gameInfo.eggs[i].x * 50, gameInfo.eggs[i].y * 50);
-
-        egg.setFillColor(sf::Color::Green);
-        egg.setPosition(pos);
-        window.draw(egg);
-    }
-    for (size_t i = 0; i < gameInfo.players.size(); ++i) {
-        sf::RectangleShape player(sf::Vector2f(50, 50));
-        sf::Vector2f pos(gameInfo.players[i].x * 50, gameInfo.players[i].y * 50);
-
-        player.setFillColor(sf::Color::Blue);
-        player.setPosition(pos);
-        window.draw(player);
-    }
-}
-
 void GameScene::run()
 {
     std::vector<t_zp_guiProtocol> packages;
@@ -95,6 +83,15 @@ void GameScene::run()
     */
     while (_protocol.receivePackage(package) == 0)
         packages.push_back(package);
-    _gameInfo = analysePackages(packages);
+    refreshPackages(packages);
     drawElements(_window, _gameInfo);
+}
+
+bool GameScene::setConnection(std::string ip, std::string port)
+{
+    if (!_connection.Connect(ip, atoi(port.c_str()))) {
+        error("Error: Connection failed");
+        exit(84);
+    }
+    return (true);
 }

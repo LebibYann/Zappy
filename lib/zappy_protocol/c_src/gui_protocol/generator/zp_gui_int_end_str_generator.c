@@ -9,7 +9,8 @@
 
 static char *append_end_str(char *buf, char *str)
 {
-    buf = (char*) realloc(buf, strlen(buf) + strlen(str) + 2);
+    buf = (char*) realloc(buf, strlen(buf) + strlen(str) + 3);
+    strcat(buf, " ");
     strcat(buf, str);
     strcat(buf, "\n");
     return (buf);

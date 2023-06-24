@@ -12,6 +12,8 @@
 #include <iostream>
 #include <unistd.h>
 #include <vector>
+#include <map>
+#include <string>
 
 #include "IScene.hpp"
 #include "ZappyProtocolGUI.hpp"
@@ -38,7 +40,7 @@ typedef struct s_eggStruct {
 
 typedef struct s_gameInfo {
     std::vector<int> mapSize;
-    std::vector<std::vector<int>> map;
+    std::vector<std::vector<std::vector<int>>> map;
     std::vector<int> mapContent;
     std::vector<t_playerStruct> players;
     std::vector<t_eggStruct> eggs;
@@ -49,17 +51,21 @@ typedef struct s_gameInfo {
 
 class GameScene: public IScene {
 public:
-    GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGUI &protocol);
+    GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGUI &protocol, Client &connection);
     ~GameScene();
 
     void loadScene();
     void unloadScene();
     void run();
-
+    bool setConnection(std::string ip, std::string port);
+    void refreshPackages(std::vector<t_zp_guiProtocol> packages);
 private:
     sf::RenderWindow &_window;
     sf::Event &_event;
     ZappyProtocolGUI &_protocol;
+    Client &_connection;
+
+
     sf::Music _music;
     sf::Font _font;
     std::vector<sf::Sprite> _spriteDraw;
@@ -69,4 +75,5 @@ private:
     t_gameInfo _gameInfo;
 };
 
-t_gameInfo analysePackages(std::vector<t_zp_guiProtocol> packages);
+std::vector<std::string> analyseArgs(int ac, char **av);
+void drawElements(sf::RenderWindow &window, t_gameInfo &gameInfo);

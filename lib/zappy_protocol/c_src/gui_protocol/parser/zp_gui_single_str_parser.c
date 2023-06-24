@@ -13,9 +13,8 @@ int zp_gui_single_str_parser(char *cmd_line, t_zp_gui_protocol *pkg)
 
     if (param == NULL)
         return (-1);
-    free(param);
     zp_gui_clear_protocol_struct(pkg);
     if ((param = strtok(NULL, " ")) != NULL)
-        pkg->str = param;
+        pkg->str = strdup(param);
     return (0);
 }
