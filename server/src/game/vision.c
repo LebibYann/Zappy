@@ -122,4 +122,6 @@ tile_t *look(map_t *map, client_t *player)
 
     while (now.tv_sec - start.tv_sec < 7)
         timespec_get(&now, TIME_UTC);
+
+    return fov;
 }
