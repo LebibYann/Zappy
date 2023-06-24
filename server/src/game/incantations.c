@@ -68,22 +68,32 @@ void remove_stones(tile_t *tile, client_t *player)
     player->incantation = false;
 }
 
-void start_incantation(tile_t **tiles, client_t *player, int frequency)
+void start_incantation(tile_t *tile, client_t *player)
 {
-    struct timespec start, now;
-    int time = 300 / frequency;
-    tile_t *tile = &tiles[player->position.y][player->position.x];
-
     if (!verify_incantation(tile, player))
         return;
 
-    timespec_get(&start, TIME_UTC);
-    timespec_get(&now, TIME_UTC);
+    timespec_get(&player->incantation_start, TIME_UTC);
     player->incantation = true;
+}
 
-    while (now.tv_nsec - start.tv_nsec < time)
-        timespec_get(&now, TIME_UTC);
+bool complete_incantation(tile_t *tile, client_t *player, int frequency)
+{
+    struct timespec now;
+    long elapsed_time;
+
+    if (!player->incantation)
+        return false;
+
+    timespec_get(&now, TIME_UTC);
+    elapsed_time = (now.tv_sec - player->incantation_start.tv_sec) * 1000
+        + (now.tv_nsec - player->incantation_start.tv_nsec) / 1000000;
+
+    if (elapsed_time < (300 / frequency))
+        return false;
+
     remove_stones(tile, player);
-    if (player->incantation)
-        player->level++;
+    player->level++;
+    player->incantation = false;
+    return true;
 }
