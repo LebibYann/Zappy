@@ -122,7 +122,7 @@ bool ZappyAI::checkServerPackage(void)
     std::string data;
 
     std::cout << "Checking server..." << std::endl;
-    if (this->_communication.getlineTimeout(data, 1) != 0)
+    if (this->_communication.getlineWait(data) != 0)
         return (false);
     if (data.compare(SERVER_EXPECTED_PACKAGE) != 0) {
         std::cerr << "Wrong package received, expecting \"WELCOME\\n\"." << std::endl;
@@ -140,7 +140,7 @@ bool ZappyAI::joinTeam(void)
     this->_communication.writeData(this->_name + "\n", this->_name.length() + 1);
     this->_communication.refresh();
     this->_communication.refresh();
-    if (this->_communication.getlineTimeout(data, 1) != 0)
+    if (this->_communication.getlineWait(data) != 0)
         return (false);
     data[data.length() - 1] = '\0';
     if (!strIsDigit(data) || atoi(data.c_str()) < 0) {
@@ -160,7 +160,7 @@ bool ZappyAI::initMap(void)
     int mapY;
 
     std::cout << "Getting map size..." << std::endl;
-    if (this->_communication.getlineTimeout(data, 1) != 0)
+    if (this->_communication.getlineWait(data) != 0)
         return (false);
     line.str(data);
     getline(line, data, ' ');
@@ -275,7 +275,7 @@ void ZappyAI::uncipherStr(std::string &str)
     }
 }
 
-int ZappyAI::handlePackageReception(enum e_AIResponse expectedResponse, std::string &str)
+int ZappyAI::handlePackageReception(enum AIResponse_e expectedResponse, std::string &str)
 {
     int out;
 
@@ -314,7 +314,7 @@ void ZappyAI::setRessourceToHave(void)
     }
 }
 
-int ZappyAI::handlePackageReception(enum e_AIResponse expectedResponse)
+int ZappyAI::handlePackageReception(enum AIResponse_e expectedResponse)
 {
     std::string str;
 
@@ -365,7 +365,6 @@ void ZappyAI::elevationBehaviour(enum e_elemOnTile seekedItem)
 void ZappyAI::run(void)
 {
     int seekedItem;
-    (void)seekedItem;
 
     this->_playerId = rand();
     while (this->_alive) {

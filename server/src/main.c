@@ -10,14 +10,14 @@
 int main(int ac, char **av)
 {
     server_t server;
+    // struct timespec timing;
 
     init_server(&server);
     if (read_parameters(&server, ac, av) == -1)
         return (84);
     if ((server.fd = open_server(server.port, 5)) < 0)
         return (84);
-    // FD_SET(server.fd, &server.current_sockets);
-    while (handle_client(&server));
-    close(server.fd);
+    run_server(&server);
+    close_server(&server);
     return (0);
 }

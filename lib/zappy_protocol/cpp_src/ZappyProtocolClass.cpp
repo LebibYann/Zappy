@@ -9,38 +9,32 @@
 
 ZappyProtocol::ZappyProtocol(int fd)
 {
-    FD_ZERO(&(this->_readSocket));
-    FD_ZERO(&(this->_writeSocket));
     zp_init_pending_data_struct(&(this->_data), fd);
 }
 
 ZappyProtocol::ZappyProtocol()
 {
-    FD_ZERO(&(this->_readSocket));
-    FD_ZERO(&(this->_writeSocket));
     zp_init_pending_data_struct(&(this->_data), -1);
 }
 
 ZappyProtocol::~ZappyProtocol()
 {
     zp_clear_pending_data_struct(&(this->_data));
-    FD_CLR(this->_data.fd, &(this->_readSocket));
-    FD_CLR(this->_data.fd, &(this->_writeSocket));
 }
 
 ssize_t ZappyProtocol::refresh(void)
 {
-    return (zp_exchange_data(&(this->_data), &(this->_readSocket), &(this->_writeSocket)));
+    return (zp_exchange_data(&(this->_data), HANDLE_NO_WAIT, HANDLE_NO_WAIT));
 }
 
 ssize_t ZappyProtocol::receive(void)
 {
-    return (zp_exchange_data(&(this->_data), &(this->_readSocket), NULL));
+    return (zp_exchange_data(&(this->_data), HANDLE_NO_WAIT, HANDLE_IGNORE));
 }
 
 ssize_t ZappyProtocol::send(void)
 {
-    return (zp_exchange_data(&(this->_data), NULL, &(this->_writeSocket)));
+    return (zp_exchange_data(&(this->_data), HANDLE_IGNORE, HANDLE_NO_WAIT));
 }
 
 void ZappyProtocol::readData(std::string &data, size_t size)
@@ -68,9 +62,9 @@ bool ZappyProtocol::zpGetline(std::string &output)
     return (true);
 }
 
-int ZappyProtocol::getlineTimeout(std::string &output, int timeout)
+int ZappyProtocol::getlineWait(std::string &output)
 {
-    char *str = zp_getline_timeout_pending_data(&(this->_data), timeout, this->_readSocket);
+    char *str = zp_getline_wait_pending_data(&(this->_data));
 
     if (this->_data.disconnected) {
         if (str != nullptr)
@@ -79,6 +73,7 @@ int ZappyProtocol::getlineTimeout(std::string &output, int timeout)
     }
     if (str == nullptr)
         return (1);
+    std::cout << "AI RECEIVED COMMAND: " << str << std::endl;
     output = str;
     free(str);
     return (0);
@@ -91,12 +86,6 @@ int ZappyProtocol::getFd(void) const
 
 void ZappyProtocol::setFd(int fd)
 {
-    if (this->_data.fd >= 0) {
-        FD_CLR(this->_data.fd, &(this->_readSocket));
-        FD_CLR(this->_data.fd, &(this->_writeSocket));
-    }
     zp_clear_pending_data_struct(&(this->_data));
     zp_init_pending_data_struct(&(this->_data), fd);
-    FD_SET(fd, &(this->_readSocket));
-    FD_SET(fd, &(this->_writeSocket));
 }

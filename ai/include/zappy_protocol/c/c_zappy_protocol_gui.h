@@ -31,6 +31,10 @@ typedef struct s_zp_gui_pair {
 
 extern const t_zp_gui_pair GUI_PAIR[];
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  ** @brief You should call zp_exchange_data() after using this function.
  ** Transform the cmd_type and ... (command arguments)
@@ -43,7 +47,6 @@ extern const t_zp_gui_pair GUI_PAIR[];
  ** @param ... The arguments of the command
  ** @return true on sucess false if the cmd_type is invalid.
  */
-extern "C"
 bool zp_gui_send_package(t_zp_pending_data *pdata, enum e_sender sender,
 enum e_zp_command cmd_type, ...);
 
@@ -59,7 +62,6 @@ enum e_zp_command cmd_type, ...);
  ** @param ... The arguments of the command
  ** @return true on sucess false if the cmd_type is invalid.
  */
-extern "C"
 bool zp_gui_send_package_varg(t_zp_pending_data *pdata, enum e_sender sender,
 enum e_zp_command cmd_type, va_list *args);
 
@@ -73,53 +75,45 @@ enum e_zp_command cmd_type, va_list *args);
  ** @return int 0 on success, -1 if no data has been received,
  ** -2 if the command receive is unknown, -3 if parameters are invalid.
  */
-extern "C"
 int zp_gui_receive_package(t_zp_pending_data *pdata, t_zp_gui_protocol *pkg,
-enum e_sender expected_sender);
+enum e_sender expected_sender, bool wait);
 
 
 // Struct
 
-extern "C"
 void zp_gui_clear_protocol_struct(t_zp_gui_protocol *gui_protocol);
 
-extern "C"
 void zp_gui_init_protocol_struct(t_zp_gui_protocol *gui_protocol);
 
-extern "C"
 t_zp_gui_protocol *zp_gui_new_protocol_struct(void);
 
-extern "C"
 void zp_gui_delete_protocol_struct(t_zp_gui_protocol *gui_protocol);
 
 
 // Find
 
-extern "C"
 const t_zp_gui_pair *zp_gui_find_command(char *cmd_line);
 
-extern "C"
 const t_zp_gui_pair *zp_gui_find_command_from_type(enum e_zp_command cmd_type);
 
 
 // Parsers
 
-extern "C"
 int zp_gui_default_parser(char *cmd_line, t_zp_gui_protocol *pkg);
 
-extern "C"
 int zp_gui_int_end_str_parser(char *cmd_line, t_zp_gui_protocol *pkg);
 
-extern "C"
 int zp_gui_single_str_parser(char *cmd_line, t_zp_gui_protocol *pkg);
 
 
 // Generators
 
-extern "C"
 char *zp_gui_default_generator(const t_zp_gui_pair *pair,
 va_list *args, enum e_sender sender);
 
-extern "C"
 char *zp_gui_int_end_str_generator(const t_zp_gui_pair *pair,
 va_list *args, enum e_sender sender);
+
+#ifdef __cplusplus
+}
+#endif

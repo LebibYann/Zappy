@@ -26,7 +26,7 @@ FLAGS = -g -g3 -Wextra -Wall -W -Werror -lstr_split
 
 #LIB
 LIB_DIRS = ../lib/
-LIB_FLAGS =
+LIB_FLAGS = -lzappy_protocol
 LIB_INCL_PATH = ./include/
 
 #EXCLUDED
@@ -60,7 +60,7 @@ BLINK 	= 	"\033[1;92m"
 SBLINK	= 	"\033[0m"
 INVERT  =	"\033[7m"
 
-SHELL := /bin/sh
+SHELL := /bin/bash
 _ERROR_LOG_EXT_NAME = .errlog
 
 # ---------------------- AUTO GENERATED DATA, DON'T TOUCH ----------------------

@@ -15,5 +15,5 @@ int set_name(server_t *server, int *index, int ac, char **av)
     }
     for (; av[*index][0] != '-' && *index < ac; index++)
         split_insert(&server->teams, strdup(av[*index]), -1);
-    return (0); 
+    return (0);
 }

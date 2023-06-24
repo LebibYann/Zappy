@@ -8,6 +8,7 @@
 #pragma once
 
 #include <string>
+#include <iostream>
 
 #include "c_zappy_protocol.h"
 
@@ -50,16 +51,13 @@ public:
      **
      **
      ** @param output
-     ** @param timeout
      ** @return int 0 on success, 1 if there's nothing to get,
      ** -1 if there's a disconnection
      */
-    int getlineTimeout(std::string &output, int timeout = -1);
+    int getlineWait(std::string &output);
     int getFd(void) const;
     void setFd(int fd);
 
 protected:
     t_zp_pending_data _data;
-    fd_set _readSocket;
-    fd_set _writeSocket;
 };
