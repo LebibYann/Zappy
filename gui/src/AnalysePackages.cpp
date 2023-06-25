@@ -8,6 +8,8 @@
 #include "GameScene.hpp"
 #include <sstream>
 
+#define MAX_EVOLVE 3 - 1
+
 void getTileContent(t_gameInfo &gameInfo, t_zp_guiProtocol package)
 {
     gameInfo.map[package.args[0]][package.args[1]] =
@@ -67,7 +69,8 @@ void changePlayerLvl(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &
     for (size_t i = 0; i < gameInfo.players.size(); ++i) {
         if (gameInfo.players[i].id == package.args[0]) {
             gameInfo.players[i].level = package.args[1];
-            gameInfo.players[i].sprite = _imageBank.getIdleSprite(gameInfo.players[i].level - 1);
+            int level = (gameInfo.players[i].level - 1) > MAX_EVOLVE ? MAX_EVOLVE : gameInfo.players[i].level - 1;
+            gameInfo.players[i].sprite = _imageBank.getIdleSprite(level);
         }
     }
 }
@@ -77,7 +80,8 @@ void playIncantationAnimation(t_gameInfo &gameInfo, t_zp_guiProtocol package, Im
     for (size_t i = 0; i < gameInfo.players.size(); ++i) {
         if (gameInfo.players[i].id == package.args[0]) {
             gameInfo.players[i].isIncanting = true;
-            gameInfo.players[i].sprite = _imageBank.getIncantSprite(gameInfo.players[i].level - 1);
+            int level = (gameInfo.players[i].level - 1) > MAX_EVOLVE ? MAX_EVOLVE : gameInfo.players[i].level - 1;
+            gameInfo.players[i].sprite = _imageBank.getIncantSprite(level);
         }
     }
 }
@@ -87,7 +91,8 @@ void endIncantationAnimation(t_gameInfo &gameInfo, t_zp_guiProtocol package, Ima
     for (size_t i = 0; i < gameInfo.players.size(); ++i) {
         if (gameInfo.players[i].id == package.args[0]) {
             gameInfo.players[i].isIncanting = false;
-            gameInfo.players[i].sprite = _imageBank.getIdleSprite(gameInfo.players[i].level - 1);
+            int level = (gameInfo.players[i].level - 1) > MAX_EVOLVE ? MAX_EVOLVE : gameInfo.players[i].level - 1;
+            gameInfo.players[i].sprite = _imageBank.getIdleSprite(level);
         }
     }
 }
@@ -97,7 +102,8 @@ void eggLaying(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &_image
     for (size_t i = 0; i < gameInfo.players.size(); ++i) {
         if (gameInfo.players[i].id == package.args[0]) {
             gameInfo.players[i].eggLaying = true;
-            gameInfo.players[i].sprite = _imageBank.getLayingSprite(gameInfo.players[i].level - 1);
+            int level = (gameInfo.players[i].level - 1) > MAX_EVOLVE ? MAX_EVOLVE : gameInfo.players[i].level - 1;
+            gameInfo.players[i].sprite = _imageBank.getLayingSprite(level);
         }
     }
 }
@@ -109,7 +115,8 @@ void playerStopEggLaying(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBa
     for (size_t i = 0; i < gameInfo.players.size(); ++i) {
         if (gameInfo.players[i].id == package.args[1]) {
             gameInfo.players[i].eggLaying = false;
-            gameInfo.players[i].sprite = _imageBank.getIdleSprite(gameInfo.players[i].level - 1);
+            int level = (gameInfo.players[i].level - 1) > MAX_EVOLVE ? MAX_EVOLVE : gameInfo.players[i].level - 1;
+            gameInfo.players[i].sprite = _imageBank.getIdleSprite(level);
             egg.id = package.args[0];
             egg.x = package.args[2];
             egg.y = package.args[3];
@@ -158,7 +165,8 @@ void playerDeath(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &_ima
     for (size_t i = 0; i < gameInfo.players.size(); ++i) {
         if (gameInfo.players[i].id == package.args[0]) {
             gameInfo.players[i].isDead = true;
-            gameInfo.players[i].sprite = _imageBank.getDeadSprite(gameInfo.players[i].level - 1);
+            int level = (gameInfo.players[i].level - 1) > MAX_EVOLVE ? MAX_EVOLVE : gameInfo.players[i].level - 1;
+            gameInfo.players[i].sprite = _imageBank.getDeadSprite(level);
             gameInfo.players[i].id = -1;
         }
     }
