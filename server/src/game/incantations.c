@@ -89,16 +89,16 @@ void start_incantation(tile_t *tile, client_t *player)
 void complete_incantation(tile_t *tile, client_t *player, int frequency)
 {
     struct timespec now;
-    long elapsed_time;
+    double elapsed_time;
 
     if (!player->incantation)
         return zp_server_ai_send_basic_package(&player->data, RESPONSE_KO);
 
     timespec_get(&now, TIME_UTC);
-    elapsed_time = (now.tv_sec - player->incantation_start.tv_sec) * 1000
-        + (now.tv_nsec - player->incantation_start.tv_nsec) / 1000000;
+    elapsed_time = (now.tv_sec - player->incantation_start.tv_sec)
+        + ((double) (now.tv_nsec - player->incantation_start.tv_nsec)) / 1e9;
 
-    if (elapsed_time < (300 / frequency) * 1000)
+    if (elapsed_time < (300 / frequency))
         return;
 
     elevate_player(tile, player);

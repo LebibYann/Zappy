@@ -29,7 +29,7 @@ void run_server(server_t *server)
             add_new_client(server);
         handle_clients(server);
         complete_ai_incantation(server);
-        kill_starving_ai(server);
+        food_time_ai(server);
         remove_disconnected_client(&(server->client_list));
     }
 }

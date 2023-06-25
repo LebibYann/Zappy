@@ -52,7 +52,7 @@ int set_nclients(server_t *server, int *index, int ac, char **av);
 int set_frequency(server_t *server, int *index, int ac, char **av);
 
 void complete_ai_incantation(server_t *server);
-void kill_starving_ai(server_t *server);
+void food_time_ai(server_t *server);
 
 void remove_player_on_tile(tile_t *tile, client_t *player);
 void add_player_on_tile(tile_t *tile, client_t *player);
