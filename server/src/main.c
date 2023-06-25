@@ -14,6 +14,9 @@ int main(int ac, char **av)
     init_server(&server);
     if (read_parameters(&server, ac, av) == -1)
         return (84);
+    initialize_map(&server.map, 10, 10);
+    allocate_map(&server.map);
+    generate_map(&server);
     if ((server.fd = open_server(server.port, 5)) < 0)
         return (84);
     run_server(&server);

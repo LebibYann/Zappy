@@ -35,27 +35,24 @@ void update_map(server_t *server)
             map_content(server, client);
 }
 
-void update_player_level(server_t *server)
+void update_player_level(server_t *server, client_t *ai)
 {
     client_t *client = NULL;
 
     LIST_FOREACH(client, &server->client_list, other_clients) {
-        if (client->category == CATEGORY_AI) {
-            zp_gui_send_package(&client->data, SERVER_SENT,
-            ZP_PLV, client->fd, client->level);
+        if (client->category == CATEGORY_GUI) {
+            player_level(server, client, ai->fd);
         }
     }
 }
 
-
-void update_player_position(server_t *server)
+void update_player_position(server_t *server, client_t *ai)
 {
     client_t *client = NULL;
 
     LIST_FOREACH(client, &server->client_list, other_clients) {
-        if (client->category == CATEGORY_AI) {
-            zp_gui_send_package(&client->data, SERVER_SENT,
-            ZP_PPO, client->fd, client->pos.x, client->pos.y, client->orientation);
+        if (client->category == CATEGORY_GUI) {
+            player_position(server, client, ai->fd);
         }
     }
 }

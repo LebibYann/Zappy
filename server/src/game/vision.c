@@ -25,6 +25,8 @@ static tile_t *get_tiles(map_t *map, client_t *player, int dx, int dy)
         for (int width = -depth; width <= depth; width++) {
             int y = player->pos.y + dy * ((dx != dy) ? depth : width);
             int x = player->pos.x + dy * ((dx != dy) ? width : depth);
+            y = (y < 0) ? map->h + y : y;
+            x = (x < 0) ? map->w + x : x;
             fov[i] = map->tiles[y % map->h][x % map->w];
             i++;
         }
@@ -80,19 +82,35 @@ void look_around(map_t *map, client_t *player)
 {
     tile_t *tiles = look_orientation(map, player);
     int nb_tiles = get_fov_size(player->level);
-    char *response = strdup("[");
+    // char *response = strdup("[ ");
 
+    zp_write_data(&(player->data), "[ ", 2);
     for (int i = 0; i < nb_tiles; i++) {
+        if (i != 0)
+            zp_write_data(&(player->data), ", ", 2);
+        // response = (i != 0) ? strcat(response, ", ") : response;
         for (int resource = 0; resource < RESOURCES_COUNT; resource++) {
             for (int j = 0; j < tiles[i].resources[resource]; j++) {
-                response = realloc(response, strlen(response) + strlen(resource_str(resource) + 2));
-                response = strcat(response, resource_str(resource));
-                response = strcat(response, " ");
+                // response = realloc(response, strlen(response) + strlen(resource_str(resource)) + 2);
+
+                zp_write_data(&(player->data), resource_str(resource), strlen(resource_str(resource)));
+                zp_write_data(&(player->data), " ", 1);
+                // response = strcat(response, resource_str(resource));
+                // response = strcat(response, " ");
             }
         }
+        for (player_list_t *players = tiles[i].players; players; players = players->next) {
+            zp_write_data(&(player->data), "player ", 7);
+            // response = realloc(response, strlen(response) + 8);
+            // response = strcat(response, "player ");
+        }
+        // response = realloc(response, strlen(response) + 2);
     }
-    response = realloc(response, strlen(response) + 3);
-    response = strcat(response, "]\n");
+    zp_write_data(&(player->data), "]\n", 2);
+    // response = realloc(response, strlen(response) + 3);
+    // response = strcat(response, "]\n");
 
-    zp_server_ai_send_package(&player->data, response);
+    zp_exchange_data(&(player->data), HANDLE_IGNORE, HANDLE_NO_WAIT);
+    // zp_server_ai_send_package(&player->data, response);
+    // free(response);
 }

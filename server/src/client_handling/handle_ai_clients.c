@@ -9,6 +9,8 @@
 
 static int get_resource_type(char *str)
 {
+    if (str == NULL)
+        return -1;
     if (!strcmp(str, "food"))
         return FOOD;
     if (!strcmp(str, "linemate"))
@@ -73,6 +75,7 @@ void food_time_ai(server_t *server)
         if (client->category == CATEGORY_AI && elapsed_time >= (126.0 / server->frequency)) {
             client->dead = (client->inventory[FOOD] <= 0);
             (client->dead) ? 0: client->inventory[FOOD]--;
+            timespec_get(&(client->last_meal), TIME_UTC);
         }
     }
 }

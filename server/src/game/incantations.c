@@ -102,5 +102,5 @@ void complete_incantation(tile_t *tile, client_t *player, int frequency)
         return;
 
     elevate_player(tile, player);
-    update_player_level(player->server);
+    update_player_level(player->server, player);
 }

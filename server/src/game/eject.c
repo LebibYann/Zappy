@@ -94,5 +94,5 @@ void eject(map_t *map, client_t *player)
         update_map(player->server);
     } else
         zp_server_ai_send_basic_package(&player->data, RESPONSE_KO);
-    update_player_position(player->server);
+    update_player_position(player->server, player);
 }

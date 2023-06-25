@@ -43,5 +43,5 @@ void forward(map_t *map, client_t *player)
     tile = &map->tiles[player->pos.y][player->pos.x];
     add_player_on_tile(tile, player);
     zp_server_ai_send_basic_package(&player->data, RESPONSE_OK);
-    update_player_position(player->server);
+    update_player_position(player->server, player);
 }
