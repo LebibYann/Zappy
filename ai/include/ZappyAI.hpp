@@ -66,8 +66,6 @@ class ZappyAI {
         uint32_t getPort(void) const;
         void setMachine(const std::string &machine);
         std::string getMachine(void) const;
-        void addFdInFdset(int fd);
-        void removeFdInFdset(int fd);
 
         void displayParameters(void);
         bool connectToServer(void);
@@ -140,8 +138,6 @@ class ZappyAI {
         std::string _name;
         std::string _machine = "127.0.0.1";
         uint32_t _port;
-        fd_set _read_socket;
-        fd_set _write_socket;
         Client _connection;
         ZappyProtocolAI _communication;
 
@@ -154,6 +150,7 @@ class ZappyAI {
         std::vector<std::string> _messages;
 
         //teamplay
+        bool _signaled = false;
         bool _master = false;
         int _friendID = -1;
         int _playersReady = 1;

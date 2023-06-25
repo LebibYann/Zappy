@@ -9,8 +9,6 @@
 
 ZappyAI::ZappyAI()
 {
-    FD_ZERO(&(this->_read_socket));
-    FD_ZERO(&(this->_write_socket));
     memset(this->_inventory, 0, TOTAL_INVENTORY * sizeof(int));
     this->_targetPos.x = 0;
     this->_targetPos.y = 0;
@@ -19,7 +17,6 @@ ZappyAI::ZappyAI()
 
 ZappyAI::~ZappyAI()
 {
-    this->removeFdInFdset(this->_communication.getFd());
     this->_connection.Disconnect();
 }
 
@@ -91,19 +88,6 @@ void ZappyAI::setMachine(const std::string &machine)
 std::string ZappyAI::getMachine(void) const
 {
     return (this->_machine);
-}
-
-
-void ZappyAI::addFdInFdset(int fd)
-{
-    FD_SET(fd, &(this->_read_socket));
-    FD_SET(fd, &(this->_write_socket));
-}
-
-void ZappyAI::removeFdInFdset(int fd)
-{
-    FD_CLR(fd, &(this->_read_socket));
-    FD_CLR(fd, &(this->_write_socket));
 }
 
 void ZappyAI::displayParameters(void)
@@ -195,7 +179,6 @@ bool ZappyAI::connectToServer(void)
     std::cout << "[OK]" << std::endl;
     std::cout << "Initializing protocol..." << std::endl;
     this->_communication.setFd(this->_connection.FD());
-    this->addFdInFdset(this->_connection.FD());
     if (!this->checkServerPackage())
         return (false);
     if (!this->joinTeam())
@@ -327,7 +310,12 @@ void ZappyAI::surviveBehaviour(void)
 
     if (PRINT_ACTION)
         std::cout << "SURVIVE BEHAVIOUR" << std::endl;
-    while (this->_inventory[ELEM_FOOD] < 10 && this->_alive) {
+    if (_friendID != -1){
+        sendSignal(-1, needToGo, _playerLevel);
+        _friendID = -1;
+        _playersReady = 1;
+    }
+    while (this->_inventory[ELEM_FOOD] < 30 && this->_alive) {
         if (this->lookFor(ELEM_FOOD, relPos) > 0) {
             this->takeAll(ELEM_FOOD);
             std::cout << "Relative START " << relPos.x << " " << relPos.y << " " << this->_direction << std::endl;
@@ -352,15 +340,19 @@ void ZappyAI::elevationBehaviour(enum e_elemOnTile seekedItem)
         std::cout << "ELEVATION BEHAVIOUR " << seekedItem << std::endl;
     if (seekedItem != TOTAL_INVENTORY && seekedItem >= 0 &&
     this->lookFor(seekedItem, relPos) > 0) {
-        std::cout << relPos.x << " " << relPos.y << " " << this->_direction << std::endl;
-        this->moveTowardRelativeCoord(relPos);
         this->takeAll(ELEM_FOOD);
         this->takeAll(seekedItem);
-        this->lookResourceOnTile(itemList);
-        this->takeUsefulResource(itemList);
+        std::cout << "Relative START " << relPos.x << " " << relPos.y << " " << this->_direction << std::endl;
+        while (!this->moveTowardRelativeCoord(relPos) && this->_alive) {
+            std::cout << "Relative " << relPos.x << " " << relPos.y << " " << this->_direction << std::endl;
+            this->takeAll(ELEM_FOOD);
+            this->takeAll(seekedItem);
+        }
+        std::cout << "Relative OK " << relPos.x << " " << relPos.y << " " << this->_direction << std::endl;
     } else {
-        this->moveRandom(this->_targetPos);
+        this->moveRandom(relPos);
     }
+    this->inventory();
 }
 
 void ZappyAI::run(void)
@@ -374,12 +366,19 @@ void ZappyAI::run(void)
         seekedItem = tryElevate();
         if (seekedItem == ELEM_FOOD)
             this->surviveBehaviour();
-        // if (this->_inventory[ELEM_FOOD] < 30)
-        //     this->takeAll(ELEM_FOOD);
+        if (this->_inventory[ELEM_FOOD] < 30)
+            this->takeAll(ELEM_FOOD);
+        if (seekedItem == ELEM_PLAYER){
+            readMessageBuffer();
+            if (_friendID == -1 && !_signaled){
+                this->sendSignal(-1, lookingForElevation, _playerLevel);
+                _signaled = true;
+            }
+        }
+        if (_friendID == -1)
+            this->elevationBehaviour(static_cast<enum e_elemOnTile>(seekedItem));
         if (seekedItem == TOTAL_ELEM_ON_TILE)
             this->elevation();
-        this->elevationBehaviour(static_cast<enum e_elemOnTile>(seekedItem));
-        this->readMessageBuffer();
     }
     std::cout << "dead" << std::endl;
 }
@@ -729,9 +728,12 @@ int ZappyAI::lookFor(enum e_elemOnTile seekedElem, t_coords &relativeCoord)
     int elemCount = 0;
     int tmp;
     int width;
+    bool ressource_on_line = false;
+    int bestX = 0;
 
     if (PRINT_ACTION)
         std::cout << "Look for:" << std::endl;
+    this->look();
     if ((!this->_lookDone && !this->look()) ||
     this->_lookResult.size() <= 0)
         return (0);
@@ -745,14 +747,24 @@ int ZappyAI::lookFor(enum e_elemOnTile seekedElem, t_coords &relativeCoord)
     relativeCoord.x = -width / 2;
     for (size_t i = 1; i < this->_lookResult.size(); ++i) {
         if (relativeCoord.x > width / 2) {
+            if (ressource_on_line) {
+                relativeCoord.x = bestX;
+                break;
+            }
             width += 2;
             relativeCoord.x = -width / 2;
             ++(relativeCoord.y);
         }
         if (this->_lookResult[i][seekedElem] > 0) {
-            relativeCoord.l = i;
-            elemCount = this->_lookResult[i][seekedElem];
-            break;
+            if (!ressource_on_line) {
+                ressource_on_line = true;
+                bestX = relativeCoord.x;
+            }
+            if (abs(bestX) > abs(relativeCoord.x)) {
+                bestX = relativeCoord.x;
+                relativeCoord.l = i;
+                elemCount = this->_lookResult[i][seekedElem];
+            }
         }
         ++(relativeCoord.x);
     }
@@ -770,13 +782,11 @@ int ZappyAI::takeAll(enum e_elemOnTile elem)
     int elemToTake = this->lookFor(elem, coords);
 
 
-    if (elem == ELEM_FOOD)
-    // if (PRINT_ACTION)
-    //     std::cout << "Take all: " << elem << std::endl;
+    if (PRINT_ACTION)
+        std::cout << "Take all: " << elem << std::endl;
     // if (elemToTake <= 0 || !ON_RELATIVE_TILE(coords))
     //     return (0);
-    std::cout << "Take all: food " << this->take(elem, elemToTake) << std::endl;
-    return (1);
+    return (this->take(elem, elemToTake));
 }
 
 void ZappyAI::takeUsefulResource(const std::vector<int> &itemList)
@@ -844,14 +854,15 @@ void ZappyAI::readMessage(std::string msg)
     char commas;
     std::string message;
 
-    iss >> prompt >> direction >> commas >> message;
+    iss >> prompt >> direction >> commas;
+    getline(iss, message);
     readSignal(message, direction);
 }
 
 void ZappyAI::readSignal(std::string msg, int direction)
 {
     std::string uncipheredMsg(msg);
-    uncipherStr(uncipheredMsg);
+    //uncipherStr(uncipheredMsg);
     std::istringstream iss(uncipheredMsg);
     char prompt;
     int sender;
@@ -859,18 +870,21 @@ void ZappyAI::readSignal(std::string msg, int direction)
     int status;
     int parameter;
 
+    std::cout << "Signaled: " << uncipheredMsg << std::endl;
     iss >> prompt >> sender >> recever >> status >> parameter;
     if (prompt != '!' || (recever != -1 && recever != _playerId))
         return;
     if (status == lookingForElevation && _friendID == -1){
         if (parameter == _playerLevel){
             _friendID = sender;
+            _signaled = false;
             if (!sendSignal(_friendID, comingForElevation, _playerLevel))
                 _friendID = -1;
         }
     }
     else if (status == comingForElevation){
         if (_friendID == -1){
+            _signaled = false;
             _friendID = sender;
             _master = true;
         } else if (_friendID != sender)
@@ -904,31 +918,54 @@ void ZappyAI::readSignal(std::string msg, int direction)
 
 bool ZappyAI::sendSignal(int recever, int status, int parameter)
 {
+    std::cout << "Signal: " << "!" + std::to_string(this->_playerId) + " " + std::to_string(recever) + " " +
+    std::to_string(status) + " " + std::to_string(parameter) << std::endl;
     return (broadcast("!" + std::to_string(this->_playerId) + " " + std::to_string(recever) + " " +
-    std::to_string(status) + " " + std::to_string(parameter)));
+    std::to_string(status) + " " + std::to_string(parameter), false));
 }
 
 void ZappyAI::moveTo(int direction)
 {
-    int orientation = DIR_NORTH;
-
-    if (direction == 2 || direction == 1 || direction == 8)
-        this->forward();
-    if (direction >= 2 && direction <= 4){
-        orientation = DIR_WEST;
-        this->left();
-        this->forward();
-    } if (direction >= 6 && direction <= 8){
-        orientation = DIR_EAST;
-        this->right();
-        this->forward();
-    } if (direction >= 4 && direction <= 6){
-        if (orientation == DIR_WEST)
+    std::cout << direction << std::endl;
+    switch (direction) {
+        case 0:
+            break;
+        case 1:
+            this->forward();
+            break;
+        case 2:
+            this->forward();
             this->left();
-        else if (orientation == DIR_EAST)
-            this->right();
-        else
+            this->forward();
+            break;
+        case 3:
+            this->left();
+            this->forward();
+            break;
+        case 4: 
+            this->left();
+            this->forward();
+            this->left();
+            this->forward();
+            break;
+        case 5:
             this->turn180();
-        this->forward();
+            this->forward();
+            break;
+        case 6:
+            this->right();
+            this->forward();
+            this->right();
+            this->forward();
+            break;
+        case 7:
+            this->right();
+            this->forward();
+            break;
+        case 8:
+            this->forward();
+            this->right();
+            this->forward();
+            break;
     }
 }
