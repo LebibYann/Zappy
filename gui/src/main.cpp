@@ -16,15 +16,18 @@
 
 int main(int ac, char **av)
 {
-    sf::Event event;
     sf::RenderWindow window(sf::VideoMode(1280, 720), "Reverse");
-    ImageBank imageBank;
+    sf::Event event;
+
     Client connection;
     std::vector<std::string> connectionID = analyseArgs(ac - 1, &av[1]);
-    connection.Connect(connectionID[0], atoi(connectionID[1].c_str()));
+    if(!connection.Connect(connectionID[0], atoi(connectionID[1].c_str())))
+        return (84);
     ZappyProtocolGUI protocol(connection.FD());
     protocol.setFd(connection.FD());
     protocol.sendPackage(ZP_GRAPHIC);
+
+    ImageBank imageBank;
     GameScene gameScene(window, event, protocol, connection, imageBank);
 
     while (window.isOpen()) {
