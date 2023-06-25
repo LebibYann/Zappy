@@ -21,6 +21,7 @@ AudioBank::AudioBank()
     _sounds[INCANT].setBuffer(_soundBuffers[INCANT]);
     _sounds[LVLUP].setBuffer(_soundBuffers[LVLUP]);
     _sounds[DEATH].setBuffer(_soundBuffers[DEATH]);
+    _sounds[DEATH].setVolume(50);
 }
 
 AudioBank::~AudioBank()
