@@ -11,4 +11,6 @@ void close_server(server_t *server)
 {
     close(server->fd);
     remove_all_clients(&(server->client_list));
+    split_free(server->teams);
+    free(server->max_team_cli);
 }

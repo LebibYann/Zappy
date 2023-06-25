@@ -8,14 +8,14 @@
 #include "GameScene.hpp"
 #include "ZappyProtocolGUI.hpp"
 
-GameScene::GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGUI &protocol, Client &connection)
-: _window(window), _event(event), _protocol(protocol), _connection(connection)
+GameScene::GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGUI &protocol, Client &connection, ImageBank &imageBank)
+: _window(window), _event(event), _protocol(protocol), _connection(connection), _imageBank(imageBank)
 {
     t_zp_guiProtocol pkg;
 
-    sleep(1);
     this->_protocol.receivePackage(pkg);
     this->_protocol.receivePackage(pkg);
+
     _gameInfo.mapSize = {pkg.args[0], pkg.args[1]};
     _gameInfo.map.resize(_gameInfo.mapSize[0]);
     for (int x = 0; x < _gameInfo.mapSize[0]; ++x){
@@ -23,6 +23,17 @@ GameScene::GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGU
         for (int y = 0; y < _gameInfo.mapSize[1]; ++y)
             _gameInfo.map[x][y].resize(TOTAL_INVENTORY);
     };
+    double tileSizeWithWidth = this->_window.getSize().x / _gameInfo.mapSize[0];
+    double tileSizeWithHeight = this->_window.getSize().y / _gameInfo.mapSize[1];
+    if (tileSizeWithWidth < tileSizeWithHeight) {
+        _gameInfo.tileSizeX = tileSizeWithWidth;
+        _gameInfo.tileSizeY = tileSizeWithWidth;
+    } else {
+        _gameInfo.tileSizeX = tileSizeWithHeight;
+        _gameInfo.tileSizeY = tileSizeWithHeight;
+    }
+    _imageBank.rescaleTexture(_gameInfo.tileSizeX, _gameInfo.tileSizeY);
+    _audioBank.playMusic();
     _gameInfo.mapContent = {};
     _gameInfo.players = {};
     _gameInfo.eggs = {};
@@ -61,16 +72,6 @@ void set_text(sf::Text &text, std::string str, sf::Color color, sf::Vector2f pos
     text.setPosition(pos);
 }
 
-void GameScene::loadScene()
-{
-    return;
-}
-
-void GameScene::unloadScene()
-{
-    _music.stop();
-}
-
 void GameScene::run()
 {
     std::vector<t_zp_guiProtocol> packages;
@@ -84,7 +85,7 @@ void GameScene::run()
     while (_protocol.receivePackage(package) == 0)
         packages.push_back(package);
     refreshPackages(packages);
-    drawElements(_window, _gameInfo);
+    drawElements(_window, _gameInfo, _imageBank);
 }
 
 bool GameScene::setConnection(std::string ip, std::string port)

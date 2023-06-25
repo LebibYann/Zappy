@@ -12,20 +12,23 @@
 
 #include "ZappyProtocolGUI.hpp"
 #include "GameScene.hpp"
+#include "ImageBank.hpp"
 
 int main(int ac, char **av)
 {
-    srand(time(nullptr));
-
-    sf::Event event;
     sf::RenderWindow window(sf::VideoMode(1280, 720), "Reverse");
+    sf::Event event;
+
     Client connection;
     std::vector<std::string> connectionID = analyseArgs(ac - 1, &av[1]);
-    connection.Connect(connectionID[0], atoi(connectionID[1].c_str()));
+    if(!connection.Connect(connectionID[0], atoi(connectionID[1].c_str())))
+        return (84);
     ZappyProtocolGUI protocol(connection.FD());
     protocol.setFd(connection.FD());
     protocol.sendPackage(ZP_GRAPHIC);
-    GameScene gameScene(window, event, protocol, connection);
+
+    ImageBank imageBank;
+    GameScene gameScene(window, event, protocol, connection, imageBank);
 
     while (window.isOpen()) {
         window.pollEvent(event);

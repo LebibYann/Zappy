@@ -43,6 +43,17 @@ typedef enum e_playerDirection {
     TOTAL_DIRECTION
 } t_playerDirection;
 
+typedef enum e_messageSubject {
+    lookingForElevation,
+    waitingForElevation,
+    comingForElevation,
+    readyForElevation,
+    alreadySomeone,
+    needToGo,
+    findRessource,
+    haveRessource
+} t_messageSubject;
+
 class ZappyAI {
     public:
         ZappyAI();
@@ -55,8 +66,6 @@ class ZappyAI {
         uint32_t getPort(void) const;
         void setMachine(const std::string &machine);
         std::string getMachine(void) const;
-        void addFdInFdset(int fd);
-        void removeFdInFdset(int fd);
 
         void displayParameters(void);
         bool connectToServer(void);
@@ -96,6 +105,13 @@ class ZappyAI {
         bool eject(void);
         bool elevation(void);
 
+        //Communication
+        void storeMessage(std::string msg);
+        void readMessageBuffer();
+        void readMessage(std::string msg);
+        void readSignal(std::string msg, int direction);
+        bool sendSignal(int recever, int subject, int parameter);
+
         void turn180(void);
         void turnTo(enum e_playerDirection direction);
 
@@ -103,6 +119,7 @@ class ZappyAI {
         bool moveTowardRelativeCoord(t_coords &relativeCoord);
         void moveRandom(void);
         void moveRandom(t_coords &relativeCoord);
+        void moveTo(int direction);
 
         void lookItemList(std::vector<int> &itemList);
         void lookResourceOnTile(std::vector<int> &itemList);
@@ -121,8 +138,6 @@ class ZappyAI {
         std::string _name;
         std::string _machine = "127.0.0.1";
         uint32_t _port;
-        fd_set _read_socket;
-        fd_set _write_socket;
         Client _connection;
         ZappyProtocolAI _communication;
 
@@ -132,6 +147,13 @@ class ZappyAI {
         int _direction = 0;
         int _inventory[TOTAL_INVENTORY];
         int _ressourceToHave[TOTAL_INVENTORY];
+        std::vector<std::string> _messages;
+
+        //teamplay
+        bool _signaled = false;
+        bool _master = false;
+        int _friendID = -1;
+        int _playersReady = 1;
 
         // Look data
         bool _lookDone = false;

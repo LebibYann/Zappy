@@ -10,7 +10,7 @@
 int set_port(server_t *server, int *index, int ac, char **av)
 {
     if (*index >= ac){
-        fprintf(stderr,  "./server: option requires an argument -- '%s'\n", "-p");
+        fprintf(stderr, "./server: option requires an argument -- '-p'\n");
         return (-1);
     }
     for (size_t i = 0; av[*index][i] != '\0'; i++){
@@ -20,6 +20,5 @@ int set_port(server_t *server, int *index, int ac, char **av)
         }
     }
     server->port = atoi(av[*index]);
-    *index = *index + 1;
     return (0);
 }

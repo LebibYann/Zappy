@@ -15,8 +15,9 @@
 #include <map>
 #include <string>
 
-#include "IScene.hpp"
 #include "ZappyProtocolGUI.hpp"
+#include "ImageBank.hpp"
+#include "AudioBank.hpp"
 
 typedef struct s_playerStruct {
     int id;
@@ -28,6 +29,7 @@ typedef struct s_playerStruct {
     bool eggLaying;
     bool isIncanting;
     bool isDead;
+    sf::Sprite sprite;
 } t_playerStruct;
 
 typedef struct s_eggStruct {
@@ -36,6 +38,7 @@ typedef struct s_eggStruct {
     int y;
     bool isHatching;
     bool isDead;
+    sf::Sprite sprite;
 } t_eggStruct;
 
 typedef struct s_gameInfo {
@@ -45,17 +48,17 @@ typedef struct s_gameInfo {
     std::vector<t_playerStruct> players;
     std::vector<t_eggStruct> eggs;
     std::vector<std::string> teamNames;
+    float tileSizeX;
+    float tileSizeY;
     int nbrTeams;
     bool gameOver;
 } t_gameInfo;
 
-class GameScene: public IScene {
+class GameScene {
 public:
-    GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGUI &protocol, Client &connection);
+    GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGUI &protocol, Client &connection, ImageBank &_imageBank);
     ~GameScene();
 
-    void loadScene();
-    void unloadScene();
     void run();
     bool setConnection(std::string ip, std::string port);
     void refreshPackages(std::vector<t_zp_guiProtocol> packages);
@@ -64,16 +67,13 @@ private:
     sf::Event &_event;
     ZappyProtocolGUI &_protocol;
     Client &_connection;
+    ImageBank &_imageBank;
+    sf::RectangleShape _tileSize;
+    AudioBank _audioBank;
+    
 
-
-    sf::Music _music;
-    sf::Font _font;
-    std::vector<sf::Sprite> _spriteDraw;
-    std::vector<sf::Text> _textDraw;
-    sf::Texture _personnage;
-    sf::SoundBuffer _buff_sound;
     t_gameInfo _gameInfo;
 };
 
 std::vector<std::string> analyseArgs(int ac, char **av);
-void drawElements(sf::RenderWindow &window, t_gameInfo &gameInfo);
+void drawElements(sf::RenderWindow &window, t_gameInfo &gameInfo, ImageBank &imageBank);
