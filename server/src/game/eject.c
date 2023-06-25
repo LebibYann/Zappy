@@ -89,9 +89,9 @@ void eject(map_t *map, client_t *player)
         }
         tmp = tmp->next;
     }
-
-    if (success)
+    if (success) {
         zp_server_ai_send_basic_package(&player->data, RESPONSE_OK);
-    else
+        update_map(player->server);
+    } else
         zp_server_ai_send_basic_package(&player->data, RESPONSE_KO);
 }

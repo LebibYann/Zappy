@@ -10,5 +10,5 @@
 void lay_egg(tile_t *tile, client_t *player)
 {
     (void)tile;
-    (void)player;
+    zp_server_ai_send_basic_package(&player->data, RESPONSE_OK);
 }

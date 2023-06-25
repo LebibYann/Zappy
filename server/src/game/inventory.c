@@ -16,6 +16,7 @@ void take_object(tile_t *tile, client_t *player, const int resource)
     player->inventory[resource]++;
 
     zp_server_ai_send_basic_package(&player->data, RESPONSE_OK);
+    update_map(player->server);
 }
 
 void set_object_down(tile_t *tile, client_t *player, const int resource)
@@ -27,6 +28,7 @@ void set_object_down(tile_t *tile, client_t *player, const int resource)
     player->inventory[resource]--;
 
     zp_server_ai_send_basic_package(&player->data, RESPONSE_OK);
+    update_map(player->server);
 }
 
 void inventory(client_t *player)

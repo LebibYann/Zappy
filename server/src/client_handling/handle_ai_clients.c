@@ -40,6 +40,7 @@ void handle_ai_clients(server_t *server, client_t *client)
         case ZP_INVENTORY:      inventory(client); break;
         case ZP_BROADCAST:      broadcast(server, client, command.str); break;
         case ZP_CONNECT_NBR:    connect_nbr(server, client); break;
+        case ZP_FORK:           lay_egg(&server->map.tiles[client->pos.x][client->pos.y], client); break;
         case ZP_EJECT:          eject(&server->map, client); break;
         case ZP_TAKE_OBJ:       take_object(&server->map.tiles[client->pos.x][client->pos.y], client, get_resource_type(command.str)); break;
         case ZP_SET_OBJ:        set_object_down(&server->map.tiles[client->pos.x][client->pos.y], client, get_resource_type(command.str)); break;

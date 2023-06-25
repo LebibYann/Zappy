@@ -5,15 +5,16 @@
 ** explusion
 */
 
-#include <zappy_server.h>
+#include "zappy_server.h"
 
-void expulsion(server_t *server, const char *team)
+void player_position(server_t *server, client_t *client, int id)
 {
-    client_t *client;
+    client_t *ai;
 
-    LIST_FOREACH(client, &server->client_list, other_clients){
-        if (client->category == CATEGORY_GUI){
+    LIST_FOREACH(ai, &server->client_list, other_clients){
+        if (ai->fd ==  id){
             zp_gui_send_package(&client->data, SERVER_SENT,
-            ZP_PEX, team);
+            ZP_PPO, id, ai->pos.x, ai->pos.y, ai->orientation);
         }
+    }
 }

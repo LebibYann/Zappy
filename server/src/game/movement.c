@@ -7,48 +7,7 @@
 
 #include "zappy_server.h"
 
-static void remove_player_on_tile(tile_t *tile, client_t *player)
-{
-    player_list_t *tmp = tile->players;
-    player_list_t *prev = NULL;
-
-    while (tmp) {
-        if (tmp->client == player && prev) {
-            prev->next = tmp->next;
-            free(tmp);
-            return;
-        }
-        if (tmp->client == player && !prev) {
-            tile->players = tmp->next;
-            free(tmp);
-            return;
-        }
-        prev = tmp;
-        tmp = tmp->next;
-    }
-}
-
-static void add_player_on_tile(tile_t *tile, client_t *player)
-{
-    player_list_t *new = malloc(sizeof(player_list_t));
-    player_list_t *tmp = tile->players;
-
-    if (!new)
-        return;
-
-    new->client = player;
-    new->next = NULL;
-    if (!tmp) {
-        tile->players = new;
-        return;
-    }
-
-    while (tmp->next)
-        tmp = tmp->next;
-    tmp->next = new;
-}
-
-static void update_player_position(map_t *map, client_t *player)
+static void move_orientation(map_t *map, client_t *player)
 {
     switch (player->orientation) {
     case NORTH:
@@ -79,9 +38,10 @@ void forward(map_t *map, client_t *player)
     tile = &map->tiles[player->pos.y][player->pos.x];
     remove_player_on_tile(tile, player);
 
-    update_player_position(map, player);
+    move_orientation(map, player);
 
     tile = &map->tiles[player->pos.y][player->pos.x];
     add_player_on_tile(tile, player);
     zp_server_ai_send_basic_package(&player->data, RESPONSE_OK);
+    update_player_position(player->server);
 }

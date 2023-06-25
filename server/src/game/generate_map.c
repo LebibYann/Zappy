@@ -6,6 +6,7 @@
 */
 
 #include "zappy_server.h"
+#include "zappy_resources.h"
 
 void generate_resource(map_t *map, int resource)
 {
@@ -19,10 +20,11 @@ void generate_resource(map_t *map, int resource)
     }
 }
 
-void generate_map(map_t *map)
+void generate_map(server_t *server)
 {
     for (int resource = 0; resource < RESOURCES_COUNT; resource++)
-        generate_resource(map, resource);
+        generate_resource(&server->map, resource);
+    update_map(server);
 }
 
 void allocate_map(map_t *map)

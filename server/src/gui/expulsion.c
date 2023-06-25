@@ -5,7 +5,7 @@
 ** explusion
 */
 
-#include <zappy_server.h>
+#include "zappy_server.h"
 
 void expulsion(server_t *server, const char *team)
 {
@@ -16,4 +16,5 @@ void expulsion(server_t *server, const char *team)
             zp_gui_send_package(&client->data, SERVER_SENT,
             ZP_PEX, team);
         }
+    }
 }

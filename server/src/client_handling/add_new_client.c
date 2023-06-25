@@ -18,6 +18,7 @@ bool add_new_client(server_t *server)
     &client_addr, (socklen_t *)&addr_size)) < 0)
         return (false);
     client = new_client_struct(client_socket);
+    client->server = server;
     LIST_INSERT_HEAD(&(server->client_list), client, other_clients);
     zp_write_data(&(client->data), "WELCOME\n", 8);
     zp_exchange_data(&(client->data), HANDLE_IGNORE, HANDLE_WAIT);
