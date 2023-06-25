@@ -21,7 +21,7 @@ static tile_t *get_tiles(map_t *map, client_t *player, int dx, int dy)
     if (!fov)
         return NULL;
 
-    for (int depth = 0; depth < player->level; depth++) {
+    for (int depth = 0; depth <= player->level; depth++) {
         for (int width = -depth; width <= depth; width++) {
             int y = player->pos.y + dy * ((dx != dy) ? depth : width);
             int x = player->pos.x + dy * ((dx != dy) ? width : depth);
