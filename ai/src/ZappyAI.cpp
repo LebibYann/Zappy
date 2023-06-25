@@ -753,10 +753,8 @@ int ZappyAI::lookFor(enum e_elemOnTile seekedElem, t_coords &relativeCoord)
     relativeCoord.x = -width / 2;
     for (size_t i = 1; i < this->_lookResult.size(); ++i) {
         if (relativeCoord.x > width / 2) {
-            if (ressource_on_line) {
-                relativeCoord.x = bestX;
+            if (ressource_on_line)
                 break;
-            }
             width += 2;
             relativeCoord.x = -width / 2;
             ++(relativeCoord.y);
@@ -775,6 +773,8 @@ int ZappyAI::lookFor(enum e_elemOnTile seekedElem, t_coords &relativeCoord)
         if (i + 1 < this->_lookResult.size())
             ++(relativeCoord.x);
     }
+    if (ressource_on_line)
+        relativeCoord.x = bestX;
     for (int i = 0; i < this->_direction; ++i) {
         tmp = relativeCoord.y;
         relativeCoord.y = -relativeCoord.x;
