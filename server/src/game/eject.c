@@ -28,7 +28,7 @@ static tile_t *get_target_tile(map_t *map, client_t *player)
     }
 }
 
-static void update_player_position(map_t *map, client_t *player,
+static void update_orientation(map_t *map, client_t *player,
 enum orientation_e orientation)
 {
     switch (orientation) {
@@ -82,7 +82,7 @@ void eject(map_t *map, client_t *player)
     while (tmp) {
         if (tmp->client != player) {
             success = true;
-            update_player_position(map, tmp->client, player->orientation);
+            update_orientation(map, tmp->client, player->orientation);
             remove_player_on_tile(tile, tmp->client);
             add_player_on_tile(target_tile, tmp->client);
             send_eject_response(tmp->client, player->orientation);
@@ -94,4 +94,5 @@ void eject(map_t *map, client_t *player)
         update_map(player->server);
     } else
         zp_server_ai_send_basic_package(&player->data, RESPONSE_KO);
+    update_player_position(player->server);
 }
