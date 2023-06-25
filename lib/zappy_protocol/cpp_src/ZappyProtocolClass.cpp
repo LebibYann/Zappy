@@ -51,15 +51,20 @@ void ZappyProtocol::writeData(const std::string &data, size_t size)
     zp_write_data(&(this->_data), data.c_str(), size);
 }
 
-bool ZappyProtocol::zpGetline(std::string &output)
+int ZappyProtocol::zpGetline(std::string &output)
 {
     char *str = zp_getline_pending_data(&(this->_data));
 
+    if (this->_data.disconnected) {
+        if (str != nullptr)
+            free(str);
+        return (-1);
+    }
     if (str == nullptr)
-        return (false);
+        return (1);
     output = str;
     free(str);
-    return (true);
+    return (0);
 }
 
 int ZappyProtocol::getlineWait(std::string &output)

@@ -64,12 +64,17 @@ bool ZappyProtocolAI::sendPackage(enum e_zp_command cmd_type, const std::string 
 //     return (true);
 // }
 
-int ZappyProtocolAI::receivePackage(std::string &str)
+int ZappyProtocolAI::receivePackage(std::string &str, bool wait)
 {
+    int out;
     std::string tmpStr;
     std::stringstream stream;
 
-    switch (this->getlineWait(str)) {
+    if (wait)
+        out = this->getlineWait(str);
+    else
+        out = this->zpGetline(str);
+    switch (out) {
         case -1:
             return (RESPONSE_DISCONNECTION);
         case 1:
@@ -87,6 +92,10 @@ int ZappyProtocolAI::receivePackage(std::string &str)
         return (RESPONSE_MESSAGE);
     if (tmpStr.compare("eject") == 0)
         return (RESPONSE_EJECT);
+    if (str.compare("Elevation underway\n") == 0)
+        return (RESPONSE_ELEVATION_UNDERWAY);
+    if (strncmp("Current level: ", str.c_str(), 15) == 0)
+        return (RESPONSE_CURRENT_LEVEL);
     return (RESPONSE_OTHER);
 }
 
