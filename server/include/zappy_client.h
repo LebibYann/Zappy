@@ -55,6 +55,18 @@ enum orientation_e {
     WEST
 };
 
+enum sound_direction_e{
+    CENTER,
+    TOP,
+    TOP_LEFT,
+    LEFT,
+    BOTTOM_LEFT,
+    BOTTOM,
+    BOTTOM_RIGHT,
+    RIGHT,
+    TOP_RIGHT
+};
+
 client_t *new_client_struct(int fd);
 
 void init_client_struct(client_t *client, int fd);
