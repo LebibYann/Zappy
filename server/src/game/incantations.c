@@ -8,7 +8,8 @@
 #include "zappy_server.h"
 #include "zappy_incantations.h"
 
-static bool verify_player_incantation(tile_t *tile, const int level, const char *team)
+static bool verify_player_incantation(tile_t *tile, const int level,
+const char *team)
 {
     int player_count = 0;
     player_list_t *player_list = tile->players;
@@ -62,13 +63,17 @@ static bool verify_incantation(tile_t *tile, client_t *player)
     return true;
 }
 
-void remove_stones(tile_t *tile, client_t *player)
+static void elevate_player(tile_t *tile, client_t *player)
 {
+    char response[32];
     for (int stone = 1; stone < RESOURCES_COUNT; stone++) {
         tile->resources[stone] -= INCANTATIONS[player->level - 1]
             .prerequisites[stone];
     }
+    player->level++;
     player->incantation = false;
+    sprintf(response, "Current level: %d\n", player->level);
+    zp_server_ai_send_package(&player->data, response);
 }
 
 void start_incantation(tile_t *tile, client_t *player)
@@ -83,7 +88,6 @@ void start_incantation(tile_t *tile, client_t *player)
 
 bool complete_incantation(tile_t *tile, client_t *player, int frequency)
 {
-    char response[32];
     struct timespec now;
     long elapsed_time;
 
@@ -99,10 +103,6 @@ bool complete_incantation(tile_t *tile, client_t *player, int frequency)
     if (elapsed_time < (300 / frequency))
         return false;
 
-    remove_stones(tile, player);
-    player->level++;
-    player->incantation = false;
-    sprintf(response, "Current level: %d\n", player->level);
-    zp_server_ai_send_package(&player->data, response);
+    elevate_player(tile, player);
     return true;
 }

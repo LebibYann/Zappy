@@ -34,7 +34,7 @@ void inventory(client_t *player)
     char response[256] = {0};
 
     sprintf(response, "[food %d, linemate %d, deraumere %d, sibur %d, "
-                      "mendiane %d, phiras %d, thystame %d]\n",
+"mendiane %d, phiras %d, thystame %d]\n",
             player->inventory[FOOD],
             player->inventory[LINEMATE], player->inventory[DERAUMERE],
             player->inventory[SIBUR], player->inventory[MENDIANE],
