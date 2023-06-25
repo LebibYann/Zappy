@@ -101,18 +101,22 @@ void ImageBank::rescaleTexture(float x, float y)
     _idleSprites[0].scale(multiplyerX, multiplyerY);
     _idleSprites[1].scale(multiplyerX, multiplyerY);
     _idleSprites[2].scale(multiplyerX, multiplyerY);
+    _idleSprites[3].scale(multiplyerX, multiplyerY);
 
     _incantSprites[0].scale(multiplyerX, multiplyerY);
     _incantSprites[1].scale(multiplyerX, multiplyerY);
     _incantSprites[2].scale(multiplyerX, multiplyerY);
+    _incantSprites[3].scale(multiplyerX, multiplyerY);
 
     _layingSprites[0].scale(multiplyerX, multiplyerY);
     _layingSprites[1].scale(multiplyerX, multiplyerY);
     _layingSprites[2].scale(multiplyerX, multiplyerY);
+    _layingSprites[3].scale(multiplyerX, multiplyerY);
 
     _deadSprites[0].scale(multiplyerX, multiplyerY);
     _deadSprites[1].scale(multiplyerX, multiplyerY);
     _deadSprites[2].scale(multiplyerX, multiplyerY);
+    _deadSprites[3].scale(multiplyerX, multiplyerY);
 
     _eggSprites[0].scale(multiplyerX, multiplyerY);
     _eggSprites[1].scale(multiplyerX, multiplyerY);
