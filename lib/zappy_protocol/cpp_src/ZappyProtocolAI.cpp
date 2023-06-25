@@ -94,6 +94,8 @@ int ZappyProtocolAI::receivePackage(std::string &str, bool wait)
         return (RESPONSE_EJECT);
     if (str.compare("Elevation underway\n") == 0)
         return (RESPONSE_ELEVATION_UNDERWAY);
+    if (strncmp("Current level: ", str.c_str(), 15) == 0)
+        return (RESPONSE_CURRENT_LEVEL);
     return (RESPONSE_OTHER);
 }
 

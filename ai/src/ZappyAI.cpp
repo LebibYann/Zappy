@@ -265,9 +265,40 @@ int ZappyAI::handlePackageReception(enum AIResponse_e expectedResponse, std::str
         out = this->_communication.receivePackage(str);
         switch (out) {
             case RESPONSE_ELEVATION_UNDERWAY:
-                this->waitElevation();
-                std::cout << "AYO" << std::endl;
                 break;
+            case RESPONSE_CURRENT_LEVEL:
+                this->_playerLevel = atoi(&(str.c_str())[15]);
+                std::cout << this->_playerLevel << std::endl;
+                break;
+            case RESPONSE_EJECT:
+                std::cout << "Eject" << std::endl;
+                this->_lookDone = false;
+                break;
+            case RESPONSE_MESSAGE:
+                storeMessage(str);
+                break;
+            default:
+                if (out != expectedResponse) {
+                    if (out == RESPONSE_DISCONNECTION || out == RESPONSE_DEAD) {
+                        this->_alive = false;
+                        return (-1);
+                    }
+                    return (0);
+                }
+                return (1);
+        }
+
+    }
+    return (0);
+}
+
+int ZappyAI::handlePackageReceptionElevation(enum AIResponse_e expectedResponse, std::string &str)
+{
+    int out;
+
+    while (true) {
+        out = this->_communication.receivePackage(str);
+        switch (out) {
             case RESPONSE_EJECT:
                 std::cout << "Eject" << std::endl;
                 this->_lookDone = false;
@@ -391,12 +422,13 @@ void ZappyAI::run(void)
             this->surviveBehaviour();
         this->readMessageBuffer(signalData);
 
+        std::cout << "\033[0;31m" << "MESSAGE ID " << signalData.subject << "\033[00m" << std::endl;
         if (signalData.subject != noMessage) {
             std::cout << "\033[0;31m" << "MESSAGE RECU" << "\033[00m" << std::endl;
             if (signalData.subject == stopTrackingMe)
                 _trackingStatus = STATUS_FREE;
             if (signalData.subject == trackMe && signalData.playerLevel == this->_playerLevel) {
-                std::cout << "\033[0;31m" << "JARIV" << signalData.soundDirection << "\033[00m" << std::endl;
+                std::cout << "\033[0;31m" << "JARIV " << signalData.soundDirection << "\033[00m" << std::endl;
                 if (signalData.soundDirection == 0)
                     _trackingStatus = STATUS_WAITING;
                 else {
@@ -662,7 +694,7 @@ bool ZappyAI::elevation(void)
     std::string str;
 
     this->_communication.sendPackage(ZP_INCANTATION);
-    this->_communication.receivePackage(str);
+    this->handlePackageReceptionElevation(RESPONSE_OTHER, str);
 
     std::cout << "ATTEMPTING ELEVATION" << std::endl;
     if (!this->waitElevation())
@@ -678,7 +710,7 @@ bool ZappyAI::waitElevation(void)
     std::string str;
 
     _trackingStatus = STATUS_FREE;
-    if (this->handlePackageReception(RESPONSE_OTHER, str) != 1)
+    if (this->handlePackageReceptionElevation(RESPONSE_CURRENT_LEVEL, str) != 1)
         return (false);
     return (strncmp("Current level: ", str.c_str(), 15) == 0);
 }
@@ -692,11 +724,12 @@ void ZappyAI::turn180(void)
 
 void ZappyAI::turnTo(enum e_playerDirection direction)
 {
-    if (direction == this->_direction)
+    if (direction == this->_direction || direction == DIR_UNDEF)
         return;
     if ((this->_direction + 1) % TOTAL_DIRECTION == direction) {
         this->right();
-    } else if (direction % 2 == 1) {
+    } else if ((direction == DIR_WEST && this->_direction == DIR_NORTH) ||
+    this->_direction - 1 == direction) {
         this->left();
     } else if (direction != DIR_UNDEF) {
         this->turn180();
@@ -909,8 +942,7 @@ void ZappyAI::readMessageBuffer(signalData_t &signal)
         if (signal.subject == noMessage || tmp.subject == signal.subject)
             signal = tmp;
         if (tmp.subject == noMessage || tmp.subject == signal.subject){
-            signal = tmp;    signal = tmp;
-
+            signal = tmp;
             _messages.erase(it);
         }
     }
@@ -945,7 +977,6 @@ bool ZappyAI::sendSignal(int status)
 
 void ZappyAI::moveTo(int direction)
 {
-    std::cout << direction << std::endl;
     switch (direction) {
         case 0:
             break;
@@ -987,4 +1018,5 @@ void ZappyAI::moveTo(int direction)
             this->forward();
             break;
     }
+    this->_messages.clear();
 }
