@@ -159,6 +159,7 @@ void playerDeath(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &_ima
         if (gameInfo.players[i].id == package.args[0]) {
             gameInfo.players[i].isDead = true;
             gameInfo.players[i].sprite = _imageBank.getDeadSprite(gameInfo.players[i].level - 1);
+            gameInfo.players[i].id = -1;
         }
     }
 }

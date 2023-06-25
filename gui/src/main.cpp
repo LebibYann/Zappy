@@ -16,8 +16,6 @@
 
 int main(int ac, char **av)
 {
-    srand(time(nullptr));
-
     sf::Event event;
     sf::RenderWindow window(sf::VideoMode(1280, 720), "Reverse");
     ImageBank imageBank;

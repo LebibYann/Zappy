@@ -88,6 +88,8 @@ void ImageBank::rescaleTexture(float x, float y)
     float multiplyerX = x / 32;
     float multiplyerY = y / 32;
 
+    _groundSprites[0].scale(multiplyerX, multiplyerY);
+    
     _idleSprites[0].scale(multiplyerX, multiplyerY);
     _idleSprites[1].scale(multiplyerX, multiplyerY);
     _idleSprites[2].scale(multiplyerX, multiplyerY);
@@ -108,6 +110,9 @@ void ImageBank::rescaleTexture(float x, float y)
     _eggSprites[1].scale(multiplyerX, multiplyerY);
     _eggSprites[2].scale(multiplyerX, multiplyerY);
 
+    multiplyerX /= 2;
+    multiplyerY /= 2;
+
     _rssSprites[0].scale(multiplyerX, multiplyerY);
     _rssSprites[1].scale(multiplyerX, multiplyerY);
     _rssSprites[2].scale(multiplyerX, multiplyerY);
@@ -115,8 +120,6 @@ void ImageBank::rescaleTexture(float x, float y)
     _rssSprites[4].scale(multiplyerX, multiplyerY);
     _rssSprites[5].scale(multiplyerX, multiplyerY);
     _rssSprites[6].scale(multiplyerX, multiplyerY);
-
-    _groundSprites[0].scale(multiplyerX, multiplyerY);
 }
 
 sf::Sprite &ImageBank::getIdleSprite(int index)
