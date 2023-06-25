@@ -150,6 +150,7 @@ class ZappyAI {
         std::vector<std::string> _messages;
 
         //teamplay
+        bool _ready = false;
         bool _signaled = false;
         bool _master = false;
         int _friendID = -1;

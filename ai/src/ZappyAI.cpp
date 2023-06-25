@@ -377,8 +377,14 @@ void ZappyAI::run(void)
         }
         if (_friendID == -1)
             this->elevationBehaviour(static_cast<enum e_elemOnTile>(seekedItem));
-        if (seekedItem == TOTAL_ELEM_ON_TILE)
+        if (seekedItem == TOTAL_ELEM_ON_TILE){
+            if (_playersReady > 1)
+                this->sendSignal(_friendID, readyForElevation, _playerLevel);
             this->elevation();
+            _playersReady = 1;
+            _friendID = -1;
+            _master = false;
+        }
     }
     std::cout << "dead" << std::endl;
 }
@@ -854,6 +860,7 @@ void ZappyAI::readMessage(std::string msg)
     char commas;
     std::string message;
 
+    std::cout << "Signaled: " << msg << std::endl;
     iss >> prompt >> direction >> commas;
     getline(iss, message);
     readSignal(message, direction);
@@ -870,7 +877,6 @@ void ZappyAI::readSignal(std::string msg, int direction)
     int status;
     int parameter;
 
-    std::cout << "Signaled: " << uncipheredMsg << std::endl;
     iss >> prompt >> sender >> recever >> status >> parameter;
     if (prompt != '!' || (recever != -1 && recever != _playerId))
         return;
@@ -892,11 +898,13 @@ void ZappyAI::readSignal(std::string msg, int direction)
         sendSignal(_friendID, waitingForElevation, _playerLevel);
     }
     else if (status == waitingForElevation){
-        if (direction == 0)
+        if (direction == 0){
             sendSignal(_friendID, readyForElevation, _playerLevel);
+            _ready = true;
+        }
         else{
-            sendSignal(_friendID, comingForElevation, _playerLevel);
             moveTo(direction);
+            sendSignal(_friendID, comingForElevation, _playerLevel);
         }
     } else if (status == alreadySomeone){
         if (sender == _friendID)
@@ -904,8 +912,12 @@ void ZappyAI::readSignal(std::string msg, int direction)
     } else if (status == readyForElevation && sender == _friendID){
         if (_master)
             _playersReady++;
-        else
-            this->tryElevate();
+        else{
+            this->elevation();
+            _ready = false;
+            _friendID = -1;
+            return;
+        }
     } else if (status == needToGo){
         if (direction == 0)
             _playersReady--;

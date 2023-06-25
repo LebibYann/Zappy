@@ -22,6 +22,7 @@ int main(int argc, char **argv)
     std::vector<std::string> argvList = generateStrVector(argc, argv);
     ZappyAI zai;
 
+    srand(time(NULL));
     switch (zai.init(argvList)) {
         case INIT_KO:
             return (84);
