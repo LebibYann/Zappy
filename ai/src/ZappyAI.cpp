@@ -265,10 +265,11 @@ int ZappyAI::handlePackageReception(enum AIResponse_e expectedResponse, std::str
         out = this->_communication.receivePackage(str);
         switch (out) {
             case RESPONSE_ELEVATION_UNDERWAY:
+                _trackingStatus = STATUS_WAITING;
                 break;
             case RESPONSE_CURRENT_LEVEL:
                 this->_playerLevel = atoi(&(str.c_str())[15]);
-                std::cout << this->_playerLevel << std::endl;
+                _trackingStatus = STATUS_FREE;
                 break;
             case RESPONSE_EJECT:
                 std::cout << "Eject" << std::endl;
@@ -448,7 +449,9 @@ void ZappyAI::run(void)
         } else if (seekedItem == TOTAL_ELEM_ON_TILE) {
             if (_trackingStatus == STATUS_INCANTATION)
                 this->sendSignal(elevationStarting);
-            this->elevation();
+            if (_trackingStatus == STATUS_INCANTATION ||
+            ELEVATION_REQUIREMENT[this->_playerLevel][ELEM_PLAYER] <= 1)
+                this->elevation();
         } else if (_trackingStatus == STATUS_FREE) {
             if (this->_inventory[ELEM_FOOD] < 30)
                 this->takeAll(ELEM_FOOD);
@@ -546,6 +549,7 @@ bool ZappyAI::forward(void)
     if (this->handlePackageReception(RESPONSE_OK) != 1)
         return (false);
     this->_lookDone = false;
+    this->_messages.clear();
     return (true);
 }
 
@@ -584,6 +588,7 @@ bool ZappyAI::right(void)
         return (false);
     this->_direction = (this->_direction + 1) % TOTAL_DIRECTION;
     this->_lookDone = false;
+    this->_messages.clear();
     return (true);
 }
 
@@ -596,6 +601,7 @@ bool ZappyAI::left(void)
         return (false);
     this->_direction = (this->_direction + TOTAL_DIRECTION - 1) % TOTAL_DIRECTION;
     this->_lookDone = false;
+    this->_messages.clear();
     return (true);
 }
 
@@ -912,6 +918,8 @@ int ZappyAI::tryElevate(void)
     this->inventory();
     if (this->_inventory[ELEM_FOOD] < 5)
         return (ELEM_FOOD);
+    if (_trackingStatus == STATUS_WAITING)
+        return (-1);
     for (size_t i = 0; i < TOTAL_INVENTORY; ++i) {
         if (this->_inventory[i] < ELEVATION_REQUIREMENT[this->_playerLevel][i])
             return (i);
@@ -1018,5 +1026,4 @@ void ZappyAI::moveTo(int direction)
             this->forward();
             break;
     }
-    this->_messages.clear();
 }
