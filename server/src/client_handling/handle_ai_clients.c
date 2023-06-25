@@ -49,3 +49,29 @@ void handle_ai_clients(server_t *server, client_t *client)
         zp_server_ai_clear_protocol_struct(&command);
     }
 }
+
+void complete_ai_incantation(server_t *server)
+{
+    client_t *client = NULL;
+
+    LIST_FOREACH(client, &server->client_list, other_clients)
+        if (client->category == CATEGORY_AI && client->incantation == true)
+            complete_incantation(&server->map.tiles[client->pos.x][client->pos.y], client, server->frequency);
+}
+
+void kill_starving_ai(server_t *server)
+{
+    client_t *client = NULL;
+    struct timespec now;
+    long elapsed_time;
+
+    LIST_FOREACH(client, &server->client_list, other_clients) {
+        timespec_get(&now, TIME_UTC);
+        elapsed_time = (now.tv_sec - client->last_meal.tv_sec) * 1000
+            + (now.tv_nsec - client->last_meal.tv_nsec) / 1000000;
+        if (client->category == CATEGORY_AI && elapsed_time >= (126 / server->frequency) * 1000) {
+            client->dead = true;
+            client->data.disconnected = true;
+        }
+    }
+}

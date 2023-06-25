@@ -51,6 +51,9 @@ int set_name(server_t *server, int *index, int ac, char **av);
 int set_nclients(server_t *server, int *index, int ac, char **av);
 int set_frequency(server_t *server, int *index, int ac, char **av);
 
+void complete_ai_incantation(server_t *server);
+void kill_starving_ai(server_t *server);
+
 void remove_player_on_tile(tile_t *tile, client_t *player);
 void add_player_on_tile(tile_t *tile, client_t *player);
 
@@ -65,3 +68,4 @@ void eject(map_t *map, client_t *client);
 void take_object(tile_t *tile, client_t *client, const int resource);
 void set_object_down(tile_t *tile, client_t *client, const int resource);
 void start_incantation(tile_t *tile, client_t *client);
+void complete_incantation(tile_t *tile, client_t *client, int frequency);
