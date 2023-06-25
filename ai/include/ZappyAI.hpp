@@ -44,15 +44,24 @@ typedef enum e_playerDirection {
 } t_playerDirection;
 
 typedef enum e_messageSubject {
-    lookingForElevation,
-    waitingForElevation,
-    comingForElevation,
-    readyForElevation,
-    alreadySomeone,
-    needToGo,
-    findRessource,
-    haveRessource
+    noMessage = -1,
+    trackMe,
+    stopTrackingMe,
+    elevationStarting
 } t_messageSubject;
+
+typedef enum e_trackingStatus {
+    STATUS_FREE,
+    STATUS_WAITING,
+    STATUS_INCANTATION,
+    STATUS_TRACKING
+} t_trackingStatus;
+
+typedef struct signalData_s {
+    enum e_messageSubject subject;
+    int soundDirection;
+    int playerLevel;
+} signalData_t;
 
 class ZappyAI {
     public:
@@ -77,6 +86,7 @@ class ZappyAI {
         void uncipherStr(std::string &str);
         int handlePackageReception(enum AIResponse_e expectedResponse);
         int handlePackageReception(enum AIResponse_e expectedResponse, std::string &str);
+        void handlePackageReceptionMsg(void);
 
         void setRessourceToHave(void);
 
@@ -107,10 +117,9 @@ class ZappyAI {
 
         //Communication
         void storeMessage(std::string msg);
-        void readMessageBuffer();
-        void readMessage(std::string msg);
-        void readSignal(std::string msg, int direction);
-        bool sendSignal(int recever, int subject, int parameter);
+        void readMessageBuffer(signalData_t &signal);
+        void readMessage(std::string msg, signalData_t &signal);
+        bool sendSignal(int status);
 
         void turn180(void);
         void turnTo(enum e_playerDirection direction);
@@ -131,6 +140,7 @@ class ZappyAI {
         bool setObjectForElevation(int level);
 
         int tryElevate(void);
+        bool waitElevation(void);
 
     private:
         bool charExist(char charToCheck);
@@ -142,7 +152,6 @@ class ZappyAI {
         ZappyProtocolAI _communication;
 
         bool _alive = true;
-        int _playerId = 0;
         int _playerLevel = 1;
         int _direction = 0;
         int _inventory[TOTAL_INVENTORY];
@@ -150,11 +159,7 @@ class ZappyAI {
         std::vector<std::string> _messages;
 
         //teamplay
-        bool _ready = false;
-        bool _signaled = false;
-        bool _master = false;
-        int _friendID = -1;
-        int _playersReady = 1;
+        int _trackingStatus = STATUS_FREE;
 
         // Look data
         bool _lookDone = false;
