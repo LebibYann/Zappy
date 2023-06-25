@@ -13,96 +13,39 @@ static int get_fov_size(int player_level)
     return player_level * player_level;
 }
 
-static tile_t *get_north_tiles(map_t *map, client_t *player)
+static tile_t *get_tiles(map_t *map, client_t *player, int dx, int dy)
 {
     tile_t *fov = malloc(sizeof(tile_t) * get_fov_size(player->level));
-    int i = 1;
+    int i = 0;
 
     if (!fov)
         return NULL;
 
-    fov[0] = map->tiles[player->position.y][player->position.x];
-    for (int y = 1; y < player->level; y++) {
-        for (int x = -y; x <= y; x++) {
-            fov[i] = map->tiles[player->position.y - y][player->position.x + x];
-            i++;
+    for (int depth = 0; depth < player->level; depth++) {
+        for (int width = -depth; width <= depth; width++) {
+            int y = player->pos.y + dy * ((dx != dy) ? depth : width);
+            int x = player->pos.x + dy * ((dx != dy) ? width : depth);
+            fov[i++] = map->tiles[y][x];
         }
     }
 
     return fov;
 }
 
-static tile_t *get_east_tiles(map_t *map, client_t *player)
-{
-    tile_t *fov = malloc(sizeof(tile_t) * get_fov_size(player->level));
-    int i = 1;
-
-    if (!fov)
-        return NULL;
-
-    fov[0] = map->tiles[player->position.y][player->position.x];
-    for (int x = 1; x < player->level; x++) {
-        for (int y = -x; y <= x; y++) {
-            fov[i] = map->tiles[player->position.y + y][player->position.x + x];
-            i++;
-        }
-    }
-
-    return fov;
-}
-
-static tile_t *get_south_tiles(map_t *map, client_t *player)
-{
-    tile_t *fov = malloc(sizeof(tile_t) * get_fov_size(player->level));
-    int i = 1;
-
-    if (!fov)
-        return NULL;
-
-    fov[0] = map->tiles[player->position.y][player->position.x];
-    for (int y = 1; y < player->level; y++) {
-        for (int x = y; x >= -y; x--) {
-            fov[i] = map->tiles[player->position.y + y][player->position.x + x];
-            i++;
-        }
-    }
-
-    return fov;
-}
-
-static tile_t *get_west_tiles(map_t *map, client_t *player)
-{
-    tile_t *fov = malloc(sizeof(tile_t) * get_fov_size(player->level));
-    int i = 1;
-
-    if (!fov)
-        return NULL;
-
-    fov[0] = map->tiles[player->position.y][player->position.x];
-    for (int x = 1; x < player->level; x++) {
-        for (int y = x; y >= -x; y--) {
-            fov[i] = map->tiles[player->position.y + y][player->position.x - x];
-            i++;
-        }
-    }
-
-    return fov;
-}
-
-static tile_t *look_direction(map_t *map, client_t *player)
+static tile_t *look_orientation(map_t *map, client_t *player)
 {
     switch (player->orientation) {
     case NORTH:
-        return get_north_tiles(map, player);
+        return get_tiles(map, player, 1, -1);
         break;
     case EAST:
-        return get_east_tiles(map, player);
+        return get_tiles(map, player, 1, 1);
         break;
     case SOUTH:
-        return get_south_tiles(map, player);
+        return get_tiles(map, player, -1, 1);
         break;
     case WEST:
-        return get_west_tiles(map, player);
+        return get_tiles(map, player, -1, -1);
         break;
     default:
         return NULL;
@@ -110,18 +53,45 @@ static tile_t *look_direction(map_t *map, client_t *player)
     }
 }
 
-tile_t *look(map_t *map, client_t *player)
+static char *resource_str(int resource)
 {
-    struct timespec start, now;
-    tile_t *fov;
+    switch (resource) {
+    case FOOD:
+        return "food";
+    case LINEMATE:
+        return "linemate";
+    case DERAUMERE:
+        return "deraumere";
+    case SIBUR:
+        return "sibur";
+    case MENDIANE:
+        return "mendiane";
+    case PHIRAS:
+        return "phiras";
+    case THYSTAME:
+        return "thystame";
+    default:
+        return NULL;
+    }
+}
 
-    timespec_get(&start, TIME_UTC);
-    timespec_get(&now, TIME_UTC);
+void look_around(map_t *map, client_t *player)
+{
+    tile_t *tiles = look_orientation(map, player);
+    int nb_tiles = get_fov_size(player->level);
+    char *response = strdup("[");
 
-    fov = look_direction(map, player);
+    for (int i = 0; i < nb_tiles; i++) {
+        for (int resource = 0; resource < RESOURCES_COUNT; resource++) {
+            for (int j = 0; j < tiles[i].resources[resource]; j++) {
+                response = realloc(response, strlen(response) + strlen(resource_str(resource) + 2));
+                response = strcat(response, resource_str(resource));
+                response = strcat(response, " ");
+            }
+        }
+    }
+    response = realloc(response, strlen(response) + 3);
+    response = strcat(response, "]\n");
 
-    while (now.tv_sec - start.tv_sec < 7)
-        timespec_get(&now, TIME_UTC);
-
-    return fov;
+    zp_server_ai_send_package(&player->data, response);
 }

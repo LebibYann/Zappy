@@ -28,6 +28,8 @@ void run_server(server_t *server)
         while (zp_detect_new_connection(server->fd))
             add_new_client(server);
         handle_clients(server);
+        complete_ai_incantation(server);
+        kill_starving_ai(server);
         remove_disconnected_client(&(server->client_list));
     }
 }

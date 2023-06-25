@@ -37,12 +37,13 @@ enum resources_e {
     THYSTAME
 };
 
+struct server_s;
 struct map_s;
 
 void initialize_map(struct map_s *map, int w, int h);
 
 void allocate_map(struct map_s *map);
 
-void generate_map(struct map_s *map);
+void generate_map(struct server_s *server);
 
 void generate_resource(struct map_s *map, int resource);
