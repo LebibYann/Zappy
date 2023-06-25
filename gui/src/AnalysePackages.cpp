@@ -8,7 +8,7 @@
 #include "GameScene.hpp"
 #include <sstream>
 
-#define MAX_EVOLVE 3 - 1
+#define MAX_EVOLVE 4 - 1
 
 void getTileContent(t_gameInfo &gameInfo, t_zp_guiProtocol package)
 {

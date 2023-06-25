@@ -10,42 +10,50 @@
 
 ImageBank::ImageBank()
 {
-    _idleTexture.resize(3);
+    _idleTexture.resize(4);
     _idleTexture[0].loadFromFile("assets/idle1.png");
     _idleTexture[1].loadFromFile("assets/idle2.png");
     _idleTexture[2].loadFromFile("assets/idle3.png");
-    _idleSprites.resize(3);
+    _idleTexture[3].loadFromFile("assets/idle4.png");
+    _idleSprites.resize(4);
     _idleSprites[0].setTexture(_idleTexture[0]);
     _idleSprites[1].setTexture(_idleTexture[1]);
     _idleSprites[2].setTexture(_idleTexture[2]);
+    _idleSprites[3].setTexture(_idleTexture[3]);
 
-    _incantTexture.resize(3);
+    _incantTexture.resize(4);
     _incantTexture[0].loadFromFile("assets/incant1.png");
     _incantTexture[1].loadFromFile("assets/incant2.png");
     _incantTexture[2].loadFromFile("assets/incant3.png");
-    _incantSprites.resize(3);
+    _incantTexture[3].loadFromFile("assets/incant4.png");
+
+    _incantSprites.resize(4);
     _incantSprites[0].setTexture(_incantTexture[0]);
     _incantSprites[1].setTexture(_incantTexture[1]);
     _incantSprites[2].setTexture(_incantTexture[2]);
+    _incantSprites[3].setTexture(_incantTexture[3]);
 
-    _layingTexture.resize(3);
+    _layingTexture.resize(4);
     _layingTexture[0].loadFromFile("assets/incant1.png");
     _layingTexture[1].loadFromFile("assets/incant2.png");
     _layingTexture[2].loadFromFile("assets/incant3.png");
-
-    _layingSprites.resize(3);
+    _layingTexture[3].loadFromFile("assets/incant4.png");
+    _layingSprites.resize(4);
     _layingSprites[0].setTexture(_layingTexture[0]);
     _layingSprites[1].setTexture(_layingTexture[1]);
     _layingSprites[2].setTexture(_layingTexture[2]);
+    _layingSprites[3].setTexture(_layingTexture[3]);
 
-    _deadTexture.resize(3);
+    _deadTexture.resize(4);
     _deadTexture[0].loadFromFile("assets/dead1.png");
     _deadTexture[1].loadFromFile("assets/dead2.png");
     _deadTexture[2].loadFromFile("assets/dead3.png");
-    _deadSprites.resize(3);
+    _deadTexture[3].loadFromFile("assets/dead4.png");
+    _deadSprites.resize(4);
     _deadSprites[0].setTexture(_deadTexture[0]);
     _deadSprites[1].setTexture(_deadTexture[1]);
     _deadSprites[2].setTexture(_deadTexture[2]);
+    _deadSprites[3].setTexture(_deadTexture[3]);
 
     _eggTexture.resize(3);
     _eggTexture[0].loadFromFile("assets/egg.png");
