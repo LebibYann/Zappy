@@ -15,9 +15,9 @@
 #include <map>
 #include <string>
 
-#include "IScene.hpp"
 #include "ZappyProtocolGUI.hpp"
 #include "ImageBank.hpp"
+#include "AudioBank.hpp"
 
 typedef struct s_playerStruct {
     int id;
@@ -54,13 +54,11 @@ typedef struct s_gameInfo {
     bool gameOver;
 } t_gameInfo;
 
-class GameScene: public IScene {
+class GameScene {
 public:
     GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGUI &protocol, Client &connection, ImageBank &_imageBank);
     ~GameScene();
 
-    void loadScene();
-    void unloadScene();
     void run();
     bool setConnection(std::string ip, std::string port);
     void refreshPackages(std::vector<t_zp_guiProtocol> packages);
@@ -71,13 +69,9 @@ private:
     Client &_connection;
     ImageBank &_imageBank;
     sf::RectangleShape _tileSize;
+    AudioBank _audioBank;
+    
 
-    sf::Music _music;
-    sf::Font _font;
-    std::vector<sf::Sprite> _spriteDraw;
-    std::vector<sf::Text> _textDraw;
-    sf::Texture _personnage;
-    sf::SoundBuffer _buff_sound;
     t_gameInfo _gameInfo;
 };
 

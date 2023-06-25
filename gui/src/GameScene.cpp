@@ -33,6 +33,7 @@ GameScene::GameScene(sf::RenderWindow &window, sf::Event &event, ZappyProtocolGU
         _gameInfo.tileSizeY = tileSizeWithHeight;
     }
     _imageBank.rescaleTexture(_gameInfo.tileSizeX, _gameInfo.tileSizeY);
+    _audioBank.playMusic();
     _gameInfo.mapContent = {};
     _gameInfo.players = {};
     _gameInfo.eggs = {};
@@ -69,16 +70,6 @@ void set_text(sf::Text &text, std::string str, sf::Color color, sf::Vector2f pos
     text.setFillColor(color);
     pos.x += x;
     text.setPosition(pos);
-}
-
-void GameScene::loadScene()
-{
-    return;
-}
-
-void GameScene::unloadScene()
-{
-    _music.stop();
 }
 
 void GameScene::run()

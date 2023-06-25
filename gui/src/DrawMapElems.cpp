@@ -5,6 +5,8 @@
 ** DrawMapElems
 */
 
+#include <random>
+
 #include "GameScene.hpp"
 #include "ZappyProtocolGUI.hpp"
 
@@ -21,6 +23,8 @@ void drawGround(sf::RenderWindow &window, t_gameInfo &gameInfo, ImageBank &image
 
 void drawRss(sf::RenderWindow &window, t_gameInfo &gameInfo, ImageBank &imageBank)
 {
+    srand(time(nullptr));
+
     for (size_t i = 0; i < gameInfo.map.size(); ++i) {
         for (size_t j = 0; j < gameInfo.map[i].size(); ++j) {
             for (size_t k = 0; k < TOTAL_INVENTORY; k++){
