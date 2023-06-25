@@ -621,14 +621,14 @@ bool ZappyAI::eject(void)
 
 bool ZappyAI::elevation(void)
 {
-    std::string str;
+    std::string str("Elevation underway\n");
 
     this->_communication.sendPackage(ZP_INCANTATION);
     this->handlePackageReception(RESPONSE_OTHER);
-    // if (str.compare("Elevation underway\n") != 0)
-    //     return (false);
-    if (this->handlePackageReception(RESPONSE_OTHER, str) != 1)
-        return (false);
+    while (str.compare("Elevation underway\n") == 0)
+        if (this->handlePackageReception(RESPONSE_OTHER, str) != 1)
+            return (false);
+    std::cout << "elevation return:" << str << std::endl;
     ++(this->_playerLevel);
     if (PRINT_ACTION)
         std::cout << "Elevation success: " << this->_playerLevel << std::endl;
@@ -906,6 +906,7 @@ void ZappyAI::readSignal(std::string msg, int direction)
         else{
             moveTo(direction);
             sendSignal(_friendID, comingForElevation, _playerLevel);
+            return;
         }
     } else if (status == alreadySomeone){
         if (sender == _friendID)
