@@ -52,36 +52,36 @@ static void update_player_position(map_t *map, client_t *player)
 {
     switch (player->orientation) {
     case NORTH:
-        player->position.y = (player->position.y - 1) % map->h;
+        player->pos.y = (player->pos.y - 1) % map->h;
         break;
     case EAST:
-        player->position.x = (player->position.x + 1) % map->w;
+        player->pos.x = (player->pos.x + 1) % map->w;
         break;
     case SOUTH:
-        player->position.y = (player->position.y + 1) % map->h;
+        player->pos.y = (player->pos.y + 1) % map->h;
         break;
     case WEST:
-        player->position.x = (player->position.x - 1) % map->w;
+        player->pos.x = (player->pos.x - 1) % map->w;
         break;
     default:
         break;
     }
-    if (player->position.x < 0)
-        player->position.x = map->w - 1;
-    if (player->position.y < 0)
-        player->position.y = map->h - 1;
+    if (player->pos.x < 0)
+        player->pos.x = map->w - 1;
+    if (player->pos.y < 0)
+        player->pos.y = map->h - 1;
 }
 
 void forward(map_t *map, client_t *player)
 {
     tile_t *tile;
 
-    tile = &map->tiles[player->position.y][player->position.x];
+    tile = &map->tiles[player->pos.y][player->pos.x];
     remove_player_on_tile(tile, player);
 
     update_player_position(map, player);
 
-    tile = &map->tiles[player->position.y][player->position.x];
+    tile = &map->tiles[player->pos.y][player->pos.x];
     add_player_on_tile(tile, player);
     zp_server_ai_send_basic_package(&player->data, RESPONSE_OK);
 }

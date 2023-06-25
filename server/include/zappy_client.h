@@ -27,7 +27,7 @@ typedef struct client_s {
     t_zp_pending_data data;
     int category;
 
-    position_t position;
+    position_t pos;
     int orientation;
     int inventory[7];
     int level;

@@ -23,8 +23,8 @@ static tile_t *get_tiles(map_t *map, client_t *player, int dx, int dy)
 
     for (int depth = 0; depth < player->level; depth++) {
         for (int width = -depth; width <= depth; width++) {
-            int y = player->position.y + dy * ((dx != dy) ? depth : width);
-            int x = player->position.x + dy * ((dx != dy) ? width : depth);
+            int y = player->pos.y + dy * ((dx != dy) ? depth : width);
+            int x = player->pos.x + dy * ((dx != dy) ? width : depth);
             fov[i++] = map->tiles[y][x];
         }
     }
