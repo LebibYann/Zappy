@@ -48,6 +48,11 @@ typedef struct player_list_s {
     struct player_list_s *next;
 }   player_list_t;
 
+typedef struct egg_list_s {
+    client_t *client;
+    struct egg_list_s *next;
+}   egg_list_t;
+
 enum orientation_e {
     NORTH,
     EAST,

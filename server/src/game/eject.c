@@ -54,8 +54,7 @@ enum orientation_e orientation)
 static void send_eject_response(client_t *player,
 enum orientation_e orientation)
 {
-    switch (orientation)
-    {
+    switch (orientation) {
     case NORTH:
         zp_server_ai_send_package(&player->data, "eject: NORTH\n");
         break;
