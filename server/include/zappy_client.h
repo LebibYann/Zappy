@@ -33,10 +33,11 @@ typedef struct client_s {
     int level;
     const char *team;
     struct timespec last_meal;
+    struct timespec incantation_start;
     bool dead;
     bool incantation;
     bool egg;
-    pending_command_t pending_list[MAX_PENDING_COMMAND];
+    struct pending_command_list_s pending_list;
     LIST_ENTRY(client_s) other_clients;
 }   client_t;
 

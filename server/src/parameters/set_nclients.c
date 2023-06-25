@@ -9,15 +9,19 @@
 
 int set_nclients(server_t *server, int *index, int ac, char **av)
 {
+    int nclients = 3;
+
     if (*index >= ac){
-        fprintf(stderr,  "./server: option requires an argument -- '%s'\n", "-f");
+        fprintf(stderr,  "./server: option requires an argument -- '-c'\n");
         return (-1);
     }
-    server->nclients = atoi(av[*index]);
-    if (server->nclients < 1){
-        fprintf(stderr, "-x option only accepts integer values greater or equal to 1\n");
+    nclients = atoi(av[*index]);
+    if (nclients < 1){
+        fprintf(stderr, "-c option only accepts integer values "
+        "greater or equal to 1\n");
         return (-1);
     }
-    *index = *index + 1;
+    for (size_t i = 0; i < split_len(server->teams); ++i)
+        server->max_team_cli[i] = nclients;
     return (0);
 }

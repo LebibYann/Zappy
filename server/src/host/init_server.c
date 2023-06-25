@@ -17,7 +17,6 @@ void init_server(server_t *server)
     server->max_team_cli = malloc(sizeof(int) * split_len(server->teams));
     for (size_t i = 0; i < split_len(server->teams); ++i)
         server->max_team_cli[i] = 3;
-    server->nclients = 0;
     server->frequency = 100;
     LIST_INIT(&(server->client_list));
 }

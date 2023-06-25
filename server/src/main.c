@@ -10,7 +10,6 @@
 int main(int ac, char **av)
 {
     server_t server;
-    // struct timespec timing;
 
     init_server(&server);
     if (read_parameters(&server, ac, av) == -1)
