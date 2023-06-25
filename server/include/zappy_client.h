@@ -24,10 +24,12 @@ typedef struct position_s {
 }   position_t;
 
 typedef struct client_s {
+    struct server_s *server;
+    int fd;
     t_zp_pending_data data;
     int category;
 
-    position_t position;
+    position_t pos;
     int orientation;
     int inventory[7];
     int level;
@@ -48,11 +50,28 @@ typedef struct player_list_s {
     struct player_list_s *next;
 }   player_list_t;
 
+typedef struct egg_list_s {
+    client_t *client;
+    struct egg_list_s *next;
+}   egg_list_t;
+
 enum orientation_e {
     NORTH,
     EAST,
     SOUTH,
     WEST
+};
+
+enum sound_direction_e{
+    CENTER,
+    TOP,
+    TOP_LEFT,
+    LEFT,
+    BOTTOM_LEFT,
+    BOTTOM,
+    BOTTOM_RIGHT,
+    RIGHT,
+    TOP_RIGHT
 };
 
 client_t *new_client_struct(int fd);

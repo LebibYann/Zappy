@@ -15,6 +15,7 @@
 typedef struct tile_s {
     int resources[RESOURCES_COUNT];
     struct player_list_s *players;
+    struct egg_list_s *eggs;
 }   tile_t;
 
 typedef struct map_s {
