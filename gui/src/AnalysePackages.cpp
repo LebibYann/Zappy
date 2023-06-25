@@ -27,7 +27,7 @@ void getTeamName(t_gameInfo &gameInfo, t_zp_guiProtocol package)
     gameInfo.nbrTeams = gameInfo.teamNames.size();
 }
 
-void getPlayerInfo(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &_imageBank)
+void getPlayerInfo(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &imageBank)
 {
     t_playerStruct player;
     bool exist = false;
@@ -48,7 +48,7 @@ void getPlayerInfo(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &_i
         player.eggLaying = false;
         player.isIncanting = false;
         player.isDead = false;
-        player.sprite = _imageBank.getIdleSprite(player.level - 1);
+        player.sprite = imageBank.getIdleSprite(player.level - 1);
         gameInfo.players.push_back(player);
     }
 }
@@ -75,40 +75,42 @@ void changePlayerLvl(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &
     }
 }
 
-void playIncantationAnimation(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &_imageBank)
+void playIncantationAnimation(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &imageBank, AudioBank &audioBank)
 {
     for (size_t i = 0; i < gameInfo.players.size(); ++i) {
         if (gameInfo.players[i].id == package.args[0]) {
             gameInfo.players[i].isIncanting = true;
             int level = (gameInfo.players[i].level - 1) > MAX_EVOLVE ? MAX_EVOLVE : gameInfo.players[i].level - 1;
-            gameInfo.players[i].sprite = _imageBank.getIncantSprite(level);
+            gameInfo.players[i].sprite = imageBank.getIncantSprite(level);
+            audioBank.playSound(INCANT);
         }
     }
 }
 
-void endIncantationAnimation(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &_imageBank)
+void endIncantationAnimation(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &imageBank, AudioBank &audioBank)
 {
     for (size_t i = 0; i < gameInfo.players.size(); ++i) {
         if (gameInfo.players[i].id == package.args[0]) {
             gameInfo.players[i].isIncanting = false;
             int level = (gameInfo.players[i].level - 1) > MAX_EVOLVE ? MAX_EVOLVE : gameInfo.players[i].level - 1;
-            gameInfo.players[i].sprite = _imageBank.getIdleSprite(level);
+            gameInfo.players[i].sprite = imageBank.getIdleSprite(level);
+            audioBank.playSound(LVLUP);
         }
     }
 }
 
-void eggLaying(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &_imageBank)
+void eggLaying(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &imageBank)
 {
     for (size_t i = 0; i < gameInfo.players.size(); ++i) {
         if (gameInfo.players[i].id == package.args[0]) {
             gameInfo.players[i].eggLaying = true;
             int level = (gameInfo.players[i].level - 1) > MAX_EVOLVE ? MAX_EVOLVE : gameInfo.players[i].level - 1;
-            gameInfo.players[i].sprite = _imageBank.getLayingSprite(level);
+            gameInfo.players[i].sprite = imageBank.getLayingSprite(level);
         }
     }
 }
 
-void playerStopEggLaying(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &_imageBank)
+void playerStopEggLaying(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &imageBank)
 {
     t_eggStruct egg;
 
@@ -116,34 +118,34 @@ void playerStopEggLaying(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBa
         if (gameInfo.players[i].id == package.args[1]) {
             gameInfo.players[i].eggLaying = false;
             int level = (gameInfo.players[i].level - 1) > MAX_EVOLVE ? MAX_EVOLVE : gameInfo.players[i].level - 1;
-            gameInfo.players[i].sprite = _imageBank.getIdleSprite(level);
+            gameInfo.players[i].sprite = imageBank.getIdleSprite(level);
             egg.id = package.args[0];
             egg.x = package.args[2];
             egg.y = package.args[3];
             egg.isDead = false;
             egg.isHatching = false;
-            egg.sprite = _imageBank.getEggSprite(0);
+            egg.sprite = imageBank.getEggSprite(0);
             gameInfo.eggs.push_back(egg);
         }
     }
 }
 
-void eggConnection(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &_imageBank)
+void eggConnection(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &imageBank)
 {
     for (size_t i = 0; i < gameInfo.eggs.size(); ++i) {
         if (gameInfo.eggs[i].id == package.args[0]) {
             gameInfo.eggs[i].isHatching = true;
-            gameInfo.eggs[i].sprite = _imageBank.getEggSprite(1);
+            gameInfo.eggs[i].sprite = imageBank.getEggSprite(1);
         }
     }
 }
 
-void eggDeath(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &_imageBank)
+void eggDeath(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &imageBank)
 {
     for (size_t i = 0; i < gameInfo.eggs.size(); ++i) {
         if (gameInfo.eggs[i].id == package.args[0]) {
             gameInfo.eggs[i].isDead = true;
-            gameInfo.eggs[i].sprite = _imageBank.getEggSprite(2);
+            gameInfo.eggs[i].sprite = imageBank.getEggSprite(2);
         }
     }
 }
@@ -160,13 +162,14 @@ void playSoundCollect(t_gameInfo &gameInfo, t_zp_guiProtocol package)
     (void) package;
 }
 
-void playerDeath(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &_imageBank)
+void playerDeath(t_gameInfo &gameInfo, t_zp_guiProtocol package, ImageBank &imageBank, AudioBank &audioBank)
 {
     for (size_t i = 0; i < gameInfo.players.size(); ++i) {
         if (gameInfo.players[i].id == package.args[0]) {
             gameInfo.players[i].isDead = true;
             int level = (gameInfo.players[i].level - 1) > MAX_EVOLVE ? MAX_EVOLVE : gameInfo.players[i].level - 1;
-            gameInfo.players[i].sprite = _imageBank.getDeadSprite(level);
+            gameInfo.players[i].sprite = imageBank.getDeadSprite(level);
+            audioBank.playSound(DEATH);
             gameInfo.players[i].id = -1;
         }
     }
@@ -205,10 +208,10 @@ void GameScene::refreshPackages(std::vector<t_zp_guiProtocol> packages)
                 std::cout << "Broadcast: " << packages[i].str << std::endl;
                 break;
             case ZP_PIC:
-                playIncantationAnimation(_gameInfo, packages[i], _imageBank);
+                playIncantationAnimation(_gameInfo, packages[i], _imageBank, _audioBank);
                 break;
             case ZP_PIE:
-                endIncantationAnimation(_gameInfo, packages[i], _imageBank);
+                endIncantationAnimation(_gameInfo, packages[i], _imageBank, _audioBank);
                 break;
             case ZP_PFK:
                 eggLaying(_gameInfo, packages[i], _imageBank);
@@ -220,7 +223,7 @@ void GameScene::refreshPackages(std::vector<t_zp_guiProtocol> packages)
                 playSoundCollect(_gameInfo, packages[i]);
                 break;
             case ZP_PDI:
-                playerDeath(_gameInfo, packages[i], _imageBank);
+                playerDeath(_gameInfo, packages[i], _imageBank, _audioBank);
                 break;
             case ZP_ENW:
                 playerStopEggLaying(_gameInfo, packages[i], _imageBank);
