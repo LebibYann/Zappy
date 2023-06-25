@@ -52,7 +52,7 @@ int set_nclients(server_t *server, int *index, int ac, char **av);
 int set_frequency(server_t *server, int *index, int ac, char **av);
 
 void complete_ai_incantation(server_t *server);
-void kill_starving_ai(server_t *server);
+void food_time_ai(server_t *server);
 
 void remove_player_on_tile(tile_t *tile, client_t *player);
 void add_player_on_tile(tile_t *tile, client_t *player);
@@ -74,8 +74,9 @@ void complete_incantation(tile_t *tile, client_t *player, int frequency);
 void expulsion(server_t *server, const char *team);
 void map_content(server_t *server, client_t *client);
 void tile_content(map_t *map, client_t *client, int x, int y);
+void player_info(server_t *server, client_t *client);
 void player_position(server_t *server, client_t *client, int id);
 void player_level(server_t *server, client_t *client, int id);
 void update_map(server_t *server);
-void update_player_level(server_t *server);
-void update_player_position(server_t *server);
+void update_player_level(server_t *server, client_t *client);
+void update_player_position(server_t *server, client_t *client);

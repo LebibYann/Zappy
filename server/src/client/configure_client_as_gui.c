@@ -5,7 +5,7 @@
 ** configure_client_as_gui
 */
 
-#include "zappy_client.h"
+#include "zappy_server.h"
 
 void configure_client_as_gui(client_t *client)
 {

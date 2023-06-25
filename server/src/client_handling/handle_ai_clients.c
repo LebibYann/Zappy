@@ -9,6 +9,8 @@
 
 static int get_resource_type(char *str)
 {
+    if (str == NULL)
+        return -1;
     if (!strcmp(str, "food"))
         return FOOD;
     if (!strcmp(str, "linemate"))
@@ -60,19 +62,20 @@ void complete_ai_incantation(server_t *server)
             complete_incantation(&server->map.tiles[client->pos.x][client->pos.y], client, server->frequency);
 }
 
-void kill_starving_ai(server_t *server)
+void food_time_ai(server_t *server)
 {
     client_t *client = NULL;
     struct timespec now;
-    long elapsed_time;
+    double elapsed_time;
 
     LIST_FOREACH(client, &server->client_list, other_clients) {
         timespec_get(&now, TIME_UTC);
-        elapsed_time = (now.tv_sec - client->last_meal.tv_sec) * 1000
-            + (now.tv_nsec - client->last_meal.tv_nsec) / 1000000;
-        if (client->category == CATEGORY_AI && elapsed_time >= (126 / server->frequency) * 1000) {
-            client->dead = true;
-            client->data.disconnected = true;
+        elapsed_time = (now.tv_sec - client->last_meal.tv_sec)
+            + ((double) (now.tv_nsec - client->last_meal.tv_nsec)) / 1e9;
+        if (client->category == CATEGORY_AI && elapsed_time >= (126.0 / server->frequency)) {
+            client->dead = (client->inventory[FOOD] <= 0);
+            (client->dead) ? 0: client->inventory[FOOD]--;
+            timespec_get(&(client->last_meal), TIME_UTC);
         }
     }
 }

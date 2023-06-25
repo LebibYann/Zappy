@@ -11,7 +11,7 @@ void turn_right(client_t *player)
 {
     player->orientation = (player->orientation + 1) % 4;
     zp_server_ai_send_basic_package(&player->data, RESPONSE_OK);
-    update_player_position(player->server);
+    update_player_position(player->server, player);
 }
 
 void turn_left(client_t *player)
@@ -20,5 +20,5 @@ void turn_left(client_t *player)
     if (player->orientation < 0)
         player->orientation = 3;
     zp_server_ai_send_basic_package(&player->data, RESPONSE_OK);
-    update_player_position(player->server);
+    update_player_position(player->server, player);
 }

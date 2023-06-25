@@ -16,7 +16,7 @@
 
 int main(int ac, char **av)
 {
-    sf::RenderWindow window(sf::VideoMode(1280, 720), "Reverse");
+    sf::RenderWindow window(sf::VideoMode(1280, 720), "ZAPPY GUI");
     sf::Event event;
 
     Client connection;

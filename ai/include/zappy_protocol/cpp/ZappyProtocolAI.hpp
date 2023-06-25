@@ -54,7 +54,7 @@ class ZappyProtocolAI : public ZappyProtocol {
          ** @return int 0 on success, -1 if no data has been received,
          ** -2 if the command receive is unknown, -3 if parameters are invalid.
          */
-        int receivePackage(std::string &str);
+        int receivePackage(std::string &str, bool wait = true);
         int receivePackage(void);
 
     private:

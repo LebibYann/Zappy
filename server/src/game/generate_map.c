@@ -29,7 +29,7 @@ void generate_map(server_t *server)
 
 void allocate_map(map_t *map)
 {
-    map->tiles = malloc(sizeof(tile_t *) * map->h);
+    map->tiles = calloc(map->h, sizeof(tile_t *));
 
     if (!map->tiles)
         return;
@@ -39,6 +39,7 @@ void allocate_map(map_t *map)
         if (!map->tiles[i])
             return;
         for (int j = 0; j < map->w; j++) {
+            memset(map->tiles[i][j].resources, 0, sizeof(int) * 7);
             map->tiles[i][j].players = NULL;
             map->tiles[i][j].eggs = NULL;
         }

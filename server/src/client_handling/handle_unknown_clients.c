@@ -9,6 +9,7 @@
 
 static void send_gui_init(server_t *server, client_t *client)
 {
+    client_t *ai = NULL;
     int *items;
     t_zp_pending_data *pdata = &(client->data);
 
@@ -25,6 +26,12 @@ static void send_gui_init(server_t *server, client_t *client)
     }
     for (size_t i = 0; server->teams[i] != NULL; ++i)
         zp_gui_send_package(pdata, SERVER_SENT, ZP_TNA, server->teams[i]);
+    LIST_FOREACH(ai, &client->server->client_list, other_clients){
+        if (ai->category == CATEGORY_AI)
+            zp_gui_send_package(&client->data, SERVER_SENT,
+            ZP_PNW, ai->fd, ai->pos.x, ai->pos.y,
+            ai->orientation, ai->level, ai->team);
+    }
 }
 
 static bool is_a_team_name_match(server_t *server, client_t *client, char *line,
