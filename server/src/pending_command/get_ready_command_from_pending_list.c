@@ -19,7 +19,7 @@ t_zp_ai_to_serv_data *command, int frequency)
     if (current_tm.tv_sec > end_tm.tv_sec ||
     (current_tm.tv_sec == end_tm.tv_sec &&
     current_tm.tv_nsec >= end_tm.tv_nsec)) {
-        *command = pending_cmd->command;
+        memcpy(command, &(pending_cmd->command), sizeof(*command));
         return (true);
     }
     return (false);

@@ -11,19 +11,19 @@ static int get_resource_type(char *str)
 {
     if (str == NULL)
         return -1;
-    if (!strcmp(str, "food"))
+    if (!strncmp(str, "food", 4))
         return FOOD;
-    if (!strcmp(str, "linemate"))
+    if (!strncmp(str, "linemate", 8))
         return LINEMATE;
-    if (!strcmp(str, "deraumere"))
+    if (!strncmp(str, "deraumere", 9))
         return DERAUMERE;
-    if (!strcmp(str, "sibur"))
+    if (!strncmp(str, "sibur", 5))
         return SIBUR;
-    if (!strcmp(str, "mendiane"))
+    if (!strncmp(str, "mendiane", 8))
         return MENDIANE;
-    if (!strcmp(str, "phiras"))
+    if (!strncmp(str, "phiras", 6))
         return PHIRAS;
-    if (!strcmp(str, "thystame"))
+    if (!strncmp(str, "thystame", 8))
         return THYSTAME;
     return -1;
 }
@@ -44,12 +44,12 @@ void handle_ai_clients(server_t *server, client_t *client)
         case ZP_CONNECT_NBR:    connect_nbr(server, client); break;
         case ZP_FORK:           lay_egg(&server->map.tiles[client->pos.x][client->pos.y], client); break;
         case ZP_EJECT:          eject(&server->map, client); break;
-        case ZP_TAKE_OBJ:       take_object(&server->map.tiles[client->pos.x][client->pos.y], client, get_resource_type(command.str)); break;
-        case ZP_SET_OBJ:        set_object_down(&server->map.tiles[client->pos.x][client->pos.y], client, get_resource_type(command.str)); break;
+        case ZP_TAKE_OBJ:       take_object(server, &server->map.tiles[client->pos.x][client->pos.y], client, get_resource_type(command.str)); break;
+        case ZP_SET_OBJ:        set_object_down(server, &server->map.tiles[client->pos.x][client->pos.y], client, get_resource_type(command.str)); break;
         case ZP_INCANTATION:    start_incantation(&server->map.tiles[client->pos.x][client->pos.y], client); break;
         default:                break;
         }
-        zp_server_ai_clear_protocol_struct(&command);
+        // zp_server_ai_clear_protocol_struct(&command);
     }
 }
 

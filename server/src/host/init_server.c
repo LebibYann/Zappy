@@ -18,5 +18,6 @@ void init_server(server_t *server)
     for (size_t i = 0; i < split_len(server->teams); ++i)
         server->max_team_cli[i] = 3;
     server->frequency = 100;
+    memset(server->resource_count, 0, sizeof(int) * 7);
     LIST_INIT(&(server->client_list));
 }

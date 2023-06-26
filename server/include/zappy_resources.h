@@ -7,6 +7,7 @@
 
 #pragma once
 
+
 #define RESOURCES_COUNT 7
 
 #define FOOD_DENSITY 0.5
@@ -46,4 +47,4 @@ void allocate_map(struct map_s *map);
 
 void generate_map(struct server_s *server);
 
-void generate_resource(struct map_s *map, int resource);
+void generate_resource(struct server_s *server, struct map_s *map, int resource);

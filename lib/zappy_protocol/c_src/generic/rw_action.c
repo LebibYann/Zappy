@@ -45,7 +45,7 @@ bool *something_to_read, fd_set **sock_ptr)
         }
     }
     if (sock_ptr[1] != NULL && FD_ISSET(zp_pending_d->fd, sock_ptr[1])) {
-        if (write_action(zp_pending_d))
+        if (write_action(zp_pending_d) < 0)
             return (-3);
     }
     return (0);

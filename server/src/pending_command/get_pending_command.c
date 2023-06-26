@@ -18,9 +18,10 @@ client_t *client, t_zp_ai_to_serv_data *command)
         if (command->cmd_type == AI_CLI_COMMANDS[i].id)
             break;
     }
-    if (add_command_to_pending_list(
-    &(client->pending_list), command, AI_CLI_COMMANDS[i].tick))
+    if (!add_command_to_pending_list(
+    &(client->pending_list), command, AI_CLI_COMMANDS[i].tick)) {
         zp_server_ai_clear_protocol_struct(command);
+    }
     return (false);
 }
 

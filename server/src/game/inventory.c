@@ -7,11 +7,12 @@
 
 #include "zappy_server.h"
 
-void take_object(tile_t *tile, client_t *player, const int resource)
+void take_object(server_t *server, tile_t *tile, client_t *player, const int resource)
 {
-    if (tile->resources[resource] == 0)
+    if (resource < 0 || tile->resources[resource] == 0)
         return zp_server_ai_send_basic_package(&player->data, RESPONSE_KO);
 
+    server->resource_count[resource]--;
     tile->resources[resource]--;
     player->inventory[resource]++;
 
@@ -19,11 +20,12 @@ void take_object(tile_t *tile, client_t *player, const int resource)
     update_map(player->server);
 }
 
-void set_object_down(tile_t *tile, client_t *player, const int resource)
+void set_object_down(server_t *server, tile_t *tile, client_t *player, const int resource)
 {
     if (player->inventory[resource] == 0)
         return zp_server_ai_send_basic_package(&player->data, RESPONSE_KO);
 
+    server->resource_count[resource]++;
     tile->resources[resource]++;
     player->inventory[resource]--;
 

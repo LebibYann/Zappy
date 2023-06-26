@@ -66,8 +66,8 @@ void broadcast(server_t *server, client_t *player, const char *message);
 void connect_nbr(server_t *server, client_t *player);
 void lay_egg(tile_t *tile, client_t *player);
 void eject(map_t *map, client_t *player);
-void take_object(tile_t *tile, client_t *player, const int resource);
-void set_object_down(tile_t *tile, client_t *player, const int resource);
+void take_object(server_t *server, tile_t *tile, client_t *player, const int resource);
+void set_object_down(server_t *server, tile_t *tile, client_t *player, const int resource);
 void start_incantation(tile_t *tile, client_t *player);
 void complete_incantation(tile_t *tile, client_t *player, int frequency);
 

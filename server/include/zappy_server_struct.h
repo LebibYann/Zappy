@@ -30,6 +30,7 @@ typedef struct server_s {
     int port;
     int frequency;
     char **teams;
+    int resource_count[7];
     int *max_team_cli;
 
     struct client_list_s client_list;

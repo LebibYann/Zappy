@@ -22,7 +22,7 @@ t_zp_ai_to_serv_data *command, int tick_to_wait)
             return (false);
     }
     new_pending_cmd = new_pending_command();
-    new_pending_cmd->command = *command;
+    memcpy(&(new_pending_cmd->command), command, sizeof(*command));
     new_pending_cmd->tick_to_wait = tick_to_wait;
     new_pending_cmd->start_time.tv_sec = -1;
     if (LIST_EMPTY(pending_list))
