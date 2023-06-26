@@ -25,7 +25,6 @@ typedef struct position_s {
 
 typedef struct client_s {
     struct server_s *server;
-    int fd;
     t_zp_pending_data data;
     int category;
 

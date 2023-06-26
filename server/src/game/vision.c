@@ -7,15 +7,9 @@
 
 #include "zappy_server.h"
 
-static int get_fov_size(int player_level)
-{
-    player_level++;
-    return player_level * player_level;
-}
-
 static tile_t *get_tiles(map_t *map, client_t *player, int dx, int dy)
 {
-    tile_t *fov = malloc(sizeof(tile_t) * get_fov_size(player->level));
+    tile_t *fov = malloc(sizeof(tile_t) * GET_FOV_SIZE(player->level));
     int i = 0;
 
     if (!fov)
@@ -78,25 +72,31 @@ static char *resource_str(int resource)
     }
 }
 
+static void write_looked_item(client_t *player, tile_t *tile)
+{
+    for (int resource = 0; resource < RESOURCES_COUNT; resource++) {
+        for (int j = 0; j < tile->resources[resource]; j++) {
+            zp_write_data(&(player->data), " ", 1);
+            zp_write_data(&(player->data), resource_str(resource),
+            strlen(resource_str(resource)));
+        }
+    }
+}
+
 void look_around(map_t *map, client_t *player)
 {
     tile_t *tiles = look_orientation(map, player);
-    int nb_tiles = get_fov_size(player->level);
+    int nb_tiles = GET_FOV_SIZE(player->level);
 
-    zp_write_data(&(player->data), "[ ", 2);
+    zp_write_data(&(player->data), "[", 1);
     for (int i = 0; i < nb_tiles; i++) {
         if (i != 0)
-            zp_write_data(&(player->data), ", ", 2);
-        for (int resource = 0; resource < RESOURCES_COUNT; resource++) {
-            for (int j = 0; j < tiles[i].resources[resource]; j++) {
-                zp_write_data(&(player->data), resource_str(resource), strlen(resource_str(resource)));
-                zp_write_data(&(player->data), " ", 1);
-            }
-        }
+            zp_write_data(&(player->data), ",", 1);
+        write_looked_item(player, &tiles[i]);
         for (player_list_t *players = tiles[i].players; players; players = players->next) {
-            zp_write_data(&(player->data), "player ", 7);
+            zp_write_data(&(player->data), " player", 7);
         }
     }
-    zp_write_data(&(player->data), "]\n", 2);
+    zp_write_data(&(player->data), " ]\n", 3);
     zp_exchange_data(&(player->data), HANDLE_IGNORE, HANDLE_NO_WAIT);
 }

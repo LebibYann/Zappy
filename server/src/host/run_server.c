@@ -44,6 +44,7 @@ void run_server(server_t *server)
     while (server->run) {
         while (zp_detect_new_connection(server->fd))
             add_new_client(server);
+        handle_gui_out_command(server);
         handle_clients(server);
         refresh_map(server, &time);
         complete_ai_incantation(server);

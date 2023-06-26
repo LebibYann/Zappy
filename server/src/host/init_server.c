@@ -19,5 +19,6 @@ void init_server(server_t *server)
         server->max_team_cli[i] = 3;
     server->frequency = 100;
     memset(server->resource_count, 0, sizeof(int) * 7);
+    zp_init_pending_data_struct(&(server->gui_update_data), -1);
     LIST_INIT(&(server->client_list));
 }

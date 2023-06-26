@@ -34,6 +34,7 @@ typedef struct server_s {
     int *max_team_cli;
 
     struct client_list_s client_list;
+    t_zp_pending_data gui_update_data;
 
     map_t map;
 }   server_t;

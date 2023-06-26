@@ -91,8 +91,9 @@ void eject(map_t *map, client_t *player)
     }
     if (success) {
         zp_server_ai_send_basic_package(&player->data, RESPONSE_OK);
-        update_map(player->server);
+        send_map(&(player->server->gui_update_data), &(player->server->map));
     } else
         zp_server_ai_send_basic_package(&player->data, RESPONSE_KO);
-    update_player_position(player->server, player);
+    zp_gui_send_package(&player->data, SERVER_SENT, ZP_PPO, player->data.fd,
+    player->pos.x, player->pos.y, player->orientation);
 }

@@ -10,27 +10,18 @@
 static void send_gui_init(server_t *server, client_t *client)
 {
     client_t *ai = NULL;
-    int *items;
     t_zp_pending_data *pdata = &(client->data);
 
     zp_gui_send_package(pdata, SERVER_SENT,
         ZP_MSZ, server->map.w, server->map.h);
     zp_gui_send_package(pdata, SERVER_SENT, ZP_SGT, server->frequency);
-    for (int y = 0; y < server->map.h && server->map.tiles != NULL; ++y) {
-        for (int x = 0; x < server->map.w; ++x) {
-            items = server->map.tiles[y][x].resources;
-            zp_gui_send_package(pdata, SERVER_SENT, ZP_BCT, x, y,
-                items[LINEMATE], items[DERAUMERE], items[SIBUR],
-                items[MENDIANE], items[PHIRAS], items[THYSTAME]);
-        }
-    }
+    send_map(pdata, &(server->map));
     for (size_t i = 0; server->teams[i] != NULL; ++i)
         zp_gui_send_package(pdata, SERVER_SENT, ZP_TNA, server->teams[i]);
     LIST_FOREACH(ai, &client->server->client_list, other_clients){
         if (ai->category == CATEGORY_AI)
-            zp_gui_send_package(&client->data, SERVER_SENT,
-            ZP_PNW, ai->fd, ai->pos.x, ai->pos.y,
-            ai->orientation, ai->level, ai->team);
+            zp_gui_send_package(&client->data, SERVER_SENT, ZP_PNW, ai->data.fd,
+            ai->pos.x, ai->pos.y, ai->orientation, ai->level, ai->team);
     }
 }
 

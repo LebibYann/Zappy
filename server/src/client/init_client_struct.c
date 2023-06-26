@@ -11,7 +11,6 @@ void init_client_struct(client_t *client, int fd)
 {
     memset(client, 0, sizeof(*client));
     zp_init_pending_data_struct(&(client->data), fd);
-    client->fd = fd;
     client->category = CATEGORY_UNKNOWN;
     LIST_INIT(&(client->pending_list));
 }

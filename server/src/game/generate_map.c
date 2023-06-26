@@ -12,12 +12,14 @@ void generate_resource(server_t *server, map_t *map, int resource)
 {
     int x, y;
 
-    for (int i = 0; server->resource_count[resource] < map->w * map->h * resource_densities[resource]; i++) {
+    for (int i = 0; server->resource_count[resource] <
+    map->w * map->h * resource_densities[resource]; i++) {
         x = rand() % map->w;
         y = rand() % map->h;
 
         map->tiles[y][x].resources[resource] += 1;
         ++(server->resource_count[resource]);
+        send_tile(&(server->gui_update_data), x, y, map->tiles[y][x].resources);
     }
 }
 
@@ -25,7 +27,6 @@ void generate_map(server_t *server)
 {
     for (int resource = 0; resource < RESOURCES_COUNT; resource++)
         generate_resource(server, &server->map, resource);
-    update_map(server);
 }
 
 void allocate_map(map_t *map)

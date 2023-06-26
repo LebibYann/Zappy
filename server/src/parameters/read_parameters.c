@@ -8,13 +8,14 @@
 #include "zappy_server.h"
 
 const char *HELP =
-"USAGE: ./zappy_server -p port -x width -y height -n name1 name2 ... -c clientsNb -f freq\n\
-\tport\tis the port number\n\
-\twidth\tis the width of the world\n\
-\theight\t is the height of the world\n\
-\tnameX\tis the name of the team X\n\
-\tclientsNb\tis the number of authorized clients per team\n\
-\tfreq\tis the reciprocal of time unit for execution of actions\n";
+"USAGE: ./zappy_server -p port -x width -y height "
+"-n name1 name2 ... -c clientsNb -f freq\n"
+"\tport\tis the port number\n"
+"\twidth\tis the width of the world\n"
+"\theight\t is the height of the world\n"
+"\tnameX\tis the name of the team X\n"
+"\tclientsNb\tis the number of authorized clients per team\n"
+"\tfreq\tis the reciprocal of time unit for execution of actions\n";
 
 const parameter_t PARAMETERS[6] =
 {

@@ -20,3 +20,4 @@ void handle_clients(server_t *server);
 void handle_unknown_clients(server_t *server, client_t *client);
 void handle_gui_clients(server_t *server, client_t *client);
 void handle_ai_clients(server_t *server, client_t *client);
+void handle_gui_out_command(server_t *server);

@@ -7,30 +7,32 @@
 
 #include "zappy_server.h"
 
-void take_object(server_t *server, tile_t *tile, client_t *player, const int resource)
+void take_object(tile_t *tile, client_t *player, const int resource)
 {
-    if (resource < 0 || tile->resources[resource] == 0)
+    if (resource < 0 || tile->resources[resource] <= 0)
         return zp_server_ai_send_basic_package(&player->data, RESPONSE_KO);
 
-    server->resource_count[resource]--;
+    player->server->resource_count[resource]--;
     tile->resources[resource]--;
     player->inventory[resource]++;
 
     zp_server_ai_send_basic_package(&player->data, RESPONSE_OK);
-    update_map(player->server);
+    send_tile(&(player->server->gui_update_data),
+    player->pos.x, player->pos.y, tile->resources);
 }
 
-void set_object_down(server_t *server, tile_t *tile, client_t *player, const int resource)
+void set_object_down(tile_t *tile, client_t *player, const int resource)
 {
-    if (player->inventory[resource] == 0)
+    if (resource < 0 || player->inventory[resource] <= 0)
         return zp_server_ai_send_basic_package(&player->data, RESPONSE_KO);
 
-    server->resource_count[resource]++;
+    player->server->resource_count[resource]++;
     tile->resources[resource]++;
     player->inventory[resource]--;
 
     zp_server_ai_send_basic_package(&player->data, RESPONSE_OK);
-    update_map(player->server);
+    send_tile(&(player->server->gui_update_data),
+    player->pos.x, player->pos.y, tile->resources);
 }
 
 void inventory(client_t *player)
@@ -38,7 +40,7 @@ void inventory(client_t *player)
     char response[256] = {0};
 
     sprintf(response, "[food %d, linemate %d, deraumere %d, sibur %d, "
-"mendiane %d, phiras %d, thystame %d]\n",
+            "mendiane %d, phiras %d, thystame %d]\n",
             player->inventory[FOOD],
             player->inventory[LINEMATE], player->inventory[DERAUMERE],
             player->inventory[SIBUR], player->inventory[MENDIANE],
