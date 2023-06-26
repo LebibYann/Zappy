@@ -368,7 +368,7 @@ void ZappyAI::surviveBehaviour(void)
         sendSignal(stopTrackingMe);
     }
     _trackingStatus = STATUS_FREE;
-    while (this->_inventory[ELEM_FOOD] < 10 && this->_alive) {
+    while (this->_inventory[ELEM_FOOD] < 20 && this->_alive) {
         if (this->lookFor(ELEM_FOOD, relPos) > 0) {
             std::cout << "Relative survive START " << relPos.x << " " << relPos.y << " " << this->_direction << std::endl;
             do {
@@ -421,14 +421,10 @@ void ZappyAI::run(void)
         if (seekedItem == ELEM_FOOD)
             this->surviveBehaviour();
         this->readMessageBuffer(signalData);
-
-        std::cout << "\033[0;31m" << "MESSAGE ID " << signalData.subject << "\033[00m" << std::endl;
         if (signalData.subject != noMessage) {
-            std::cout << "\033[0;31m" << "MESSAGE RECU" << "\033[00m" << std::endl;
             if (signalData.subject == stopTrackingMe)
                 _trackingStatus = STATUS_FREE;
             if (signalData.subject == trackMe && signalData.playerLevel == this->_playerLevel) {
-                std::cout << "\033[0;31m" << "JARIV " << signalData.soundDirection << "\033[00m" << std::endl;
                 if (signalData.soundDirection == 0)
                     _trackingStatus = STATUS_WAITING;
                 else {
@@ -443,12 +439,12 @@ void ZappyAI::run(void)
             }
         } else if (seekedItem == ELEM_PLAYER) {
             this->sendSignal(trackMe);
-            std::cout << "\033[0;31m" << "VENEZ LA MIFF" << "\033[00m" << std::endl;
             _trackingStatus = STATUS_INCANTATION;
         } else if (seekedItem == TOTAL_ELEM_ON_TILE) {
             if (_trackingStatus == STATUS_INCANTATION)
                 this->sendSignal(elevationStarting);
-            this->elevation();
+            if (_trackingStatus == STATUS_INCANTATION || ELEVATION_REQUIREMENT[_playerLevel][ELEM_PLAYER] == 1)
+                this->elevation();
         } else if (_trackingStatus == STATUS_FREE) {
             if (this->_inventory[ELEM_FOOD] < 30)
                 this->takeAll(ELEM_FOOD);
@@ -693,6 +689,7 @@ bool ZappyAI::elevation(void)
     // int playForThisElevation = ELEVATION_REQUIREMENT[this->_playerLevel][ELEM_PLAYER];
     std::string str;
 
+    this->handlePackageReceptionMsg();
     this->_communication.sendPackage(ZP_INCANTATION);
     this->handlePackageReceptionElevation(RESPONSE_OTHER, str);
 
@@ -910,7 +907,7 @@ int ZappyAI::tryElevate(void)
     if (PRINT_ACTION)
         std::cout << "Try elevate" << std::endl;
     this->inventory();
-    if (this->_inventory[ELEM_FOOD] < 5)
+    if (this->_inventory[ELEM_FOOD] < 10)
         return (ELEM_FOOD);
     for (size_t i = 0; i < TOTAL_INVENTORY; ++i) {
         if (this->_inventory[i] < ELEVATION_REQUIREMENT[this->_playerLevel][i])
