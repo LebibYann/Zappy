@@ -28,8 +28,9 @@ client_t *client, t_zp_ai_to_serv_data *command)
 bool get_pending_command(client_t *client, t_zp_ai_to_serv_data *command,
 int frequency)
 {
-    if (receive_last_package(client, command))
-        return (true);
+    receive_last_package(client, command);
+    if (client->incantation)
+        return (false);
     return (get_ready_command_from_pending_list(
         &(client->pending_list), command, frequency));
 }

@@ -11,6 +11,7 @@ void init_server(server_t *server)
 {
     char *base_team_list[] = {"Team1", "Team2", "Team3", "Team4", NULL};
 
+    srand(time(NULL));
     server->port = 4242;
     initialize_map(&server->map, 10, 10);
     server->teams = split_dup(base_team_list);

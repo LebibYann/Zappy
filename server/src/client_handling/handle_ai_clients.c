@@ -33,6 +33,7 @@ void handle_ai_clients(server_t *server, client_t *client)
     t_zp_ai_to_serv_data command;
 
     zp_server_ai_init_protocol_struct(&command);
+    zp_exchange_data(&(client->data), HANDLE_IGNORE, HANDLE_NO_WAIT);
     while (get_pending_command(client, &command, server->frequency)) {
         switch (command.cmd_type) {
         case ZP_FORWARD:        forward(&server->map, client); break;
@@ -57,9 +58,13 @@ void complete_ai_incantation(server_t *server)
 {
     client_t *client = NULL;
 
-    LIST_FOREACH(client, &server->client_list, other_clients)
-        if (client->category == CATEGORY_AI && client->incantation == true)
-            complete_incantation(&server->map.tiles[client->pos.x][client->pos.y], client, server->frequency);
+    LIST_FOREACH(client, &server->client_list, other_clients) {
+        if (client->category == CATEGORY_AI && client->incantation) {
+            complete_incantation(
+                &server->map.tiles[client->pos.y][client->pos.x],
+                client, server->frequency);
+        }
+    }
 }
 
 void food_time_ai(server_t *server)

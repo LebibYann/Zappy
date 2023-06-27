@@ -11,6 +11,8 @@
 
 void configure_client_as_ai(client_t *client, const char *team)
 {
+    client->pos.x = rand() % client->server->map.w;
+    client->pos.y = rand() % client->server->map.h;
     client->category = CATEGORY_AI;
     client->level = 1;
     memset(client->inventory, 0, sizeof(int) * 7);
@@ -18,6 +20,7 @@ void configure_client_as_ai(client_t *client, const char *team)
     client->team = team;
     add_player_on_tile(&client->server->map.tiles[client->pos.y][client->pos.x],
     client);
+    client->incantation_bond = 0;
     timespec_get(&(client->last_meal), TIME_UTC);
     zp_gui_send_package(&(client->server->gui_update_data), SERVER_SENT,
         ZP_PNW, client->data.fd, client->pos.x, client->pos.y,

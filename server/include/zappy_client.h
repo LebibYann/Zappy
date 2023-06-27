@@ -37,6 +37,7 @@ typedef struct client_s {
     struct timespec incantation_start;
     bool dead;
     bool incantation;
+    int incantation_bond;
     bool egg;
     struct pending_command_list_s pending_list;
     LIST_ENTRY(client_s) other_clients;

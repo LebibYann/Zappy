@@ -73,14 +73,10 @@ void take_object(tile_t *tile, client_t *player, const int resource);
 void set_object_down(tile_t *tile, client_t *player, const int resource);
 void start_incantation(tile_t *tile, client_t *player);
 void complete_incantation(tile_t *tile, client_t *player, int frequency);
+bool verify_player_incantation(tile_t *tile, const int level);
+bool verify_stone_incantation(tile_t *tile, const int level);
+bool verify_incantation(tile_t *tile, client_t *player);
 
 void expulsion(server_t *server, const char *team);
-// void map_content(server_t *server, client_t *client);
-// void tile_content(map_t *map, client_t *client, int x, int y);
-// void player_position(server_t *server, client_t *client, int id);
-void player_level(server_t *server, client_t *client, int id);
-// void update_map(server_t *server);
-void update_player_level(server_t *server, client_t *client);
-// void update_player_position(server_t *server, client_t *client);
 void send_tile(t_zp_pending_data *pdata, int x, int y, int *items);
 void send_map(t_zp_pending_data *pdata, map_t *map);

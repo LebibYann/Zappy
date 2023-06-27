@@ -8,99 +8,80 @@
 #include "zappy_server.h"
 #include "zappy_incantations.h"
 
-static bool verify_player_incantation(tile_t *tile, const int level,
-const char *team)
+static void remove_stone(tile_t *tile, int level)
 {
-    int player_count = 0;
-    player_list_t *player_list = tile->players;
-    client_t *player = NULL;
-
-    while (player_list) {
-        player = player_list->client;
-        if (player->level >= level && strcmp(player->team, team) == 0)
-            player_count++;
-        if (player_count >= INCANTATIONS[level - 1].prerequisites[0])
-            return true;
-        player_list = player_list->next;
-    }
-
-    return false;
+    for (int stone = 1; stone < RESOURCES_COUNT; stone++)
+        tile->resources[stone] -= INCANTATIONS[level - 1].prerequisites[stone];
 }
 
-static bool verify_stone_incantation(tile_t *tile, const int level)
-{
-    int stone_count = 0;
-
-    for (int stone = 1; stone < RESOURCES_COUNT; stone++) {
-        stone_count = tile->resources[stone];
-        if (stone_count < INCANTATIONS[level - 1].prerequisites[stone])
-            return false;
-    }
-
-    return true;
-}
-
-static bool verify_incantation(tile_t *tile, client_t *player)
-{
-    const int player_level = player->level;
-
-    if (player_level >= 8){
-        fprintf(stderr, "Player %d is already level 8.\n", player->data.fd);
-        return false;
-    }
-
-    if (!verify_player_incantation(tile, player_level, player->team)) {
-        fprintf(stderr, "Player %d does not have the necessary players.\n",
-            player->data.fd);
-        return false;
-    }
-    if (!verify_stone_incantation(tile, player_level)) {
-        fprintf(stderr, "Player %d does not have the necessary stones.\n",
-            player->data.fd);
-        return false;
-    }
-
-    return true;
-}
-
-static void elevate_player(tile_t *tile, client_t *player)
+static void elevate_player(client_t *player)
 {
     char response[32];
-    for (int stone = 1; stone < RESOURCES_COUNT; stone++) {
-        tile->resources[stone] -= INCANTATIONS[player->level - 1]
-            .prerequisites[stone];
-    }
-    player->level++;
-    player->incantation = false;
+
+    (player->level)++;
     sprintf(response, "Current level: %d\n", player->level);
-    zp_server_ai_send_package(&player->data, response);
+    zp_write_data(&(player->data), response, strlen(response));
+    zp_gui_send_package(&(player->server->gui_update_data), SERVER_SENT, ZP_PLV,
+    player->data.fd, player->level);
+}
+
+static void send_incantation_result(tile_t *tile, client_t *player)
+{
+    client_t *client = NULL;
+    int bond = player->incantation_bond;
+
+    LIST_FOREACH(client, &(player->server->client_list), other_clients) {
+        if (client->category == CATEGORY_AI &&
+        client->incantation_bond == bond) {
+            client->incantation_bond = 0;
+            if (verify_stone_incantation(tile, client->level))
+                elevate_player(client);
+            else {
+                player->incantation = false;
+                zp_server_ai_send_basic_package(&(client->data), RESPONSE_KO);
+            }
+        }
+    }
 }
 
 void start_incantation(tile_t *tile, client_t *player)
 {
-    if (!verify_incantation(tile, player))
-        return;
+    int i = 1;
+    client_t *client = NULL;
 
     timespec_get(&player->incantation_start, TIME_UTC);
     player->incantation = true;
+    if (player->incantation_bond != 0 || !verify_incantation(tile, player)) {
+        zp_server_ai_send_basic_package(&(player->data), RESPONSE_KO);
+        return;
+    }
+    player->incantation_bond = rand();
+    player->incantation_bond += (player->incantation_bond == 0);
+    for (player_list_t *list = tile->players; list &&
+    i < INCANTATIONS[player->level - 1].prerequisites[0]; list = list->next) {
+        client = list->client;
+        if (client->incantation_bond == 0 && client->level == player->level) {
+            client->incantation_bond = player->incantation_bond;
+            ++i;
+            zp_server_ai_send_package(&(client->data), "Elevation underway\n");
+        }
+    }
     zp_server_ai_send_package(&player->data, "Elevation underway\n");
 }
 
 void complete_incantation(tile_t *tile, client_t *player, int frequency)
 {
+    int initial_level = player->level;
     struct timespec now;
     double elapsed_time;
-
-    if (!player->incantation)
-        return zp_server_ai_send_basic_package(&player->data, RESPONSE_KO);
 
     timespec_get(&now, TIME_UTC);
     elapsed_time = (now.tv_sec - player->incantation_start.tv_sec)
         + ((double) (now.tv_nsec - player->incantation_start.tv_nsec)) / 1e9;
-
     if (elapsed_time < (300 / frequency))
         return;
-
-    elevate_player(tile, player);
-    update_player_level(player->server, player);
+    player->incantation = false;
+    send_incantation_result(tile, player);
+    if (initial_level < player->level)
+        remove_stone(tile, initial_level);
 }
