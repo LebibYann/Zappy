@@ -19,5 +19,6 @@ void handle_gui_out_command(server_t *server)
                 zp_exchange_data(&(gui->data), HANDLE_IGNORE, HANDLE_NO_WAIT);
             }
         }
+        free(str);
     }
 }

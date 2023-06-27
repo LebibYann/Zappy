@@ -13,4 +13,5 @@ void close_server(server_t *server)
     remove_all_clients(&(server->client_list));
     split_free(server->teams);
     free(server->max_team_cli);
+    zp_clear_pending_data_struct(&(server->gui_update_data));
 }

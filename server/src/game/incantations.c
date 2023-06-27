@@ -29,17 +29,16 @@ static void send_incantation_result(tile_t *tile, client_t *player)
 {
     client_t *client = NULL;
     int bond = player->incantation_bond;
+    bool incantation_status = verify_incantation(tile, player);
 
     LIST_FOREACH(client, &(player->server->client_list), other_clients) {
         if (client->category == CATEGORY_AI &&
         client->incantation_bond == bond) {
             client->incantation_bond = 0;
-            if (verify_stone_incantation(tile, client->level))
+            if (incantation_status)
                 elevate_player(client);
-            else {
-                player->incantation = false;
+            else
                 zp_server_ai_send_basic_package(&(client->data), RESPONSE_KO);
-            }
         }
     }
 }

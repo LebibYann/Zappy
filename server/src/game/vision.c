@@ -99,4 +99,5 @@ void look_around(map_t *map, client_t *player)
     }
     zp_write_data(&(player->data), " ]\n", 3);
     zp_exchange_data(&(player->data), HANDLE_IGNORE, HANDLE_NO_WAIT);
+    free(tiles);
 }
