@@ -77,8 +77,13 @@ void food_time_ai(server_t *server)
         timespec_get(&now, TIME_UTC);
         elapsed_time = (now.tv_sec - client->last_meal.tv_sec)
             + ((double) (now.tv_nsec - client->last_meal.tv_nsec)) / 1e9;
-        if (client->category == CATEGORY_AI && elapsed_time >= (126.0 / server->frequency)) {
+        if (client->category == CATEGORY_AI && elapsed_time >=
+        (126.0 / server->frequency)) {
             client->dead = (client->inventory[FOOD] <= 0);
+            if (client->dead) {
+                zp_server_ai_send_basic_package(&(client->data), RESPONSE_DEAD);
+                client->data.disconnected = true;
+            }
             (client->dead) ? 0: client->inventory[FOOD]--;
             timespec_get(&(client->last_meal), TIME_UTC);
         }
