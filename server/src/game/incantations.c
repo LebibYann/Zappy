@@ -47,7 +47,6 @@ void start_incantation(tile_t *tile, client_t *player)
 {
     int i = 1;
     client_t *client = NULL;
-
     timespec_get(&player->incantation_start, TIME_UTC);
     player->incantation = true;
     if (player->incantation_bond != 0 || !verify_incantation(tile, player)) {

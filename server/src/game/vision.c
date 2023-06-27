@@ -93,7 +93,8 @@ void look_around(map_t *map, client_t *player)
         if (i != 0)
             zp_write_data(&(player->data), ",", 1);
         write_looked_item(player, &tiles[i]);
-        for (player_list_t *players = tiles[i].players; players; players = players->next) {
+        for (player_list_t *players = tiles[i].players; players;
+        players = players->next) {
             zp_write_data(&(player->data), " player", 7);
         }
     }

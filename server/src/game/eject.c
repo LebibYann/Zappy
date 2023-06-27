@@ -77,9 +77,8 @@ void eject(map_t *map, client_t *player)
     bool success = false;
     tile_t *tile = &map->tiles[player->pos.y][player->pos.x];
     tile_t *target_tile = get_target_tile(map, player);
-    player_list_t *tmp = tile->players;
 
-    while (tmp) {
+    for (player_list_t *tmp = tile->players; tmp; tmp = tmp->next) {
         if (tmp->client != player) {
             success = true;
             update_orientation(map, tmp->client, player->orientation);
@@ -87,7 +86,6 @@ void eject(map_t *map, client_t *player)
             add_player_on_tile(target_tile, tmp->client);
             send_eject_response(tmp->client, player->orientation);
         }
-        tmp = tmp->next;
     }
     if (success) {
         zp_server_ai_send_basic_package(&player->data, RESPONSE_OK);
